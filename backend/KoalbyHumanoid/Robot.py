@@ -134,6 +134,8 @@ class SimRobot(Robot):
         self.links = self.links_init()
         self.limbs = self.limbs_init()
         self.PID = PID(0.25,0.1,0)
+        self.imuPIDX = PID(0.5,0,1)
+        self.imuPIDZ = PID(0.5,0,1)
 
         # Placeholder need to make this set up the links
     def chain_init(self):
@@ -358,19 +360,53 @@ class SimRobot(Robot):
     def findSupportPolygon(self):
         rightAnkle = self.locate(self.motors[Joints.Right_Ankle_Joint.value])
         leftAnkle = self.locate(self.motors[Joints.Left_Ankle_Joint.value])
+        rightAnkleToSole = 
+        leftAnkleToSole = 
         rightSole = rightAnkle*rightAnkleToSole #-43.49,659.84,70.68
         leftSole = leftAnkle*leftAnkleToSole #-43.49,659.84,70.68
         rightPolyCoords = rightSole[0:3,4]
         leftPolyCoords = leftSole[0:3,4]
+        centerPoint = (rightPolyCoords+leftPolyCoords)/2
+        return centerPoint
 
     def IMUBalance(self, Xtarget, Ztarget):
-        pitch = self.get_imu_data()[0]
-        roll = self.get_imu_data()[1]
-        Xerror = math.radians(Xtarget - pitch)
-        Zerror = math.radians(Ztarget - roll)
-        self.motors[14].target += -(Xerror)
-        self.motors[10].target += (Xerror)
-        self.motors[11].target += (Zerror)
+        xRot = self.get_imu_data()[0]
+        zRot = self.get_imu_data()[1]
+        Xerror = Xtarget - xRot
+        Zerror = Ztarget - zRot
+        self.imuPIDX.setError(Xerror)
+        self.imuPIDZ.setError(Zerror)
+        newTargetX = self.imuPIDX.calculate()
+        newTargetZ = self.imuPIDZ.calculate()
+        # self.motors[14].target = -newTargetX
+        self.motors[13].target = newTargetZ
+        self.motors[10].target = newTargetX
+        # self.motors[11].target = newTargetZ
+        # print(xRot, Xerror, newTargetX)
+
+    def balanceAngleTEST(self):
+        # targetZ = 88
+        # zError = targetZ - self.CoM[2]
+        # target = 0.11
+        # self.locate(self.motors[Joints.Left_Ankle_Joint.value])*ankleL_to_sole
+        staticCoM = [-5.7919215528026395, -478.1476301728874, 77.13638385800057]
+        staticKickLoc = [93.54, -209.39, 41.53]
+        targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
+        kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
+        currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
+        thetaError = targetTheta - currTheta
+        # print(math.degrees(targetTheta), math.degrees(currTheta), thetaError, self.CoM)
+        # print(self.CoM)
+        # print(math.degrees(self.motors[22].target), math.degrees(self.motors[22].target), math.degrees(self.motors[17].target), math.degrees(self.motors[19].target))
+        self.PID.setError(thetaError)
+        newTarget = self.PID.calculate()
+        
+        self.motors[22].target = -newTarget
+        self.motors[24].target = -newTarget
+        self.motors[17].target = newTarget
+        self.motors[19].target = newTarget
+        self.IMUBalance(0, 0)
+        return thetaError
 
     def balanceAngle(self):
         # targetZ = 88
@@ -394,28 +430,6 @@ class SimRobot(Robot):
         self.motors[17].target = newTarget
         self.motors[19].target = newTarget
         self.IMUBalance(0, 0)
-        return thetaError
-    
-    def balanceZ(self):
-        self.IMUBalance()
-        # targetZ = 88
-        # zError = targetZ - self.CoM[2]
-        # target = 0.11
-        staticCoM = [-5.7919215528026395, -478.1476301728874, 77.13638385800057]
-        targetZ = staticCoM[2]
-        curZ = self.CoM[2]
-        staticKickLoc = [93.54, -209.39, 41.53]
-        targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
-        kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
-        currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
-        thetaError = targetTheta - currTheta
-        # print(math.degrees(targetTheta), math.degrees(currTheta), thetaError, self.CoM)
-        # print(self.CoM)
-        # print(math.degrees(self.motors[22].target), math.degrees(self.motors[22].target), math.degrees(self.motors[17].target), math.degrees(self.motors[19].target))
-        self.motors[22].target = -thetaError
-        self.motors[24].target = -thetaError
-        self.motors[17].target = thetaError
-        self.motors[19].target = thetaError
         return thetaError
         
     def IK(self, motor, T, thetaGuess):

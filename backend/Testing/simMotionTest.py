@@ -19,7 +19,7 @@ print("Setup Complete")
 setPoints = [[0,  0], [math.radians(-90), math.radians(-90)], [math.radians(0), math.radians(0)]]
 tj = trajPlanner.TrajPlannerNew(setPoints)
 traj = tj.getCubicTraj(10, 100)
-plotter = Plotter()
+plotter = Plotter(10, True)
 
 robot.motors[1].target = math.radians(80)
 robot.motors[6].target = math.radians(-80)
@@ -36,7 +36,7 @@ vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
 
 #robot.motors[0].target = -math.radians(90)
 simStartTime = time.time()
-while time.time() - simStartTime < 5:
+while time.time() - simStartTime < 30:
     time.sleep(0.01)
     robot.updateRobotCoM() 
     robot.IMUBalance(0,0)
