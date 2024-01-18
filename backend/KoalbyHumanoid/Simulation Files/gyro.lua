@@ -1,4 +1,3 @@
--- Accelerometer object
 function handleUI(p)
     local s=sim.getObjectSelection()
     if s and #s>0 and s[#s]==model then
@@ -54,8 +53,14 @@ function sysCall_sensing()
     local gyroData=(sim.getEulerAnglesFromMatrix(sim.getObjectMatrix(ref,-1)))
     result,force=sim.readForceSensor(sensor)
     if (result>0) then
-        accel={gyroData[1],gyroData[3],-gyroData[2],force[1]/mass,force[3]/mass,-force[2]/mass}
-        handleUI(accel)
+        data={gyroData[1],gyroData[3],-gyroData[2],force[1]/mass,force[3]/mass,-force[2]/mass}
+        handleUI(data)
+        sim.setFloatSignal('gyroX',data[1])
+        sim.setFloatSignal('gyroY',data[2])
+        sim.setFloatSignal('gyroZ',data[3])
+        sim.setFloatSignal('accelX',data[4])
+        sim.setFloatSignal('accelY',data[5])
+        sim.setFloatSignal('accelZ',data[6])
     else
         handleUI(nil)
     end
