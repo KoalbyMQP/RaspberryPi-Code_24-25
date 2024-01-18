@@ -1,13 +1,14 @@
 import sys, time, math 
 sys.path.append("./")
-from backend.Testing import initSim, initRobot, trajPlanner
-from backend.Testing import inverseKinematics as IK
+from backend.Testing import initSim, initRobot
+from backend.KoalbyHumanoid import inverseKinematics as IK
+from backend.KoalbyHumanoid import trajPlanner
 from backend.KoalbyHumanoid.Robot import Joints
-from backend.LimbTrajectories.rightLegTraj import * # Old Traj Code, see bottom comment
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 from backend.KoalbyHumanoid.Plotter import Plotter
+from backend.Simulation import sim as vrep
 
 # Edit to declare if you are testing the sim or the real robot
 isSim = True
@@ -16,16 +17,16 @@ robot, client_id = initSim.setup() if isSim else initRobot.setup()
 
 print("Setup Complete")
 
-setPoints = [[0,  0], [math.radians(-90), math.radians(-90)], [math.radians(0), math.radians(0)]]
+setPoints = [[0,  0], [math.radians(90), math.radians(-90)], [math.radians(0), math.radians(0)]]
 tj = trajPlanner.TrajPlannerNew(setPoints)
 traj = tj.getCubicTraj(10, 100)
-plotter = Plotter(10, True)
+plotter = Plotter(10, False)
 
-robot.motors[1].target = math.radians(80)
-robot.motors[6].target = math.radians(-80)
+robot.motors[1].target = (math.radians(80), 'P')
+robot.motors[6].target = (math.radians(-80), 'P')
 # robot.motors[3].target = math.radians(90)
 # robot.motors[8].target = math.radians(90)
-robot.motors[14].target = 0
+robot.motors[14].target = (0, 'P')
 # robot.motors[17].target = math.radians(90)
 # robot.motors[22].target = math.radians(90)
 
@@ -43,16 +44,8 @@ while time.time() - simStartTime < 5:
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
-while time.time() - simStartTime < 30:
-    time.sleep(0.01)
-    robot.updateRobotCoM()
-    robot.updateBalancePoint()
-    robot.IMUBalance(0,0)
-    robot.moveAllToTarget()
-    plotter.addPoint(robot.balanceAngleTEST())
-
 while True:
-    errorData = []
+    # errorData = []
     # timeData = []
     startTime = time.time()
     for point in traj:
@@ -61,17 +54,18 @@ while True:
         robot.updateRobotCoM()
         # plotting stuff
         plotter.addPoint(robot.CoM)
+        robot.balanceAngle()
         # plotting stuff
-        errorData.append(robot.balanceAngle())
+        # errorData.append(robot.balanceAngle())
         # timeData.append(time.time() - simStartTime)
         #print(robot.motors[0].prevError, robot.motors[0].effort)
         robot.moveAllToTarget()
         #print(robot.CoM)
 
         # print(point)
-        robot.motors[0].target = point[1]
+        robot.motors[0].target = (point[1], 'P')
         # robot.motors[3].target += math.radians(2)
-        robot.motors[5].target = point[2]
+        robot.motors[5].target = (point[2], 'P')
         # robot.motors[8].target += math.radians(2)
         #print(math.degrees(robot.motors[0].target))
         while time.time() - startTime < point[0]:
@@ -79,8 +73,9 @@ while True:
             robot.updateRobotCoM() 
             # plotting stuff
             plotter.addPoint(robot.CoM)
+            robot.balanceAngle()
             # plotting stuff
-            errorData.append(robot.balanceAngle())
+            # errorData.append(robot.balanceAngle())
             # timeData.append(time.time() - simStartTime)
             #print(robot.motors[0].prevError, robot.motors[0].effort)
             robot.moveAllToTarget()

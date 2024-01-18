@@ -2,7 +2,6 @@ import sys
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import SimRobot
 from backend.Simulation import sim as vrep
-#from backend.LimbTrajectories.jointVelocityControl import Joint
 
 """
 Function to connect Python to CoppeliaSim. Does not run if user is trying to connect to the real robot

@@ -7,13 +7,11 @@ import numpy as np
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
 from backend.KoalbyHumanoid.Link import RealLink, SimLink
-from backend.KoalbyHumanoid.Limb import RealLimb, SimLimb
 from backend.KoalbyHumanoid.PID import PID
-from backend.ArduinoSerial import ArduinoSerial
+from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import RealMotor, SimMotor
 from backend.Simulation import sim as vrep
-from backend.KoalbyHumanoid.Sensors.PiratedCode import Kalman_EKF as KM
-from backend.Testing import poe as poe
+from backend.KoalbyHumanoid import poe as poe
 
 global prevAngleError
 
@@ -60,7 +58,6 @@ class Robot(ABC):
         self.motors = motors
         print("Robot Created and Initialized")
         self.is_real = is_real
-        self.sys = KM.System()
         self.prevTime = time.perf_counter()
 
     def get_motor(self, key):
@@ -96,19 +93,6 @@ class Robot(ABC):
     def get_husky_lens_data(self):
         pass
 
-    def get_filtered_data(self, data):
-        # print("here")
-        w = [data[0], data[1], data[2]]  # gyro
-        dt = 1 / 50
-        a = [data[3], data[4], data[5]]  # accele
-        m = [data[6], data[7], data[8]]  # magnetometer
-        # quat rotate
-
-        self.sys.predict(w, dt)  # w = gyroscope
-        self.sys.update(a, m)  # a = acceleration, m = magnetometer
-        # return KM.getEulerAngles(self.sys.xHat[0:4])
-        return KM.getEulerAngles(data)
-
     @abstractmethod
     def open_hand(self):
         pass
@@ -134,10 +118,10 @@ class SimRobot(Robot):
         self.is_real = False
         self.chain = self.chain_init()
         self.links = self.links_init()
-        self.limbs = self.limbs_init()
         self.PID = PID(0.25,0.1,0)
         self.imuPIDX = PID(0.5,0,1)
         self.imuPIDZ = PID(0.5,0,1)
+        self.PIDVel = PID(10,0,0)
 
         # Placeholder need to make this set up the links
     def chain_init(self):
@@ -173,13 +157,6 @@ class SimRobot(Robot):
         self.motors[5].name:"base"
         }
         return chain
-    
-    def limbs_init(self):
-        limbs = list()
-        for limbsConfig in Config.limbs:
-            limb = SimLimb(limbsConfig[1])
-            limbs.append(limb)
-        return limbs
     
     def links_init(self):
         links = list()
@@ -382,26 +359,30 @@ class SimRobot(Robot):
         self.imuPIDZ.setError(Zerror)
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
-        self.motors[13].target = -newTargetZ
-        self.motors[10].target = newTargetX
+        self.motors[13].target = (-newTargetZ, 'P')
+        self.motors[10].target = (newTargetX, 'P')
 
-    def balanceAngleTEST(self):
+    def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM
+        
         # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
         # kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
         # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
         # thetaError = targetTheta - currTheta
         # self.PID.setError(thetaError)
         # newTarget = self.PID.calculate()
+
+        self.PIDVel.setError(balanceError[2])
+        newTarget = self.PIDVel.calculate()
         
-        # self.motors[22].target = -newTarget
-        # self.motors[24].target = -newTarget
-        # self.motors[17].target = newTarget
-        # self.motors[19].target = newTarget
+        self.motors[22].target = (1, 'V')
+        # self.motors[24].target = (-10, 'V')
+        self.motors[17].target = (1, 'V')
+        # self.motors[19].target = (10, 'V')
         # self.IMUBalance(0, 0)
         return balanceError
 
-    def balanceAngle(self):
+    def balanceAngleOLD(self):
         # targetZ = 88
         # zError = targetZ - self.CoM[2]
         # target = 0.11
@@ -418,10 +399,10 @@ class SimRobot(Robot):
         self.PID.setError(thetaError)
         newTarget = self.PID.calculate()
         
-        self.motors[22].target = -newTarget
-        self.motors[24].target = -newTarget
-        self.motors[17].target = newTarget
-        self.motors[19].target = newTarget
+        self.motors[22].target = (-newTarget, 'P')
+        self.motors[24].target = (-newTarget, 'P')
+        self.motors[17].target = (newTarget, 'P')
+        self.motors[19].target = (newTarget, 'P')
         self.IMUBalance(0, 0)
         return thetaError
         

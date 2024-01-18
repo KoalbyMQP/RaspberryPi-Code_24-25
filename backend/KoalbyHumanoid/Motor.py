@@ -34,7 +34,7 @@ class SimMotor(Motor):
         self.theta = None
 
         #Should we put this in a Controller Object? Then have the motor have a controller assigned to it?
-        self.target = 0
+        self.target = (0, 'P')
         self.prevTime = 0
         self.prevError = 0
         self.effort = 0
@@ -54,33 +54,41 @@ class SimMotor(Motor):
         vrep.simxSetJointTargetPosition(self.client_id, self.handle, position, vrep.simx_opmode_streaming)
         # pose_time not used -- could do something with velocity but unsure if its necessary to go through
 
-    def move(self, position="TARGET"):
-        if time.perf_counter() - self.prevTime > 0.01:
-            if position == "TARGET":
-                position = self.target
-            kP, kI, kD = self.pidGains
-            self.theta = self.get_position()
-            error = position - self.theta
-            p = error * kP
-            
-            self.errorMemoryIndex %= self.errorMemorySize
-            self.errorMemory[self.errorMemoryIndex] = error
-            i = sum(self.errorMemory) * kI
+    # def set_velocity(self, velocity):
+    #     vrep.simxSetJointTargetVelocity(self.client_id, self.handle, velocity, vrep.)
 
-            elapsedTime = time.perf_counter() - self.prevTime
-            dedt = (error - self.prevError)# / (elapsedTime - self.prevTime )
-            d = kD * dedt
-            
-            self.effort = p + i + d
-            """if(self.effort > 4):
-                self.effort = 4
-            elif(self.effort < -4):
-                self.effort = -4"""
-            #print(self.effort)
-            vrep.simxSetJointTargetVelocity(self.client_id, self.handle, self.effort, vrep.simx_opmode_streaming)
-            self.prevError = error
-            self.prevTime = time.perf_counter()
-            self.errorMemoryIndex += 1
+    def move(self, goal="TARGET"):
+        if time.perf_counter() - self.prevTime > 0.01:
+            if goal == "TARGET":
+                goal = self.target
+            if goal[1] == 'P':
+                kP, kI, kD = self.pidGains
+                self.theta = self.get_position()
+                error = goal[0] - self.theta
+                p = error * kP
+                
+                self.errorMemoryIndex %= self.errorMemorySize
+                self.errorMemory[self.errorMemoryIndex] = error
+                i = sum(self.errorMemory) * kI
+
+                elapsedTime = time.perf_counter() - self.prevTime
+                dedt = (error - self.prevError)# / (elapsedTime - self.prevTime )
+                d = kD * dedt
+                
+                self.effort = p + i + d
+                """if(self.effort > 4):
+                    self.effort = 4
+                elif(self.effort < -4):
+                    self.effort = -4"""
+                #print(self.effort)
+                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, self.effort, vrep.simx_opmode_streaming)
+                self.prevError = error
+                self.prevTime = time.perf_counter()
+                self.errorMemoryIndex += 1
+            elif goal[1] == 'V':
+                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, math.degrees(goal[0]), vrep.simx_opmode_streaming)
+            else:
+                raise Exception("Invalid goal")
 
 class RealMotor(Motor):
     def __init__(self, motor_id, angle_limit, name, serial):
