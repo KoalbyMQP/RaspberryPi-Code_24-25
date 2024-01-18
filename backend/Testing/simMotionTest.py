@@ -36,15 +36,17 @@ vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
 
 #robot.motors[0].target = -math.radians(90)
 simStartTime = time.time()
-while time.time() - simStartTime < 30:
+while time.time() - simStartTime < 10:
     time.sleep(0.01)
-    robot.updateRobotCoM() 
+    robot.updateRobotCoM()
+    robot.updateBalancePoint()
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
+    print(robot.findSupportPolygon())
 
 while True:
     errorData = []
-    timeData = []
+    # timeData = []
     startTime = time.time()
     for point in traj:
         time.sleep(0.01)
@@ -54,7 +56,7 @@ while True:
         plotter.addPoint(robot.CoM)
         # plotting stuff
         errorData.append(robot.balanceAngle())
-        timeData.append(time.time() - simStartTime)
+        # timeData.append(time.time() - simStartTime)
         #print(robot.motors[0].prevError, robot.motors[0].effort)
         robot.moveAllToTarget()
         #print(robot.CoM)
@@ -72,7 +74,7 @@ while True:
             plotter.addPoint(robot.CoM)
             # plotting stuff
             errorData.append(robot.balanceAngle())
-            timeData.append(time.time() - simStartTime)
+            # timeData.append(time.time() - simStartTime)
             #print(robot.motors[0].prevError, robot.motors[0].effort)
             robot.moveAllToTarget()
             #print(robot.locate(robot.motors[22]))

@@ -2,6 +2,7 @@ import time
 import math
 from abc import ABC, abstractmethod
 from enum import Enum
+import numpy as np
 
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
@@ -127,6 +128,7 @@ class SimRobot(Robot):
         self.motors = self.motors_init()
         self.gyro = self.gyro_init()
         self.CoM = 0
+        self.balancePoint = 0
         super().__init__(False, self.motors)
         self.primitives = []
         self.is_real = False
@@ -329,7 +331,7 @@ class SimRobot(Robot):
         thetaList.reverse()
         # print(thetaList)
         location = mr.FKinSpace(M,slist,thetaList)
-        return location[0:3,3]
+        return location
     
     def locatePolygon(self):
         slist = []
@@ -357,63 +359,53 @@ class SimRobot(Robot):
             locations.append(mr.FKinSpace(M,slist,thetaList)[0:3,3])
         return locations
     
-    def findSupportPolygon(self):
+    def updateBalancePoint(self):
         rightAnkle = self.locate(self.motors[Joints.Right_Ankle_Joint.value])
         leftAnkle = self.locate(self.motors[Joints.Left_Ankle_Joint.value])
-        rightAnkleToSole = 
-        leftAnkleToSole = 
-        rightSole = rightAnkle*rightAnkleToSole #-43.49,659.84,70.68
-        leftSole = leftAnkle*leftAnkleToSole #-43.49,659.84,70.68
-        rightPolyCoords = rightSole[0:3,4]
-        leftPolyCoords = leftSole[0:3,4]
+        rightAnkleToSole = np.array([[1,0,0,-24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
+        leftAnkleToSole = np.array([[1,0,0,24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
+        rightSole = np.matmul(rightAnkle,rightAnkleToSole)
+        leftSole = np.matmul(leftAnkle,leftAnkleToSole)
+        rightPolyCoords = rightSole[0:3,3]
+        leftPolyCoords = leftSole[0:3,3]
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
         return centerPoint
 
     def IMUBalance(self, Xtarget, Ztarget):
-        xRot = self.get_imu_data()[0]
-        zRot = self.get_imu_data()[1]
+        data = self.get_imu_data()
+        xRot = data[0]
+        zRot = data[2]
         Xerror = Xtarget - xRot
         Zerror = Ztarget - zRot
         self.imuPIDX.setError(Xerror)
         self.imuPIDZ.setError(Zerror)
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
-        # self.motors[14].target = -newTargetX
-        self.motors[13].target = newTargetZ
+        self.motors[13].target = -newTargetZ
         self.motors[10].target = newTargetX
-        # self.motors[11].target = newTargetZ
-        # print(xRot, Xerror, newTargetX)
 
     def balanceAngleTEST(self):
-        # targetZ = 88
-        # zError = targetZ - self.CoM[2]
-        # target = 0.11
-        # self.locate(self.motors[Joints.Left_Ankle_Joint.value])*ankleL_to_sole
-        staticCoM = [-5.7919215528026395, -478.1476301728874, 77.13638385800057]
-        staticKickLoc = [93.54, -209.39, 41.53]
-        targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
-        kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
-        currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
-        thetaError = targetTheta - currTheta
-        # print(math.degrees(targetTheta), math.degrees(currTheta), thetaError, self.CoM)
-        # print(self.CoM)
-        # print(math.degrees(self.motors[22].target), math.degrees(self.motors[22].target), math.degrees(self.motors[17].target), math.degrees(self.motors[19].target))
-        self.PID.setError(thetaError)
-        newTarget = self.PID.calculate()
+        balanceError = self.balancePoint - self.CoM
+        # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
+        # kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
+        # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
+        # thetaError = targetTheta - currTheta
+        # self.PID.setError(thetaError)
+        # newTarget = self.PID.calculate()
         
-        self.motors[22].target = -newTarget
-        self.motors[24].target = -newTarget
-        self.motors[17].target = newTarget
-        self.motors[19].target = newTarget
-        self.IMUBalance(0, 0)
-        return thetaError
+        # self.motors[22].target = -newTarget
+        # self.motors[24].target = -newTarget
+        # self.motors[17].target = newTarget
+        # self.motors[19].target = newTarget
+        # self.IMUBalance(0, 0)
+        return balanceError
 
     def balanceAngle(self):
         # targetZ = 88
         # zError = targetZ - self.CoM[2]
         # target = 0.11
         # self.locate(self.motors[Joints.Left_Ankle_Joint.value])*ankleL_to_sole
-        staticCoM = [-5.7919215528026395, -478.1476301728874, 77.13638385800057]
+        staticCoM = [-9.2, -487.6, 90.5]
         staticKickLoc = [93.54, -209.39, 41.53]
         targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
         kickMotorPos = self.locate(self.motors[Joints.Left_Thigh_Kick_Joint.value])
