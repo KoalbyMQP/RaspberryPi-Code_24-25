@@ -369,6 +369,7 @@ class SimRobot(Robot):
         rightPolyCoords = rightSole[0:3,3]
         leftPolyCoords = leftSole[0:3,3]
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
+        self.balancePoint = centerPoint
         return centerPoint
 
     def IMUBalance(self, Xtarget, Ztarget):
