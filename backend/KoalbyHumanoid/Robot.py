@@ -122,6 +122,8 @@ class SimRobot(Robot):
         self.imuPIDX = PID(0.5,0,1)
         self.imuPIDZ = PID(0.5,0,1)
         self.PIDVel = PID(10,0,0)
+        self.VelPIDX = PID(0.001, 0, 0)
+        self.VelPIDZ = PID(0.1825, 0, 0)
 
         # Placeholder need to make this set up the links
     def chain_init(self):
@@ -362,6 +364,18 @@ class SimRobot(Robot):
         self.motors[13].target = (-newTargetZ, 'P')
         self.motors[10].target = (newTargetX, 'P')
 
+    def VelBalance(self):
+        balanceError = self.balancePoint - self.CoM
+        Xerror = balanceError[0]
+        Zerror = balanceError[2]
+        self.VelPIDX.setError(Xerror)
+        self.VelPIDZ.setError(Zerror)
+        newTargetX = self.VelPIDX.calculate()
+        newTargetZ = self.VelPIDZ.calculate()
+        # self.motors[13].target = (-newTargetX, 'V')
+        self.motors[10].target = (newTargetZ, 'V')
+        return newTargetZ
+
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM
         
@@ -375,9 +389,11 @@ class SimRobot(Robot):
         self.PIDVel.setError(balanceError[2])
         newTarget = self.PIDVel.calculate()
         
-        self.motors[22].target = (1, 'V')
-        # self.motors[24].target = (-10, 'V')
-        self.motors[17].target = (1, 'V')
+        self.motors[10].target = (-0.000001*newTarget, 'V')
+        
+        # self.motors[22].target = (0.001*newTarget, 'V')
+        # # self.motors[24].target = (-10, 'V')
+        # self.motors[17].target = (-0.001*newTarget, 'V')
         # self.motors[19].target = (10, 'V')
         # self.IMUBalance(0, 0)
         return balanceError

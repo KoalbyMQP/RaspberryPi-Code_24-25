@@ -19,6 +19,9 @@ class Motor(ABC):
     def set_position(self, position, client_id):
         pass
 
+    @abstractmethod
+    def move(self, target="TARGET"):
+        pass
 
 class SimMotor(Motor):
     def __init__(self, motor_id, client_id, handle, pidGains, twist, M):
@@ -86,7 +89,7 @@ class SimMotor(Motor):
                 self.prevTime = time.perf_counter()
                 self.errorMemoryIndex += 1
             elif goal[1] == 'V':
-                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, math.degrees(goal[0]), vrep.simx_opmode_streaming)
+                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, goal[0], vrep.simx_opmode_streaming)
             else:
                 raise Exception("Invalid goal")
 
@@ -131,3 +134,16 @@ class RealMotor(Motor):
         """turns the compliance of a motor on or off based on a 1 or 0 input and sends this to the arduino"""
         id_bool_arr = [21, self.motor_id, toggle]
         self.arduino_serial.send_command(','.join(map(str, id_bool_arr)) + ',')
+
+    def move(self, goal="TARGET"):
+            if time.perf_counter() - self.prevTime > 0.01:
+                if goal == "TARGET":
+                    goal = self.target
+                if goal[1] == 'P':
+                    #set hurkelex position
+                    pass
+                elif goal[1] == 'V':
+                    #set hurkelex velocity
+                    pass
+                else:
+                    raise Exception("Invalid goal")
