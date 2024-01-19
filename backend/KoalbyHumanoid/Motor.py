@@ -8,8 +8,15 @@ from backend.Simulation import sim as vrep
 
 
 class Motor(ABC):
-    def __int__(self, motor_id):
+    def __init__(self, motor_id, twist, M):
         self.motor_id = motor_id
+        self.target = (0, 'P')
+        self.name = ""
+        self.theta = None
+        self.motor_id = motor_id
+
+        self.twist = twist
+        self.M = M
 
     @abstractmethod
     def get_position(self, client_id):
@@ -25,19 +32,14 @@ class Motor(ABC):
 
 class SimMotor(Motor):
     def __init__(self, motor_id, client_id, handle, pidGains, twist, M):
+        
         self.handle = handle
-        # super().__init__(self, motor_id) # idk why this doesn't work/how to make it work
-        self.motor_id = motor_id
+        super().__init__(motor_id, twist, M) # idk why this doesn't work/how to make it work
         self.pidGains = pidGains
         self.client_id = client_id
-        self.name = ""
 
-        self.twist = twist
-        self.M = M
-        self.theta = None
-
+        # Sim PID variables
         #Should we put this in a Controller Object? Then have the motor have a controller assigned to it?
-        self.target = (0, 'P')
         self.prevTime = 0
         self.prevError = 0
         self.effort = 0
