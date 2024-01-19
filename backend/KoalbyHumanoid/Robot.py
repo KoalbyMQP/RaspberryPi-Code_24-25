@@ -309,7 +309,7 @@ class SimRobot(Robot):
         slist.reverse()
         thetaList.reverse()
         # print(thetaList)
-        location = mr.FKinSpace(M,slist,thetaList)
+        location = mr.FKinSpace(M,np.transpose(slist),thetaList)
         return location
     
     def locatePolygon(self):
@@ -335,7 +335,7 @@ class SimRobot(Robot):
             slist.reverse()
             thetaList.reverse()
             # print(thetaList)
-            locations.append(mr.FKinSpace(M,slist,thetaList)[0:3,3])
+            locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
         return locations
     
     def updateBalancePoint(self):

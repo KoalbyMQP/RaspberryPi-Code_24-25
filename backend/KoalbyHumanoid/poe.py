@@ -53,7 +53,7 @@ def calcLimbCoM(motors, links):
         link = links[i]
         Slist.append(motor.twist)
         thetaList.append(motor.theta)
-        linkCoM = mr.FKinSpace(link.M, Slist, thetaList)
+        linkCoM = mr.FKinSpace(link.M, np.transpose(Slist), thetaList)
         weightX += linkCoM[0,3] * link.mass
         weightY += linkCoM[1,3] * link.mass
         weightZ += linkCoM[2,3] * link.mass
@@ -72,7 +72,7 @@ def calcLegCoM(robot, motors, links):
         link = links[i]
         Slist.append(motor.twist)
         thetaList.append(motor.theta)
-        linkCoM = mr.FKinSpace(link.M, Slist, thetaList)
+        linkCoM = mr.FKinSpace(link.M, np.transpose(Slist), thetaList)
         weightX += linkCoM[0,3] * link.mass
         weightY += linkCoM[1,3] * link.mass
         weightZ += linkCoM[2,3] * link.mass
