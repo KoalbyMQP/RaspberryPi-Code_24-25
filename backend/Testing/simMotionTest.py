@@ -1,19 +1,15 @@
 import sys, time, math 
 sys.path.append("./")
-from backend.Testing import initSim, initRobot
-from backend.KoalbyHumanoid import inverseKinematics as IK
+from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid import trajPlanner
-from backend.KoalbyHumanoid.Robot import Joints
+from backend.KoalbyHumanoid.Config import Joints
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib import style
 from backend.KoalbyHumanoid.Plotter import Plotter
-from backend.Simulation import sim as vrep
 
 # Edit to declare if you are testing the sim or the real robot
-isSim = True
+is_real = False
 
-robot, client_id = initSim.setup() if isSim else initRobot.setup()
+robot = Robot(is_real)
 
 print("Setup Complete")
 
@@ -33,8 +29,6 @@ robot.motors[14].target = (0, 'P')
 #robot.motors[17].target = math.radians(-45)
 #robot.motors[22].target = math.radians(45)
 prevTime = time.time()
-vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
-
 #robot.motors[0].target = -math.radians(90)
 
 simStartTime = time.time()
@@ -44,6 +38,7 @@ while time.time() - simStartTime < 30:
     robot.updateRobotCoM()
     robot.updateBalancePoint()
     robot.IMUBalance(0,0)
+    # robot.VelBalance()
     # print(robot.balancePoint - robot.CoM, robot.VelBalance())
     robot.moveAllToTarget()
     

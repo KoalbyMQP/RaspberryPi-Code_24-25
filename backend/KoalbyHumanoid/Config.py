@@ -1,21 +1,46 @@
 #!/usr/bin/env python3
-"""
-Motor 1 - Herkulex, Right Forearm
-Motor 2 - Herkulex, Right Upper Arm
-Motor 3 - Herkulex, Right Arm Connector
-Motor F - Herkulex, Right Shoulder
-
-Motor B - Herkulex, Left Forearm
-Motor A - Herkulex, Left Upper Arm
-Motor 6 - Herkulex, Left Arm Connector
-Motor 7 - Herkulex, Left Shoulder
-
-Motor 11 - Herkulex, Torso Double Rotation Backside
-Motor 12 - Herkulex, Torso Double Rotation Frontside
-Motor 13 - Herkluex, Abdomen
-"""
-
 '''Array of all motors for Koalby.'''
+
+from enum import Enum
+
+
+class Joints(Enum):
+    Right_Shoulder_Rotator_Joint = 0
+    Right_Shoulder_Abductor_Joint = 1
+    Right_Upper_Arm_Rotator_Joint = 2
+    Right_Elbow_Joint = 3
+    Right_Wrist_Joint = 4
+
+    # Left Arm
+    Left_Shoulder_Rotator_Joint = 5
+    Left_Shoulder_Abductor_Joint = 6
+    Left_Upper_Arm_Rotator_Joint = 7
+    Left_Elbow_Joint = 8
+    Left_Wrist_Joint = 9
+
+    # Torso
+    Lower_Torso_Front2Back_Joint = 10
+    Chest_Side2Side_Joint = 11
+    Lower_Torso_Side2Side_Joint = 12
+    Upper_Torso_Rotator_Joint = 13
+
+    # Right Leg
+    Right_Thigh_Abductor_Joint = 15
+    Right_Thigh_Rotator_Joint = 16
+    Right_Thigh_Kick_Joint = 17
+    Right_Knee_Joint = 18
+    Right_Ankle_Joint = 19
+
+    # Left Leg
+    Left_Thigh_Abductor_Joint = 20
+    Left_Thigh_Rotator_Joint = 21
+    Left_Thigh_Kick_Joint = 22
+    Left_Knee_Joint = 23
+    Left_Ankle_Joint = 24
+
+    # Head
+    Neck_Forward2Back_Joint = 25
+    Neck_Rotator_Joint = 26 
 
 links = [
 #   0          1
@@ -61,6 +86,8 @@ links = [
 ]
 
 motors = [
+#      0           1          2         3          4       5       6    7
+#   [motorID, angleLimit, motorType, jointName, realPID, simPID, twist, M]
     [15, [0, 0], 'Herk', 'RightShoulderRotator', [1,1,1], [10.0, 0, 1.0], [-1, 0, 0, 0, -76, 73], [[1, 0, 0, -93.1], [0, 1, 0, 73], [0, 0, 1, 76], [0, 0, 0, 1]]],#0
     [6, [0, 0], 'Herk', 'RightShoulderAbductor', [1,1,1], [5, 0, 1], [0, 0, 1, -73.05, -119.1, 0], [[1, 0, 0, -117.6], [0, 1, 0, 73], [0, 0, 1, 90.5], [0, 0, 0, 1]]],#1
     [10, [0, 0], 'Herk', 'RightBicep', [1,1,1], [5, 0, 1], [1, 0, 0, 0, 76.65, -72], [[1, 0, 0, -165.5], [0, 1, 0, 73], [0, 0, 1, 64.4], [0, 0, 0, 1]]],#2
