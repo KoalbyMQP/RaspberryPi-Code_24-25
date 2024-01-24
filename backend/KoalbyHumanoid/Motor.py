@@ -19,11 +19,19 @@ class Motor(ABC):
         self.M = M
 
     @abstractmethod
-    def get_position(self, client_id):
+    def get_position(self):
         pass
 
     @abstractmethod
-    def set_position(self, position, client_id):
+    def set_position(self, position):
+        pass
+
+    @abstractmethod
+    def get_velocity(self):
+        pass
+
+    @abstractmethod
+    def set_velocity(self, velocity):
         pass
 
     @abstractmethod
@@ -34,12 +42,11 @@ class SimMotor(Motor):
     def __init__(self, motor_id, client_id, handle, pidGains, twist, M):
         
         self.handle = handle
-        super().__init__(motor_id, twist, M) # idk why this doesn't work/how to make it work
+        super().__init__(motor_id, twist, M)
         self.pidGains = pidGains
         self.client_id = client_id
 
         # Sim PID variables
-        #Should we put this in a Controller Object? Then have the motor have a controller assigned to it?
         self.prevTime = 0
         self.prevError = 0
         self.effort = 0
@@ -58,6 +65,13 @@ class SimMotor(Motor):
         # ^^^ From 22-23 Team. Kept it as a mark of shame -23-24 team
         vrep.simxSetJointTargetPosition(self.client_id, self.handle, position, vrep.simx_opmode_streaming)
         # pose_time not used -- could do something with velocity but unsure if its necessary to go through
+
+    def get_velocity(self):
+        # Unimplemented
+        pass
+
+    def set_velocity(self, velocity):
+        vrep.simxSetJointTargetVelocity(self.client_id, self.handle, velocity, vrep.simx_opmode_streaming)
 
     # def set_velocity(self, velocity):
     #     vrep.simxSetJointTargetVelocity(self.client_id, self.handle, velocity, vrep.)
@@ -86,12 +100,12 @@ class SimMotor(Motor):
                 elif(self.effort < -4):
                     self.effort = -4"""
                 #print(self.effort)
-                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, self.effort, vrep.simx_opmode_streaming)
+                self.set_velocity(self.effort)
                 self.prevError = error
                 self.prevTime = time.perf_counter()
                 self.errorMemoryIndex += 1
             elif goal[1] == 'V':
-                vrep.simxSetJointTargetVelocity(self.client_id, self.handle, goal[0], vrep.simx_opmode_streaming)
+                self.set_velocity(goal[0])
             else:
                 raise Exception("Invalid goal")
 
@@ -110,7 +124,7 @@ class RealMotor(Motor):
         current_position = self.arduino_serial.read_command()
         return current_position
 
-    def set_position(self, position, client_id):
+    def set_position(self, position):
         """sends a desired motor position to the arduino"""
         position = int(position)
         id_pos_arr = [10, self.motor_id, position]
@@ -142,7 +156,7 @@ class RealMotor(Motor):
                 if goal == "TARGET":
                     goal = self.target
                 if goal[1] == 'P':
-                    #set hurkelex position
+                    self.set_position(goal[0])
                     pass
                 elif goal[1] == 'V':
                     #set hurkelex velocity
