@@ -39,14 +39,23 @@ vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
 
 simStartTime = time.time()
 
+while time.time() - simStartTime < 5:
+    time.sleep(0.01)
+    robot.updateRobotCoM()
+    robot.updateBalancePoint()
+    # robot.IMUBalance(0,0)
+    # print(robot.balancePoint - robot.CoM, robot.VelBalance())
+    robot.moveAllToTarget()
+    
 while time.time() - simStartTime < 30:
     time.sleep(0.01)
     robot.updateRobotCoM()
     robot.updateBalancePoint()
-    robot.IMUBalance(0,0)
+    # robot.IMUBalance(0,0)
+    print(robot.VelBalance())
     # print(robot.balancePoint - robot.CoM, robot.VelBalance())
     robot.moveAllToTarget()
-    
+
 while True:
     # errorData = []
     # timeData = []
