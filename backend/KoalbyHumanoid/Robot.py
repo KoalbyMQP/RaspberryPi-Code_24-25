@@ -30,13 +30,16 @@ class Robot():
 
         self.imu = IMU(self.is_real, client_id=self.client_id)
         self.CoM = 0
+        self.ang_vel = [0, 0, 0]
+        self.last_vel = [0, 0, 0]
+        self.ang_accel = [0, 0, 0]
         self.balancePoint = 0
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.5,0,1)
-        self.imuPIDZ = PID(0.5,0,1)
+        self.imuPIDX = PID(0.25,0,0.5)
+        self.imuPIDZ = PID(0.25,0,0.5)
         self.PIDVel = PID(10,0,0)
         self.VelPIDX = PID(0.01, 0, 0)
         self.VelPIDZ = PID(0.01, 0, 0)
@@ -106,18 +109,22 @@ class Robot():
     def sim_motors_init(self):
         motors = list()
         for motorConfig in Config.motors:
-            #if motorConfig[0] == 19: ## Motor does not exist in CoppeliaSim but does exist in Config.py. I am hesitant to delete it, so this is a bandaid fix. -Scott
-            #    continue
-            handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)[1]
+            print("Beginning to stream", motorConfig[3])
+
+            res, handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)
+            if res != vrep.simx_return_ok:
+                print("FAILED", res, handle)
+                continue
+            
             vrep.simxSetObjectFloatParameter(self.client_id, handle, vrep.sim_shapefloatparam_mass, 1, vrep.simx_opmode_blocking)
             motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], client_id=self.client_id, handle=handle)
             # setattr(SimRobot, motorConfig[3], motor)
 
             #Sets each motor to streaming opmode
-            print("Beginning to stream ", motor.motor_id)
             res = vrep.simx_return_novalue_flag
             while res != vrep.simx_return_ok:
-                res = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)[0]
+                res, data = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)
+            
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
             motors.append(motor)
@@ -180,7 +187,7 @@ class Robot():
         torsoMass = 434.67
         rightLegMass = 883.81
         leftLegMass = 889.11
-        massSum = rightArmMass+leftArmMass+torsoMass+chestMass
+        massSum = self.mass
         CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
         CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
         CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
@@ -213,7 +220,7 @@ class Robot():
         linkList = [self.links[20], self.links[21], self.links[22], self.links[23], self.links[24]]
         #print(poe.calcLegCoM(self, motorList))
         return poe.calcLegCoM(self, motorList, linkList)
-
+      
     def locate(self, motor):
         slist = []
         thetaList = []
@@ -312,9 +319,9 @@ class Robot():
         self.VelPIDZ.setError(Zerror)
         newTargetX = self.VelPIDX.calculate()
         newTargetZ = self.VelPIDZ.calculate()
-        # self.motors[13].target = (-newTargetX, 'V')
-        self.motors[10].target = (newTargetZ, 'V')
-        return newTargetZ
+        self.motors[13].target = (newTargetX, 'V')
+        # self.motors[10].target = (newTargetZ, 'V')
+        return (balanceError[2], newTargetX)
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM
