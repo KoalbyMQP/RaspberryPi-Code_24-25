@@ -1,5 +1,10 @@
+--lua
+
+sim=require'sim'
+simUI=require'simUI'
+
 function handleUI(p)
-    local s=sim.getObjectSelection()
+    local s=sim.getObjectSel()
     if s and #s>0 and s[#s]==model then
         if not ui then
             local xml =[[<ui title="Gyro/Accel Sensor" closeable="false" placement="relative" position="50,-50" layout="form">
@@ -16,6 +21,7 @@ function handleUI(p)
                     <label text="z accel:" />
                     <label id="6" text="-" />
             </ui>]]
+            ui=simUI.create(xml)
             ui=simUI.create(xml)
         end
         if p then
@@ -42,11 +48,11 @@ function handleUI(p)
 end
 
 function sysCall_init() 
-    model=sim.getObjectHandle(sim.handle_self)
-    massObject=sim.getObjectHandle('Accelerometer_mass')
-    sensor=sim.getObjectHandle('Accelerometer_forceSensor')
+    model=sim.getObject('.')
+    massObject=sim.getObject('./mass')
+    sensor=sim.getObject('./forceSensor')
     mass=sim.getObjectFloatParam(massObject,sim.shapefloatparam_mass)
-    ref=sim.getObjectHandle('Accelerometer_reference')
+    ref=sim.getObject('./reference')
 end
 
 function sysCall_sensing() 
