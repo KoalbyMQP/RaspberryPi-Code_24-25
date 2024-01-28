@@ -16,7 +16,7 @@ class Motor():
 
         if is_real:
             self.angle_limit = angle_limit
-            self.serial = serial
+            self.arduino_serial = serial
         else:
             self.pidGains = pidGains
             self.client_id = client_id
@@ -28,15 +28,15 @@ class Motor():
 
     def get_position(self):
         if self.is_real:
-            self.arduino_serial.send_command_arr([5, self.motor_id])
-            current_position = self.arduino_serial.read_command()
+            self.arduino_serial.send_command(f"5 {self.motor_id}")
+            current_position = self.arduino_serial.read_float()
         else:
             current_position = vrep.simxGetJointPosition(self.client_id, self.handle, vrep.simx_opmode_buffer)[1]
         return current_position
     
-    def set_position(self, position):
+    def set_position(self, position, time=1000):
         if self.is_real:
-            self.arduino_serial.send_command_arr([10, self.motor_id, position])
+            self.arduino_serial.send_command(f"10 {self.motor_id} {position} {time}")
         else:
             """sends a desired motor position to the Simulation"""
             self.theta = self.get_position()
@@ -44,18 +44,11 @@ class Motor():
             self.simMovePID.setError(error)
             self.effort = self.simMovePID.calculate()
             self.set_velocity(self.effort)
-            
-    def set_position_time(self, position, time):
-        if self.is_real:
-            """sends a desired motor position to the arduino <to be executed in a set amount of time>"""
-            self.arduino_serial.send_command_arr([11, self.motor_id, position, time])
-        else:
-            raise NotImplementedError("set_position_time is not supported in simulation")
 
     def set_torque(self, on):
         if self.is_real:
             """sets the torque of the motor on or off based on the 'on' param"""
-            self.arduino_serial.send_command_arr([20, self.motor_id, int(on)])
+            self.arduino_serial.send_command(f"20 {self.motor_id} {int(on)}")
         else:
             raise NotImplementedError("set_torque in simulation motor not implemented")
 
@@ -64,7 +57,7 @@ class Motor():
 
     def set_velocity(self, velocity):
         if self.is_real:
-            self.arduino_serial.send_command_arr([40, self.motor_id, velocity])
+            self.arduino_serial.send_command(f"40 {self.motor_id} {velocity}")
         else:
             vrep.simxSetJointTargetVelocity(self.client_id, self.handle, velocity, vrep.simx_opmode_streaming)
 

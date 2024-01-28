@@ -32,7 +32,6 @@ class Robot():
         self.CoM = 0
         self.balancePoint = 0
         self.primitives = []
-        self.is_real = False
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
@@ -46,8 +45,7 @@ class Robot():
 
     def arduino_serial_init(self):
         self.arduino_serial = ArduinoSerial()
-        self.arduino_serial.send_command('1')  # This initializes the robot with all the initial motor positions
-        time.sleep(2)
+        self.initHomePos() # This initializes the robot with all the initial motor positions
 
     def init_sim(self):
         vrep.simxFinish(-1)  # just in case, close all opened connections
@@ -104,12 +102,6 @@ class Robot():
             link = Link(linksConfig[0], linksConfig[1])
             links.append(link)
         return links
-    
-    def motors_init(self):
-        if self.is_real:
-            return self.real_motors_init()
-        else:
-            return self.sim_motors_init()
 
     def sim_motors_init(self):
         motors = list()
@@ -140,10 +132,16 @@ class Robot():
     
     # Motor Control Methods
 
-    def get_motor(self, key):
+    def getMotor(self, key):
         for motor in self.motors:
             if motor.motor_id == key:
                 return motor
+
+    def moveTo(self, motor, position):
+        motor.move(position)
+        
+    def moveToTarget(self, motor):
+        motor.move(motor.target)
 
     def moveAllTo(self, position):
         for motor in self.motors:
@@ -153,14 +151,19 @@ class Robot():
         for motor in self.motors:
             motor.move(motor.target)
 
+    def initHomePos(self):
+        if self.is_real:
+            self.arduino_serial.send_command("1")
+            time.sleep(2)
+
     def readBatteryLevel(self):
         if self.is_real:
-            self.arduino_serial.send_command(30)
-            return self.arduino_serial.read_command()
+            self.arduino_serial.send_command("30")
+            return self.arduino_serial.read_float()
 
     def shutdown(self):
         if self.is_real:
-            self.arduino_serial.send_command(100)
+            self.arduino_serial.send_command("100")
             
     # Controls/Kinematics/Dynamics methods
 
