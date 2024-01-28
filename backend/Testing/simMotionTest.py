@@ -32,15 +32,15 @@ prevTime = time.time()
 #robot.motors[0].target = -math.radians(90)
 
 ##Robot Motor Positions to hold the cart
-robot.motors[0].target = (30, 'P')
-robot.motors[3].target = (60, 'P')
+# robot.motors[0].target = (30, 'P')
+# robot.motors[3].target = (60, 'P')
 
 simStartTime = time.time()
 while time.time() - simStartTime < 30:
     time.sleep(0.01)
-    # robot.updateRobotCoM()
-    # robot.updateBalancePoint()
-    robot.IMUBalance(0,0)
+    robot.updateRobotCoM()
+    robot.updateBalancePoint()
+    # robot.IMUBalance(0,0)
     # print(robot.balancePoint - robot.CoM, robot.VelBalance())
     robot.moveAllToTarget()
     # robot.calcZMP()

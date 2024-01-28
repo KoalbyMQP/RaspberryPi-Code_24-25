@@ -1,9 +1,9 @@
-from backend.Simulation import sim as vrep
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
 class IMU():
-    def __init__(self, isReal, client_id=None):
+    def __init__(self, isReal, sim=None):
         self.isReal = isReal
-        self.client_id = client_id
+        self.sim = sim
 
     def getData(self):
         if self.isReal:
@@ -11,11 +11,10 @@ class IMU():
             #self.data = ???
             pass
         else:
-            self.data = [vrep.simxGetFloatSignal(self.client_id, "gyroX", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "gyroY", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "accelX", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "accelY", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "accelZ", vrep.simx_opmode_buffer)[1]]
-
+            self.data = [self.sim.getFloatSignal("gyroX"),
+                    self.sim.getFloatSignal("gyroY"),
+                    self.sim.getFloatSignal("gyroZ"),
+                    self.sim.getFloatSignal("accelX"),
+                    self.sim.getFloatSignal("accelY"),
+                    self.sim.getFloatSignal("accelZ")]
         return self.data

@@ -9,7 +9,7 @@ from backend.KoalbyHumanoid.Link import Link
 from backend.KoalbyHumanoid.PID import PID
 from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
-from backend.Simulation import sim as vrep
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
 
@@ -20,15 +20,18 @@ class Robot():
     def __init__(self, is_real):
         self.is_real = is_real
         if self.is_real:
+            self.client = None
+            self.sim = None
             self.client_id = None
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
         else:
+            self.client = RemoteAPIClient()
+            self.sim = self.client.require('sim')
             self.client_id = self.init_sim()
             self.motors = self.sim_motors_init()
-            self.start_sim()
 
-        self.imu = IMU(self.is_real, client_id=self.client_id)
+        self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = 0
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
@@ -43,7 +46,7 @@ class Robot():
         self.PIDVel = PID(10,0,0)
         self.VelPIDX = PID(0.01, 0, 0)
         self.VelPIDZ = PID(0.01, 0, 0)
-
+        self.sim.startSimulation()
         print("Robot Created and Initialized")
 
     def arduino_serial_init(self):
@@ -51,20 +54,8 @@ class Robot():
         self.initHomePos() # This initializes the robot with all the initial motor positions
 
     def init_sim(self):
-        vrep.simxFinish(-1)  # just in case, close all opened connections
-        client_id = vrep.simxStart('127.0.0.1', 19997, True, True, -500000, 5)
-        # client_id = vrep.simxStartSimulation(client_id, vrep.simx_opmode_oneshot_wait)
-        if client_id != -1:
-            print("Connected to remote API server")
-            #vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
-            #vrep.simxPauseSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
-        else:
-            sys.exit("Not connected to remote API server")
-        return client_id
-
-    def start_sim(self):
-        vrep.simxStartSimulation(self.client_id, operationMode=vrep.simx_opmode_oneshot)
-
+        # self.sim.stopSimulation()  # just in case, close all opened connections
+        yield()
     def chain_init(self):
         chain = {
             self.motors[24].name:self.motors[23],
@@ -110,21 +101,8 @@ class Robot():
         motors = list()
         for motorConfig in Config.motors:
             print("Beginning to stream", motorConfig[3])
-
-            res, handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)
-            if res != vrep.simx_return_ok:
-                print("FAILED", res, handle)
-                continue
-            
-            vrep.simxSetObjectFloatParameter(self.client_id, handle, vrep.sim_shapefloatparam_mass, 1, vrep.simx_opmode_blocking)
-            motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], client_id=self.client_id, handle=handle)
-            # setattr(SimRobot, motorConfig[3], motor)
-
-            #Sets each motor to streaming opmode
-            res = vrep.simx_return_novalue_flag
-            while res != vrep.simx_return_ok:
-                res, data = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)
-            
+            handle = self.sim.getObject("/" + motorConfig[3])
+            motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], sim=self.sim, handle=handle)
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
             motors.append(motor)
@@ -187,7 +165,7 @@ class Robot():
         torsoMass = 434.67
         rightLegMass = 883.81
         leftLegMass = 889.11
-        massSum = self.mass
+        massSum = rightArmMass+leftArmMass+torsoMass+chestMass
         CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
         CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
         CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
@@ -300,6 +278,7 @@ class Robot():
 
     def IMUBalance(self, Xtarget, Ztarget):
         data = self.imu.getData()
+        # print(data)
         xRot = data[0]
         zRot = data[2]
         Xerror = Xtarget - xRot
