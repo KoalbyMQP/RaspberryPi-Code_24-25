@@ -3,7 +3,6 @@ import numpy as np
 import math
 import sys
 sys.path.append("./")
-from backend.KoalbyHumanoid import Config
 
 def rodriguez(twist, theta):
     # R = I + sin(theta) * [w] + (1-cos(theta)) * [w]^2
