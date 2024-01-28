@@ -79,11 +79,6 @@ class SimMotor(Motor):
                 d = kD * dedt
                 
                 self.effort = p + i + d
-                """if(self.effort > 4):
-                    self.effort = 4
-                elif(self.effort < -4):
-                    self.effort = -4"""
-                #print(self.effort)
                 vrep.simxSetJointTargetVelocity(self.client_id, self.handle, self.effort, vrep.simx_opmode_streaming)
                 self.prevError = error
                 self.prevTime = time.perf_counter()

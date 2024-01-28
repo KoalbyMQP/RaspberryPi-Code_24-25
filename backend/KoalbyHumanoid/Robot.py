@@ -174,18 +174,22 @@ class SimRobot(Robot):
     def motors_init(self):
         motors = list()
         for motorConfig in Config.motors:
-            #if motorConfig[0] == 19: ## Motor does not exist in CoppeliaSim but does exist in Config.py. I am hesitant to delete it, so this is a bandaid fix. -Scott
-            #    continue
-            handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)[1]
+            print("Beginning to stream", motorConfig[3])
+
+            res, handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)
+            if res != vrep.simx_return_ok:
+                print("FAILED", res, handle)
+                continue
+            
             vrep.simxSetObjectFloatParameter(self.client_id, handle, vrep.sim_shapefloatparam_mass, 1, vrep.simx_opmode_blocking)
             motor = SimMotor(motorConfig[0], self.client_id, handle, motorConfig[5], motorConfig[6], motorConfig[7])
             setattr(SimRobot, motorConfig[3], motor)
 
             #Sets each motor to streaming opmode
-            print("Beginning to stream ", motor.motor_id)
             res = vrep.simx_return_novalue_flag
             while res != vrep.simx_return_ok:
-                res = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)[0]
+                res, data = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)
+            
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
             motors.append(motor)
