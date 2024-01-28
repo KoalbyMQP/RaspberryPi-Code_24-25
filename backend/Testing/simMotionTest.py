@@ -37,16 +37,20 @@ vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
 
 #robot.motors[0].target = -math.radians(90)
 
-simStartTime = time.time()
+##Robot Motor Positions to hold the cart
+robot.motors[0].target = (30, 'P')
+robot.motors[3].target = (60, 'P')
 
-while time.time() - simStartTime < 5:
+simStartTime = time.time()
+while time.time() - simStartTime < 30:
     time.sleep(0.01)
-    robot.updateRobotCoM()
-    robot.updateBalancePoint()
-    # robot.IMUBalance(0,0)
+    # robot.updateRobotCoM()
+    # robot.updateBalancePoint()
+    robot.IMUBalance(0,0)
     # print(robot.balancePoint - robot.CoM, robot.VelBalance())
     robot.moveAllToTarget()
-    
+    # robot.calcZMP()
+
 while time.time() - simStartTime < 30:
     time.sleep(0.01)
     robot.updateRobotCoM()

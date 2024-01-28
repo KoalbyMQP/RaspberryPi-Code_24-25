@@ -111,7 +111,11 @@ class SimRobot(Robot):
         self.client_id = client_id
         self.motors = self.motors_init()
         self.gyro = self.gyro_init()
+        self.mass = 3873.96
         self.CoM = 0
+        self.ang_vel = [0, 0, 0]
+        self.last_vel = [0, 0, 0]
+        self.ang_accel = [0, 0, 0]
         self.balancePoint = 0
         super().__init__(False, self.motors)
         self.primitives = []
@@ -192,9 +196,14 @@ class SimRobot(Robot):
         vrep.simxGetFloatSignal(self.client_id, "gyroX", vrep.simx_opmode_streaming)[1]
         vrep.simxGetFloatSignal(self.client_id, "gyroY", vrep.simx_opmode_streaming)[1]
         vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_streaming)[1]
-        res = vrep.simx_return_novalue_flag
-        while res != vrep.simx_return_ok:
-            res = vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_streaming)[1]
+        vrep.simxGetFloatSignal(self.client_id, "accelX", vrep.simx_opmode_streaming)[1]
+        vrep.simxGetFloatSignal(self.client_id, "accelY", vrep.simx_opmode_streaming)[1]
+        vrep.simxGetFloatSignal(self.client_id, "accelZ", vrep.simx_opmode_streaming)[1]
+
+        #Angular Velocity Sensor
+        vrep.simxGetFloatSignal(self.client_id, "angVelX", vrep.simx_opmode_streaming)[1]
+        vrep.simxGetFloatSignal(self.client_id, "angVelY", vrep.simx_opmode_streaming)[1]
+        vrep.simxGetFloatSignal(self.client_id, "angVelZ", vrep.simx_opmode_streaming)[1]
 
 
     def update_motors(self, pose_time_millis, motor_positions_dict):
@@ -220,7 +229,7 @@ class SimRobot(Robot):
         torsoMass = 434.67
         rightLegMass = 883.81
         leftLegMass = 889.11
-        massSum = rightArmMass+leftArmMass+torsoMass+chestMass
+        massSum = self.mass
         CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
         CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
         CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
@@ -258,10 +267,19 @@ class SimRobot(Robot):
     def shutdown(self):
         vrep.simxStopSimulation(self.client_id, vrep.simx_opmode_oneshot)
 
+    def get_angVelocity(self):
+        data = [vrep.simxGetFloatSignal(self.client_id, "angVelX", vrep.simx_opmode_buffer)[1],
+                vrep.simxGetFloatSignal(self.client_id, "angVelY", vrep.simx_opmode_buffer)[1],
+                vrep.simxGetFloatSignal(self.client_id, "angVelZ", vrep.simx_opmode_buffer)[1]]
+        return data
+
     def get_imu_data(self):
         data = [vrep.simxGetFloatSignal(self.client_id, "gyroX", vrep.simx_opmode_buffer)[1],
                 vrep.simxGetFloatSignal(self.client_id, "gyroY", vrep.simx_opmode_buffer)[1],
-                vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_buffer)[1]]
+                vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_buffer)[1],
+                vrep.simxGetFloatSignal(self.client_id, "accelX", vrep.simx_opmode_buffer)[1],
+                vrep.simxGetFloatSignal(self.client_id, "accelY", vrep.simx_opmode_buffer)[1],
+                vrep.simxGetFloatSignal(self.client_id, "accelZ", vrep.simx_opmode_buffer)[1]]
         # have to append 1 for magnetometer data because there isn't one in CoppeliaSim
         return data
 
@@ -440,6 +458,32 @@ class SimRobot(Robot):
         eomg = 0.01
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
+    
+    def calc_angularAcceleration(self):
+        t = 0.01
+        self.ang_vel = self.get_angVelocity()
+        if(self.ang_vel == self.last_vel):
+            return self.ang_accel
+        ang_accelX = (self.ang_vel[0] - self.last_vel[0]) / t
+        ang_accelY = (self.ang_vel[1] - self.last_vel[1]) / t
+        ang_accelZ = (self.ang_vel[2] - self.last_vel[2]) / t
+
+        self.last_vel = self.ang_vel
+        self.ang_accel = [ang_accelX, ang_accelY, ang_accelZ]
+        return self.ang_accel
+
+    def calcZMP(self):
+        mass = self.mass / 1000 #convert mass to kg
+
+        imuData = self.get_imu_data()
+        accel = [imuData[3], imuData[4], imuData[5]]
+        Fx = mass * accel[0]
+        Fy = mass * accel[1]
+        Fz = mass * accel[2]
+
+        print(self.calc_angularAcceleration())
+
+        return [Fx, Fy, Fz]
         
 
 
@@ -490,6 +534,7 @@ class RealRobot(Robot):
 
     def shutdown(self):
         self.arduino_serial.send_command('100')
+
 
     def get_imu_data(self):
         data = []
