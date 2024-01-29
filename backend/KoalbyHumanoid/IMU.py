@@ -1,9 +1,9 @@
-from backend.Simulation import sim as vrep
-
 class IMU():
     def __init__(self, isReal, client_id=None):
         self.isReal = isReal
         self.client_id = client_id
+        if not isReal:
+            from backend.Simulation import sim as vrep
 
     def getData(self):
         if self.isReal:

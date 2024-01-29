@@ -1,7 +1,6 @@
 """The Motor class hold all information for an abstract motor on the physical robot. It is used to interface with the
 arduino which directly controls the motors"""
 import time
-from backend.Simulation import sim as vrep
 from backend.KoalbyHumanoid.PID import PID
 
 class Motor():
@@ -18,6 +17,7 @@ class Motor():
             self.angle_limit = angle_limit
             self.arduino_serial = serial
         else:
+            from backend.Simulation import sim as vrep
             self.pidGains = pidGains
             self.client_id = client_id
             self.handle = handle
