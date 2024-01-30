@@ -1,5 +1,5 @@
 import adafruit_bno055
-import numpy
+import numpy as np
 import math
 from backend.Simulation import sim as vrep
 
@@ -16,18 +16,24 @@ class IMU():
         if isReal:
             i2c = board.I2C()  # uses board.SCL and board.SDA
             self.sensor = adafruit_bno055.BNO055_I2C(i2c)
-            
-            self.zero = getData() # angles/accelerations that correspond to home position
+
+            self.zero() # angles/accelerations that correspond to home position
 
     def zero(self):
         if self.isReal:
-            self.zero = getData()
+            self.zeroAngles = self.getDataRaw()
         else:
             raise NotImplementedError("IMU zero not implemented for simulation IMU")
 
+    def getData(self):
+        if self.isReal:
+            return np.subtract(self.getDataRaw(), self.zeroAngles) # subtract reading from 'zero orientation' to get reading relative to 'zero orientation'
+        else:
+            return getDataRaw() # for simulation don't do zero stuff
+
     # x axis is toward Ava's Left, y axis is up, z axis is toward Ava's front, all from the center of Ava
     # getData returns [x angle (rad), y angle (rad), z angle (rad), x acceleration (m/s^2), y acceleration (m/s^2), z acceleration (m/s^2)]
-    def getData(self): 
+    def getDataRaw(self): 
         if self.isReal:
             # in terms of right hand rule convention for positive directions:
             # sensor.euler returns: (yaw (opposite convention), roll (normal convention), pitch (opposite convention))
@@ -35,17 +41,14 @@ class IMU():
             # sensor.acceleration returns: (x acceleration (normal convention), z acceleration (opposite convention), y acceleration (normal convention))
             yaw, roll, pitch = self.sensor.euler
             
-            self.data = np.subtract( # subtract reading from zero to get reading relative for 'zero position'
-                [
+            self.data = [ 
                     math.radians(-pitch),
                     math.radians(-(yaw if yaw <= 180 else yaw - 360)), # mapping from 0 to 360 to -180 to 180
                     math.radians(roll),
                     self.sensor.acceleration[0],
                     -self.sensor.acceleration[2],
                     self.sensor.acceleration[1]
-                ],
-                self.zero
-            )
+            ]
         else:
             # gyro angles follow normal right hand rule conventions
             # angles go from -pi to pi rad
