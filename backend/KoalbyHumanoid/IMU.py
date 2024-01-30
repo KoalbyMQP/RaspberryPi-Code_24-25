@@ -1,6 +1,12 @@
 import adafruit_bno055
 import numpy
 import math
+from backend.Simulation import sim as vrep
+
+try:
+    import board
+except NotImplementedError:
+    print("Failed to import board when not running on Raspberry Pi")
 
 class IMU():
     def __init__(self, isReal, client_id=None):
@@ -8,13 +14,10 @@ class IMU():
         self.client_id = client_id
         
         if isReal:
-            import board
             i2c = board.I2C()  # uses board.SCL and board.SDA
             self.sensor = adafruit_bno055.BNO055_I2C(i2c)
             
             self.zero = getData() # angles/accelerations that correspond to home position
-        else:
-            from backend.Simulation import sim as vrep
 
     def zero(self):
         if self.isReal:

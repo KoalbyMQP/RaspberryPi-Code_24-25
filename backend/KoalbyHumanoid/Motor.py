@@ -2,6 +2,7 @@
 arduino which directly controls the motors"""
 import time
 from backend.KoalbyHumanoid.PID import PID
+from backend.Simulation import sim as vrep
 
 class Motor():
     def __init__(self, is_real, motor_id, name, twist, M, angle_limit=None, serial=None, pidGains=None, client_id=None, handle=None):
@@ -17,7 +18,6 @@ class Motor():
             self.angle_limit = angle_limit
             self.arduino_serial = serial
         else:
-            from backend.Simulation import sim as vrep
             self.pidGains = pidGains
             self.client_id = client_id
             self.handle = handle

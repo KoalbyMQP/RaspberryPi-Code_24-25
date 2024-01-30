@@ -11,6 +11,7 @@ from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
+from backend.Simulation import sim as vrep
 
 class Robot():
 
@@ -23,7 +24,6 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
         else:
-            from backend.Simulation import sim as vrep
             self.client_id = self.init_sim()
             self.motors = self.sim_motors_init()
             self.start_sim()
