@@ -39,11 +39,13 @@ class Motor():
             self.arduino_serial.send_command(f"10 {self.motor_id} {position} {time}")
         else:
             """sends a desired motor position to the Simulation"""
-            self.theta = self.get_position()
-            error = position - self.theta
-            self.simMovePID.setError(error)
-            self.effort = self.simMovePID.calculate()
-            self.set_velocity(self.effort)
+            self.sim.setJointTargetPosition(self.handle, position)
+            # self.theta = self.get_position()
+            # error = position - self.theta
+            # self.simMovePID.setError(error)
+            # self.effort = self.simMovePID.calculate()
+            # self.set_velocity(self.effort)
+            # print(self.effort)
 
     def set_torque(self, on):
         if self.is_real:

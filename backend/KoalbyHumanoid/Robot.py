@@ -28,8 +28,8 @@ class Robot():
         else:
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
-            self.client_id = self.init_sim()
             self.motors = self.sim_motors_init()
+            self.moveAllToTarget()
 
         self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = 0
@@ -41,9 +41,9 @@ class Robot():
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.25,0,0.5)
-        self.imuPIDZ = PID(0.25,0,0.5)
-        self.PIDVel = PID(10,0,0)
+        self.imuPIDX = PID(0.1,0.05,0.1)
+        self.imuPIDZ = PID(0.05,0.025,0.05)
+        self.PIDVel = PID(1,0,0)
         self.VelPIDX = PID(0.01, 0, 0)
         self.VelPIDZ = PID(0.01, 0, 0)
         self.sim.startSimulation()
@@ -53,9 +53,6 @@ class Robot():
         self.arduino_serial = ArduinoSerial()
         self.initHomePos() # This initializes the robot with all the initial motor positions
 
-    def init_sim(self):
-        # self.sim.stopSimulation()  # just in case, close all opened connections
-        yield()
     def chain_init(self):
         chain = {
             self.motors[24].name:self.motors[23],
@@ -288,7 +285,7 @@ class Robot():
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
         self.motors[13].target = (-newTargetZ, 'P')
-        self.motors[10].target = (newTargetX, 'P')
+        self.motors[10].target = (-newTargetX, 'P')
 
     def VelBalance(self):
         balanceError = self.balancePoint - self.CoM
