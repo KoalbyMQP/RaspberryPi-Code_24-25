@@ -27,6 +27,7 @@ class Motor():
         self.theta = None
 
     def get_position(self):
+        self.theta = self.get_position()
         if self.is_real:
             self.arduino_serial.send_command(f"5 {self.motor_id}")
             current_position = self.arduino_serial.read_float()

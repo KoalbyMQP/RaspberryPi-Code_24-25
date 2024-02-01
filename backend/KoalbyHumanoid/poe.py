@@ -2,6 +2,7 @@ import modern_robotics as mr
 import numpy as np
 import math
 import sys
+from backend.KoalbyHumanoid import Config
 sys.path.append("./")
 
 def rodriguez(twist, theta):
@@ -77,3 +78,17 @@ def calcLegCoM(robot, motors, links):
         weightZ += linkCoM[2,3] * link.mass
         massSum += link.mass
     return [weightX/massSum, weightY/massSum, weightZ/massSum]
+
+def calcLegChainIK(robot, T, rightToLeft):
+    Slist = Config.rightToLeftFootTwists[0]
+    M = Config.rightToLeftFootTwists[1]
+    thetaList = [robot.motors[19].theta, robot.motors[18].theta, robot.motors[17].theta, robot.motors[16].theta, robot.motors[15].theta, 
+             robot.motors[20].theta, robot.motors[21].theta, robot.motors[22].theta, robot.motors[23].theta, robot.motors[24].theta]
+    print(thetaList)
+    thetaList = [math.radians(-20), math.radians(-40), math.radians(20), 0, 0, 
+                0, 0, math.radians(-20), math.radians(40), math.radians(20)]
+    if not rightToLeft:
+        thetaList.reverse()
+    eomg = 0.01
+    ev = 0.001
+    return mr.IKinSpace(np.transpose(Slist), M, T, thetaList, eomg, ev)

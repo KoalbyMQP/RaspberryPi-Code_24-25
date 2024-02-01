@@ -13,6 +13,12 @@ robot = Robot(is_real)
 
 print("Setup Complete")
 
+from backend.KoalbyHumanoid import poe
+x = 0
+y = 0
+z = 0
+T = [[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]]
+
 setPoints = [[0,  0], [math.radians(90), math.radians(-90)], [math.radians(0), math.radians(0)]]
 tj = trajPlanner.TrajPlannerNew(setPoints)
 traj = tj.getCubicTraj(30, 100)
@@ -33,6 +39,10 @@ robot.motors[19].target = (math.radians(-20), 'P')
 robot.motors[22].target = (math.radians(-20), 'P')
 robot.motors[23].target = (math.radians(40), 'P')
 robot.motors[24].target = (math.radians(20), 'P')
+
+angles = poe.calcLegChainIK(robot, T, True)[0]
+print(angles)
+
 #robot.motors[17].target = math.radians(-45)
 #robot.motors[22].target = math.radians(45)
 prevTime = time.time()
@@ -41,6 +51,16 @@ prevTime = time.time()
 ##Robot Motor Positions to hold the cart
 # robot.motors[0].target = (30, 'P')
 # robot.motors[3].target = (60, 'P')
+motorsIndex = [19, 18, 17, 16, 15, 20, 21, 22, 23, 24]
+
+for i in range(len(angles)):
+    robot.motors[motorsIndex[i]].target = (angles[i], 'P')
+
+robot.moveAllToTarget()
+
+time.sleep(1)
+
+exit(0)
 
 simStartTime = time.time()
 while time.time() - simStartTime < 300:
