@@ -201,11 +201,11 @@ class Robot():
         thetaList = []
         M = motor.M
         slist.append(motor.twist)
-        thetaList.append(motor.theta)
+        thetaList.append(motor.get_position())
         next = self.chain[motor.name]
         while next != "base":
             slist.append(next.twist)
-            thetaList.append(next.theta)
+            thetaList.append(next.get_position())
             next = self.chain[next.name]            
         slist.reverse()
         thetaList.reverse()
@@ -227,11 +227,11 @@ class Robot():
             motor = ankleMotors[i]
             M = Ms[i]
             slist.append(motor.twist)
-            thetaList.append(motor.theta)
+            thetaList.append(motor.get_position())
             next = self.chain[motor.name]
             while next != "base":
                 slist.append(next.twist)
-                thetaList.append(next.theta)
+                thetaList.append(next.get_position())
                 next = self.chain[next.name]         
             slist.reverse()
             thetaList.reverse()
