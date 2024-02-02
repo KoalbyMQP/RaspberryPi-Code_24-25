@@ -46,6 +46,8 @@ class Robot():
         self.PIDVel = PID(1,0,0)
         self.VelPIDX = PID(0.01, 0, 0)
         self.VelPIDZ = PID(0.01, 0, 0)
+        # self.sim.stopSimulation()
+        self.sim.startSimulation()
         self.sim.startSimulation()
         print("Robot Created and Initialized")
 
