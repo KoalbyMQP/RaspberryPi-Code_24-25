@@ -1,7 +1,9 @@
-import sys, time, math 
+import sys, time, math
+
+import numpy as np 
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
-from backend.KoalbyHumanoid import trajPlanner
+from backend.KoalbyHumanoid import trajPlannerPose
 from backend.KoalbyHumanoid.Config import Joints
 import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter

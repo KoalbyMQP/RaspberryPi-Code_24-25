@@ -1,7 +1,7 @@
 import numpy as np
 ## Defines the TrajPlanner class
 # Calculates trajectories for different degrees and relevant coefficients
-class TrajPlannerNew():    
+class TrajPlannerPose():    
 
     # Constructor
     def __init__(self, setpoints):
@@ -272,3 +272,24 @@ class TrajPlannerNew():
         # Gets coefficients by division of matricies
         coeff = np.linalg.lstsq(coeffMatrix,qs,rcond=None)
         return coeff[0]
+    
+    def getPositions(self, setPointTimes, angles, vels, accels, time):
+        coeffsArray = np.zeros((len(angles[0]), len(angles)-1, 6))
+        for pointNum in range(len(angles)-1):
+            for jointNum in range(len(angles[0])):
+                coeffsArray[jointNum][pointNum] = np.transpose(self.calcQuinticCoeff(setPointTimes[pointNum][jointNum],setPointTimes[pointNum+1][jointNum], angles[pointNum][jointNum], angles[pointNum+1][jointNum], vels[pointNum][jointNum], vels[pointNum+1][jointNum], accels[pointNum][jointNum], accels[pointNum+1][jointNum]))
+
+
+        coeffsSets = [0, 0, 0]
+        for jointNum, coeffSet in enumerate(coeffsSets):
+            while coeffSet+1 < len(setPointTimes)-1 and time >= setPointTimes[coeffSet+1][jointNum]:
+                coeffsSets[jointNum] += 1
+                coeffSet += 1
+
+        poses = np.zeros(len(angles))
+
+        for jointNum in range(len(angles[0])):
+            coeffs = coeffsArray[jointNum][coeffsSets[jointNum]]
+            poses[jointNum] = sum([coeff*time**index for index, coeff in enumerate(coeffs)])
+            
+        return(poses)
