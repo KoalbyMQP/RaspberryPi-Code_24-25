@@ -32,21 +32,24 @@ class Robot():
             # self.moveAllToTarget()
 
         self.imu = IMU(self.is_real, sim=self.sim)
-        self.CoM = 0
+        self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
         self.ang_accel = [0, 0, 0]
-        self.balancePoint = 0
+        self.balancePoint = np.array([0, 0, 0])
+        self.rightFootBalancePoint = np.array([0, 0, 0])
+        self.leftFootBalancePoint = np.array([0, 0, 0])
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.1,0.05,0.1)
+        self.imuPIDX = PID(0.02,0.075,0.05)
         self.imuPIDZ = PID(0.05,0.025,0.05)
-        self.PIDVel = PID(1,0,0)
-        self.VelPIDX = PID(0.01, 0, 0)
-        self.VelPIDZ = PID(0.01, 0, 0)
-        # self.sim.stopSimulation()
+        self.PIDVel = PID(0.0,0,0)
+        self.VelPIDX = PID(0.002, 0, 0)
+        self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
+        self.trackSphere = self.sim.getObject("./trackSphere")
+        self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         self.sim.startSimulation()
         self.sim.startSimulation()
         print("Robot Created and Initialized")
@@ -250,8 +253,12 @@ class Robot():
         leftSole = np.matmul(leftAnkle,leftAnkleToSole)
         rightPolyCoords = rightSole[0:3,3]
         leftPolyCoords = leftSole[0:3,3]
+        self.rightFootBalancePoint = rightPolyCoords
+        self.leftFootBalancePoint = leftPolyCoords
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
         self.balancePoint = centerPoint
+        self.sim.setObjectPosition(self.trackSphere,(rightAnkle[0][3]/1000,-rightAnkle[2][3]/1000,rightAnkle[1][3]/1000),self.sim.getObject("./Chest_respondable"))
+        # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
         return centerPoint
     
     def IK(self, motor, T, thetaGuess):
@@ -289,8 +296,8 @@ class Robot():
         self.motors[13].target = (-newTargetZ, 'P')
         self.motors[10].target = (-newTargetX, 'P')
 
-    def VelBalance(self):
-        balanceError = self.balancePoint - self.CoM
+    def VelBalance(self, balancePoint):
+        balanceError = balancePoint - self.CoM
         Xerror = balanceError[0]
         Zerror = balanceError[2]
         self.VelPIDX.setError(Xerror)
@@ -298,8 +305,8 @@ class Robot():
         newTargetX = self.VelPIDX.calculate()
         newTargetZ = self.VelPIDZ.calculate()
         self.motors[13].target = (newTargetX, 'V')
-        # self.motors[10].target = (newTargetZ, 'V')
-        return (balanceError[2], newTargetX)
+        self.motors[10].target = (-newTargetZ, 'V')
+        return balanceError
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM

@@ -7,7 +7,7 @@ class PID():
         self.kI = kI
         self.error = 0
         self.prevError = 0
-        self.errorMemory = 100
+        self.errorMemory = 10
         self.errorList = np.zeros(self.errorMemory)
         self.errorIndex = 0
         self.output = 0
