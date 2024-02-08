@@ -29,7 +29,6 @@ class Robot():
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
             self.motors = self.sim_motors_init()
-            self.moveAllToTarget()
 
         self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = np.array([0, 0, 0])
@@ -48,10 +47,10 @@ class Robot():
         self.PIDVel = PID(0.0,0,0)
         self.VelPIDX = PID(0.002, 0, 0)
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
-        self.trackSphere = self.sim.getObject("./trackSphere")
-        self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
+        # self.trackSphere = self.sim.getObject("./trackSphere")
+        # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         self.sim.startSimulation()
-        # self.sim.startSimulation()
+        self.sim.startSimulation()
         print("Robot Created and Initialized")
 
     def arduino_serial_init(self):
@@ -257,7 +256,7 @@ class Robot():
         self.leftFootBalancePoint = leftPolyCoords
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
         self.balancePoint = centerPoint
-        self.sim.setObjectPosition(self.trackSphere,(rightAnkle[0][3]/1000,-rightAnkle[2][3]/1000,rightAnkle[1][3]/1000),self.sim.getObject("./Chest_respondable"))
+        # self.sim.setObjectPosition(self.trackSphere,(rightAnkle[0][3]/1000,-rightAnkle[2][3]/1000,rightAnkle[1][3]/1000),self.sim.getObject("./Chest_respondable"))
         # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
         return centerPoint
     
