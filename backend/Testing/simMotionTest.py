@@ -1,7 +1,7 @@
 import sys, time, math 
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
-from backend.KoalbyHumanoid import trajPlanner
+from backend.KoalbyHumanoid import trajPlannerPose
 from backend.KoalbyHumanoid.Config import Joints
 import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
@@ -21,7 +21,7 @@ T = [[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]]
 
 # setPoints = [[0,  0], [math.radians(90), math.radians(-90)], [math.radians(0), math.radians(0)]]
 setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
-tj = trajPlanner.TrajPlannerNew(setPoints)
+tj = trajPlannerPose.TrajPlannerNew(setPoints)
 traj = tj.getCubicTraj(30, 100)
 plotter = Plotter(10, True)
 

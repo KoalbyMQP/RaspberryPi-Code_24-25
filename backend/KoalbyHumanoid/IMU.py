@@ -17,4 +17,6 @@ class IMU():
                     self.sim.getFloatSignal("accelX"),
                     self.sim.getFloatSignal("accelY"),
                     self.sim.getFloatSignal("accelZ")]
+            if self.data == [None, None, None, None, None, None]:
+                self.data = [0,0,0,0,0,0]
         return self.data

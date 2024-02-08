@@ -29,7 +29,7 @@ class Robot():
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
             self.motors = self.sim_motors_init()
-            # self.moveAllToTarget()
+            self.moveAllToTarget()
 
         self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = np.array([0, 0, 0])
@@ -51,7 +51,7 @@ class Robot():
         self.trackSphere = self.sim.getObject("./trackSphere")
         self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         self.sim.startSimulation()
-        self.sim.startSimulation()
+        # self.sim.startSimulation()
         print("Robot Created and Initialized")
 
     def arduino_serial_init(self):

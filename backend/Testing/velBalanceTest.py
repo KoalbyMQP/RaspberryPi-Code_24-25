@@ -10,7 +10,7 @@ from backend.KoalbyHumanoid.Plotter import Plotter
 
 # Edit to declare if you are testing the sim or the real robot
 setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
-tj = trajPlanner.TrajPlannerNew(setPoints)
+tj = trajPlannerPose.TrajPlannerPose(setPoints)
 traj = tj.getCubicTraj(10, 100)
 
 is_real = False
