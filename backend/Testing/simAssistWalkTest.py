@@ -55,9 +55,8 @@ while time.time() - startTime < 30:
     robot.updateBalancePoint()
     robot.IMUBalance(0,0)
     points = tj.getQuinticPositions(time.time() - startTime)
-
-    robot.motors[0].target = (points[1], 'P')
-    robot.motors[5].target = (points[2], 'P')
+    robot.motors[0].target = (points[0], 'P')
+    robot.motors[5].target = (points[1], 'P')
 
     robot.moveAllToTarget()
 
@@ -70,8 +69,9 @@ while True:
     robot.IMUBalance(0,0)
     match(state):
         case 0:
+            print(time.time() - startTime)
             points = tj.getQuinticPositions(time.time() - startTime)
-            robot.motors[0].target = (points[1], 'P')
-            robot.motors[5].target = (points[2], 'P')
+            robot.motors[0].target = (points[0], 'P')
+            robot.motors[5].target = (points[1], 'P')
             robot.moveAllToTarget()
     

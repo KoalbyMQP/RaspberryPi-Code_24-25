@@ -120,15 +120,16 @@ class TrajPlannerTime():
         return coeffsArray
 
     def getQuinticPositions(self, time):
-        coeffsSets = [0, 0, 0]
+        coeffsSets = np.zeros(len(self.angles[0]))
         for jointNum, coeffSet in enumerate(coeffsSets):
+            coeffSet = int(coeffSet)
             while coeffSet+1 < len(self.setPointTimes)-1 and time >= self.setPointTimes[coeffSet+1][jointNum]:
                 coeffsSets[jointNum] += 1
                 coeffSet += 1
-        poses = np.zeros(len(self.angles))
 
+        poses = np.zeros(len(self.angles[0]))
         for jointNum in range(len(self.angles[0])):
-            coeffs = self.coeffsArray[jointNum][coeffsSets[jointNum]]
+            coeffs = self.coeffsArray[jointNum][int(coeffsSets[jointNum])]
             poses[jointNum] = sum([coeff*time**index for index, coeff in enumerate(coeffs)])
             
         return(poses)
