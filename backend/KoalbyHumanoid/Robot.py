@@ -132,10 +132,11 @@ class Robot():
     def moveAllTo(self, position):
         for motor in self.motors:
             motor.move(position)
-            
+
     def moveAllToTarget(self):
         for motor in self.motors:
             motor.move(motor.target)
+        
 
     def initHomePos(self):
         if self.is_real:
