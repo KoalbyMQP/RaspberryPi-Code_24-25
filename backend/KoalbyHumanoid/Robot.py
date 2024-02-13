@@ -12,6 +12,7 @@ from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
+from backend.Simulation import sim as vrep
 
 class Robot():
 
