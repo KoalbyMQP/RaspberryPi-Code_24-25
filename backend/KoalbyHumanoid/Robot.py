@@ -9,6 +9,7 @@ from backend.KoalbyHumanoid.Link import Link
 from backend.KoalbyHumanoid.PID import PID
 from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
 from backend.Simulation import sim as vrep
@@ -20,50 +21,44 @@ class Robot():
     def __init__(self, is_real):
         self.is_real = is_real
         if self.is_real:
+            self.client = None
+            self.sim = None
             self.client_id = None
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
         else:
-            self.client_id = self.init_sim()
+            self.client = RemoteAPIClient()
+            self.sim = self.client.require('sim')
+            self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
+            # self.sim.setStepping(True)
             self.motors = self.sim_motors_init()
-            self.start_sim()
 
-        self.imu = IMU(self.is_real, client_id=self.client_id)
-        self.CoM = 0
+        self.imu = IMU(self.is_real, sim=self.sim)
+        self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
         self.ang_accel = [0, 0, 0]
-        self.balancePoint = 0
+        self.balancePoint = np.array([0, 0, 0])
+        self.rightFootBalancePoint = np.array([0, 0, 0])
+        self.leftFootBalancePoint = np.array([0, 0, 0])
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.25,0,0.5)
-        self.imuPIDZ = PID(0.25,0,0.5)
-        self.PIDVel = PID(10,0,0)
-        self.VelPIDX = PID(0.01, 0, 0)
-        self.VelPIDZ = PID(0.01, 0, 0)
-
+        self.imuPIDX = PID(0.3,0.005,0.1)
+        self.imuPIDZ = PID(0.25,0.0,0.0075)
+        self.PIDVel = PID(0.0,0,0)
+        self.VelPIDX = PID(0.002, 0, 0)
+        self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
+        # self.trackSphere = self.sim.getObject("./trackSphere")
+        # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
+        self.sim.startSimulation()
+        self.sim.startSimulation()
         print("Robot Created and Initialized")
 
     def arduino_serial_init(self):
         self.arduino_serial = ArduinoSerial()
         self.initHomePos() # This initializes the robot with all the initial motor positions
-
-    def init_sim(self):
-        vrep.simxFinish(-1)  # just in case, close all opened connections
-        client_id = vrep.simxStart('127.0.0.1', 19997, True, True, -500000, 5)
-        # client_id = vrep.simxStartSimulation(client_id, vrep.simx_opmode_oneshot_wait)
-        if client_id != -1:
-            print("Connected to remote API server")
-            #vrep.simxStartSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
-            #vrep.simxPauseSimulation(client_id, operationMode=vrep.simx_opmode_oneshot)
-        else:
-            sys.exit("Not connected to remote API server")
-        return client_id
-
-    def start_sim(self):
-        vrep.simxStartSimulation(self.client_id, operationMode=vrep.simx_opmode_oneshot)
 
     def chain_init(self):
         chain = {
@@ -110,21 +105,8 @@ class Robot():
         motors = list()
         for motorConfig in Config.motors:
             print("Beginning to stream", motorConfig[3])
-
-            res, handle = vrep.simxGetObjectHandle(self.client_id, motorConfig[3], vrep.simx_opmode_blocking)
-            if res != vrep.simx_return_ok:
-                print("FAILED", res, handle)
-                continue
-            
-            vrep.simxSetObjectFloatParameter(self.client_id, handle, vrep.sim_shapefloatparam_mass, 1, vrep.simx_opmode_blocking)
-            motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], client_id=self.client_id, handle=handle)
-            # setattr(SimRobot, motorConfig[3], motor)
-
-            #Sets each motor to streaming opmode
-            res = vrep.simx_return_novalue_flag
-            while res != vrep.simx_return_ok:
-                res, data = vrep.simxGetJointPosition(self.client_id, motor.handle, vrep.simx_opmode_streaming)
-            
+            handle = self.sim.getObject("/" + motorConfig[3])
+            motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], sim=self.sim, handle=handle)
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
             motors.append(motor)
@@ -155,8 +137,9 @@ class Robot():
             motor.move(position)
             
     def moveAllToTarget(self):
-        for motor in self.motors:
-            motor.move(motor.target)
+        self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
+        # for motor in self.motors:
+        #     motor.move(motor.target)
 
     def initHomePos(self):
         if self.is_real:
@@ -187,7 +170,7 @@ class Robot():
         torsoMass = 434.67
         rightLegMass = 883.81
         leftLegMass = 889.11
-        massSum = self.mass
+        massSum = rightArmMass+leftArmMass+torsoMass+chestMass
         CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
         CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
         CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
@@ -226,11 +209,11 @@ class Robot():
         thetaList = []
         M = motor.M
         slist.append(motor.twist)
-        thetaList.append(motor.theta)
+        thetaList.append(motor.get_position())
         next = self.chain[motor.name]
         while next != "base":
             slist.append(next.twist)
-            thetaList.append(next.theta)
+            thetaList.append(next.get_position())
             next = self.chain[next.name]            
         slist.reverse()
         thetaList.reverse()
@@ -252,11 +235,11 @@ class Robot():
             motor = ankleMotors[i]
             M = Ms[i]
             slist.append(motor.twist)
-            thetaList.append(motor.theta)
+            thetaList.append(motor.get_position())
             next = self.chain[motor.name]
             while next != "base":
                 slist.append(next.twist)
-                thetaList.append(next.theta)
+                thetaList.append(next.get_position())
                 next = self.chain[next.name]         
             slist.reverse()
             thetaList.reverse()
@@ -273,8 +256,12 @@ class Robot():
         leftSole = np.matmul(leftAnkle,leftAnkleToSole)
         rightPolyCoords = rightSole[0:3,3]
         leftPolyCoords = leftSole[0:3,3]
+        self.rightFootBalancePoint = rightPolyCoords
+        self.leftFootBalancePoint = leftPolyCoords
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
         self.balancePoint = centerPoint
+        # self.sim.setObjectPosition(self.trackSphere,(rightAnkle[0][3]/1000,-rightAnkle[2][3]/1000,rightAnkle[1][3]/1000),self.sim.getObject("./Chest_respondable"))
+        # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
         return centerPoint
     
     def IK(self, motor, T, thetaGuess):
@@ -300,6 +287,7 @@ class Robot():
 
     def IMUBalance(self, Xtarget, Ztarget):
         data = self.imu.getData()
+        # print(data)
         xRot = data[0]
         zRot = data[2]
         Xerror = Xtarget - xRot
@@ -309,10 +297,10 @@ class Robot():
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
         self.motors[13].target = (-newTargetZ, 'P')
-        self.motors[10].target = (newTargetX, 'P')
+        self.motors[10].target = (-newTargetX, 'P')
 
-    def VelBalance(self):
-        balanceError = self.balancePoint - self.CoM
+    def VelBalance(self, balancePoint):
+        balanceError = balancePoint - self.CoM
         Xerror = balanceError[0]
         Zerror = balanceError[2]
         self.VelPIDX.setError(Xerror)
@@ -320,8 +308,8 @@ class Robot():
         newTargetX = self.VelPIDX.calculate()
         newTargetZ = self.VelPIDZ.calculate()
         self.motors[13].target = (newTargetX, 'V')
-        # self.motors[10].target = (newTargetZ, 'V')
-        return (balanceError[2], newTargetX)
+        self.motors[10].target = (-newTargetZ, 'V')
+        return balanceError
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM

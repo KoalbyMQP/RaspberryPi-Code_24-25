@@ -1,11 +1,12 @@
 """The Motor class hold all information for an abstract motor on the physical robot. It is used to interface with the
 arduino which directly controls the motors"""
 import time
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid.PID import PID
 from backend.Simulation import sim as vrep
 
 class Motor():
-    def __init__(self, is_real, motor_id, name, twist, M, angle_limit=None, serial=None, pidGains=None, client_id=None, handle=None):
+    def __init__(self, is_real, motor_id, name, twist, M, angle_limit=None, serial=None, pidGains=None, sim=None, handle=None):
         self.is_real = is_real
         self.motor_id = motor_id
         self.name = name
@@ -19,7 +20,7 @@ class Motor():
             self.arduino_serial = serial
         else:
             self.pidGains = pidGains
-            self.client_id = client_id
+            self.sim = sim
             self.handle = handle
             self.simMovePID = PID(self.pidGains[0], self.pidGains[1], self.pidGains[2])
 
@@ -31,7 +32,7 @@ class Motor():
             self.arduino_serial.send_command(f"5 {self.motor_id}")
             current_position = self.arduino_serial.read_float()
         else:
-            current_position = vrep.simxGetJointPosition(self.client_id, self.handle, vrep.simx_opmode_buffer)[1]
+            current_position = self.sim.getJointPosition(self.handle)
         return current_position
     
     def set_position(self, position, time=1000):
@@ -39,11 +40,13 @@ class Motor():
             self.arduino_serial.send_command(f"10 {self.motor_id} {position} {time}")
         else:
             """sends a desired motor position to the Simulation"""
-            self.theta = self.get_position()
-            error = position - self.theta
-            self.simMovePID.setError(error)
-            self.effort = self.simMovePID.calculate()
-            self.set_velocity(self.effort)
+            self.sim.setJointTargetPosition(self.handle, position)
+            # self.theta = self.get_position()
+            # error = position - self.theta
+            # self.simMovePID.setError(error)
+            # self.effort = self.simMovePID.calculate()
+            # self.set_velocity(self.effort)
+            # print(self.effort)
 
     def set_torque(self, on):
         if self.is_real:
@@ -59,7 +62,7 @@ class Motor():
         if self.is_real:
             self.arduino_serial.send_command(f"40 {self.motor_id} {velocity}")
         else:
-            vrep.simxSetJointTargetVelocity(self.client_id, self.handle, velocity, vrep.simx_opmode_streaming)
+            self.sim.setJointTargetVelocity(self.handle, velocity)
 
     def move(self, target="TARGET"):
         if time.perf_counter() - self.prevTime > 0.01:

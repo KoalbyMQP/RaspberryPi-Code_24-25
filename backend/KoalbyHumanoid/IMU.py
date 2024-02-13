@@ -1,7 +1,8 @@
+
 import adafruit_bno055
 import numpy as np
 import math
-from backend.Simulation import sim as vrep
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
 try:
     import board
@@ -9,21 +10,24 @@ except NotImplementedError:
     print("Failed to import board when not running on Raspberry Pi")
 
 class IMU():
-    def __init__(self, isReal, client_id=None):
+    def __init__(self, isReal, sim=None):
         self.isReal = isReal
-        self.client_id = client_id
+        self.sim = sim
         
         if isReal:
             i2c = board.I2C()  # uses board.SCL and board.SDA
             self.sensor = adafruit_bno055.BNO055_I2C(i2c)
 
             self.zero() # angles/accelerations that correspond to home position
+        
 
     def zero(self):
         if self.isReal:
             self.zeroAngles = self.getDataRaw()
         else:
             raise NotImplementedError("IMU zero not implemented for simulation IMU")
+
+        
 
     def getData(self):
         if self.isReal:
@@ -50,13 +54,12 @@ class IMU():
                     self.sensor.acceleration[1]
             ]
         else:
-            # gyro angles follow normal right hand rule conventions
-            # angles go from -pi to pi rad
-            self.data = [vrep.simxGetFloatSignal(self.client_id, "gyroX", vrep.simx_opmode_buffer)[1], # pitch
-                    vrep.simxGetFloatSignal(self.client_id, "gyroY", vrep.simx_opmode_buffer)[1], # yaw
-                    vrep.simxGetFloatSignal(self.client_id, "gyroZ", vrep.simx_opmode_buffer)[1], # roll
-                    vrep.simxGetFloatSignal(self.client_id, "accelX", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "accelY", vrep.simx_opmode_buffer)[1],
-                    vrep.simxGetFloatSignal(self.client_id, "accelZ", vrep.simx_opmode_buffer)[1]]
-
+            self.data = [self.sim.getFloatSignal("gyroX"),
+                    self.sim.getFloatSignal("gyroY"),
+                    self.sim.getFloatSignal("gyroZ"),
+                    self.sim.getFloatSignal("accelX"),
+                    self.sim.getFloatSignal("accelY"),
+                    self.sim.getFloatSignal("accelZ")]
+            if self.data == [None, None, None, None, None, None]:
+                self.data = [0,0,0,0,0,0]
         return self.data
