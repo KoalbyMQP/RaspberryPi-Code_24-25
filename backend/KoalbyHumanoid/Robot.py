@@ -28,6 +28,8 @@ class Robot():
         else:
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
+            self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
+            # self.sim.setStepping(True)
             self.motors = self.sim_motors_init()
 
         self.imu = IMU(self.is_real, sim=self.sim)
@@ -42,8 +44,8 @@ class Robot():
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.02,0.075,0.05)
-        self.imuPIDZ = PID(0.05,0.025,0.05)
+        self.imuPIDX = PID(0.3,0.005,0.1)
+        self.imuPIDZ = PID(0.25,0.0,0.0075)
         self.PIDVel = PID(0.0,0,0)
         self.VelPIDX = PID(0.002, 0, 0)
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
@@ -134,9 +136,9 @@ class Robot():
             motor.move(position)
 
     def moveAllToTarget(self):
-        for motor in self.motors:
-            motor.move(motor.target)
-        
+        self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
+        # for motor in self.motors:
+        #     motor.move(motor.target)
 
     def initHomePos(self):
         if self.is_real:
