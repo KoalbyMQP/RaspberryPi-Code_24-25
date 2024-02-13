@@ -35,43 +35,61 @@ robot.motors[14].target = (0, 'P')
 prevTime = time.time()
 simStartTime = time.time()
 
-while time.time() - simStartTime < 2:
+while time.time() - simStartTime < 1:
     time.sleep(0.01)
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
 
 startTime = time.time()
-setPointTimes = [[0,0],[5,5],[10,10]]
-angles = [[0,0],[math.radians(90),math.radians(-90)],[0,0]]
-vels = [[0,0],[0,0],[0,0]]
-accels = [[0,0],[0,0],[0,0]]
+setPointTimes = [[0,0,0],[5,5,5],[10,10,10]]
+angles = [[math.radians(20),math.radians(-40), math.radians(-20)],[math.radians(36.9495),math.radians(-56.3311), math.radians(-19.3816)],[math.radians(30.1578),math.radians(-32.3075), math.radians(-2.1477)]]
+# angles = [[math.radians(20),math.radians(-40), math.radians(-20)],[math.radians(36.9495),math.radians(-56.3311), math.radians(-19.3816)],[math.radians(30.1578),math.radians(-32.3075), math.radians(-2.1477)]]
+# angles = [[math.radians(20),math.radians(-40), math.radians(-20)],[math.radians(30),math.radians(-60), math.radians(-30)],[math.radians(30.1578),math.radians(-32.3075), math.radians(-2.1487)]]
+vels = [[0,0,0],[0,0,0],[0,0,0]]
+accels = [[0,0,0],[0,0,0],[0,0,0]]
 
 tj = TrajPlannerTime(setPointTimes,angles,vels,accels)
 
-while time.time() - startTime < 30:
-    time.sleep(0.01)
-    robot.updateRobotCoM()
-    robot.updateBalancePoint()
-    robot.IMUBalance(0,0)
-    points = tj.getQuinticPositions(time.time() - startTime)
-    robot.motors[0].target = (points[0], 'P')
-    robot.motors[5].target = (points[1], 'P')
+# while time.time() - startTime < 30:
+#     time.sleep(0.01)
+#     robot.updateRobotCoM()
+#     robot.updateBalancePoint()
+#     robot.IMUBalance(0,0)
+#     points = tj.getQuinticPositions(time.time() - startTime)
+#     robot.motors[17].target = (points[0], 'P')
+#     robot.motors[18].target = (points[1], 'P')
+#     robot.motors[19].target = (points[2], 'P')
 
-    robot.moveAllToTarget()
+#     robot.moveAllToTarget()
 
 
 #State Machine to move through walking gait
 
+# startTime = time.perf_counter()
+# while True:
+#     print(time.perf_counter() - startTime)
+#     startTime = time.perf_counter()
+#     robot.moveAllToTarget2()
+#     # robot.moveToTarget(robot.motors[3])
+    
+
+
+
 state = 0
 while True:
     robot.moveAllToTarget()
-    robot.IMUBalance(0,0)
     match(state):
         case 0:
-            print(time.time() - startTime)
+            if(time.time() - startTime >= 10):
+                startTime = time.time()
             points = tj.getQuinticPositions(time.time() - startTime)
-            robot.motors[0].target = (points[0], 'P')
-            robot.motors[5].target = (points[1], 'P')
-            robot.moveAllToTarget()
+            robot.motors[17].target = (points[0], 'P')
+            robot.motors[18].target = (points[1], 'P')
+            robot.motors[19].target = (points[2], 'P')
+            # robot.IMUBalance(0,math.radians(-40))
+            robot.moveToTarget(robot.motors[17])
+            robot.moveToTarget(robot.motors[18])
+            robot.moveToTarget(robot.motors[19])
+            # robot.moveAllToTarget()
     

@@ -64,7 +64,7 @@ class Motor():
             self.sim.setJointTargetVelocity(self.handle, velocity)
 
     def move(self, target="TARGET"):
-        if time.perf_counter() - self.prevTime > 0.01:
+        if time.perf_counter() - self.prevTime > 0.001:
             if target == "TARGET":
                 target = self.target
             if target[1] == 'P':

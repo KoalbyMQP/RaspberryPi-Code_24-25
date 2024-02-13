@@ -143,7 +143,7 @@ class Robot():
     def moveAllTo(self, position):
         for motor in self.motors:
             motor.move(position)
-            
+
     def moveAllToTarget(self):
         self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
         # for motor in self.motors:
