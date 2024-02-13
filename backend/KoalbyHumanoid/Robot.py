@@ -26,10 +26,11 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
         else:
+            self.checkCoppeliaSimResponding()
+
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
-            # self.sim.setStepping(True)
             self.motors = self.sim_motors_init()
 
         self.imu = IMU(self.is_real, sim=self.sim)
@@ -54,6 +55,14 @@ class Robot():
         self.sim.startSimulation()
         self.sim.startSimulation()
         print("Robot Created and Initialized")
+
+    def checkCoppeliaSimResponding(self):
+        client = RemoteAPIClient()
+        client._send({'func': '', 'args': ['']})
+        if (client.socket.poll(1000) == 0):
+            raise Exception("CoppeliaSim is not responding. Restart CoppeliaSim and try again.")
+        else:
+            client.__del__()
 
     def arduino_serial_init(self):
         self.arduino_serial = ArduinoSerial()
