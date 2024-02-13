@@ -3,7 +3,6 @@ arduino which directly controls the motors"""
 import time
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid.PID import PID
-from backend.Simulation import sim as vrep
 
 class Motor():
     def __init__(self, is_real, motor_id, name, twist, M, angle_limit=None, serial=None, pidGains=None, sim=None, handle=None):

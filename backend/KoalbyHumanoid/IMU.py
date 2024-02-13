@@ -33,7 +33,7 @@ class IMU():
         if self.isReal:
             return np.subtract(self.getDataRaw(), self.zeroAngles) # subtract reading from 'zero orientation' to get reading relative to 'zero orientation'
         else:
-            return getDataRaw() # for simulation don't do zero stuff
+            return self.getDataRaw() # for simulation don't do zero stuff
 
     # x axis is toward Ava's Left, y axis is up, z axis is toward Ava's front, all from the center of Ava
     # getData returns [x angle (rad), y angle (rad), z angle (rad), x acceleration (m/s^2), y acceleration (m/s^2), z acceleration (m/s^2)]
@@ -46,20 +46,20 @@ class IMU():
             yaw, roll, pitch = self.sensor.euler
             
             self.data = [ 
-                    math.radians(-pitch),
-                    math.radians(-(yaw if yaw <= 180 else yaw - 360)), # mapping from 0 to 360 to -180 to 180
-                    math.radians(roll),
-                    self.sensor.acceleration[0],
-                    -self.sensor.acceleration[2],
-                    self.sensor.acceleration[1]
-            ]
+                math.radians(-pitch),
+                math.radians(-(yaw if yaw <= 180 else yaw - 360)), # mapping from 0 to 360 to -180 to 180
+                math.radians(roll),
+                self.sensor.acceleration[0],
+                -self.sensor.acceleration[2],
+                self.sensor.acceleration[1]
+                ]
         else:
             self.data = [self.sim.getFloatSignal("gyroX"),
-                    self.sim.getFloatSignal("gyroY"),
-                    self.sim.getFloatSignal("gyroZ"),
-                    self.sim.getFloatSignal("accelX"),
-                    self.sim.getFloatSignal("accelY"),
-                    self.sim.getFloatSignal("accelZ")]
+            self.sim.getFloatSignal("gyroY"),
+            self.sim.getFloatSignal("gyroZ"),
+            self.sim.getFloatSignal("accelX"),
+            self.sim.getFloatSignal("accelY"),
+            self.sim.getFloatSignal("accelZ")]
             if self.data == [None, None, None, None, None, None]:
                 self.data = [0,0,0,0,0,0]
         return self.data
