@@ -26,10 +26,11 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
         else:
+            self.checkCoppeliaSimResponding()
+
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
-            # self.sim.setStepping(True)
             self.motors = self.sim_motors_init()
 
         self.imu = IMU(self.is_real, sim=self.sim)
@@ -52,8 +53,16 @@ class Robot():
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         self.sim.startSimulation()
-        self.sim.startSimulation()
+        # self.sim.startSimulation()
         print("Robot Created and Initialized")
+
+    def checkCoppeliaSimResponding(self):
+        client = RemoteAPIClient()
+        client._send({'func': '', 'args': ['']})
+        if (client.socket.poll(1000) == 0):
+            raise Exception("CoppeliaSim is not responding. Restart CoppeliaSim and try again.")
+        else:
+            client.__del__()
 
     def arduino_serial_init(self):
         self.arduino_serial = ArduinoSerial()
@@ -136,6 +145,8 @@ class Robot():
             motor.move(position)
 
     def moveAllToTarget(self):
+        # joint = self.locate(self.motors[19])
+        # self.sim.setObjectPosition(self.trackSphere,(joint[0][3]/1000,joint[2][3]/-1000,joint[1][3]/1000),self.sim.getObject("./Chest_respondable"))
         self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
         # for motor in self.motors:
         #     motor.move(motor.target)
@@ -259,7 +270,6 @@ class Robot():
         self.leftFootBalancePoint = leftPolyCoords
         centerPoint = (rightPolyCoords+leftPolyCoords)/2
         self.balancePoint = centerPoint
-        # self.sim.setObjectPosition(self.trackSphere,(rightAnkle[0][3]/1000,-rightAnkle[2][3]/1000,rightAnkle[1][3]/1000),self.sim.getObject("./Chest_respondable"))
         # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
         return centerPoint
     
