@@ -1,13 +1,13 @@
 
-import adafruit_bno055
+# import adafruit_bno055
 import numpy as np
 import math
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
-try:
-    import board
-except NotImplementedError:
-    print("Failed to import board when not running on Raspberry Pi")
+# try:
+#     import board
+# except NotImplementedError:
+#     print("Failed to import board when not running on Raspberry Pi")
 
 class IMU():
     def __init__(self, isReal, sim=None):
