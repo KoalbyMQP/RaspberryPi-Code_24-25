@@ -25,6 +25,9 @@ class Robot():
             self.client_id = None
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
+            
+            self.imuPIDX = PID(0.2,0,0.1) # 1
+            self.imuPIDZ = PID(0.25,0.0,0.0075)
         else:
             self.checkCoppeliaSimResponding()
 
@@ -32,6 +35,9 @@ class Robot():
             self.sim = self.client.require('sim')
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
+            
+            self.imuPIDX = PID(0.3,0.005,0.1)
+            self.imuPIDZ = PID(0.25,0.0,0.0075)
 
         self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = np.array([0, 0, 0])
@@ -45,14 +51,14 @@ class Robot():
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
-        self.imuPIDX = PID(0.3,0.005,0.1)
-        self.imuPIDZ = PID(0.25,0.0,0.0075)
+        # self.imuPIDX = PID(0.3,0.005,0.1)
+        # self.imuPIDZ = PID(0.25,0.0,0.0075)
         self.PIDVel = PID(0.0,0,0)
         self.VelPIDX = PID(0.002, 0, 0)
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
-        self.sim.startSimulation()
+        # self.sim.startSimulation()
         # self.sim.startSimulation()
         print("Robot Created and Initialized")
 
@@ -145,11 +151,16 @@ class Robot():
             motor.move(position)
 
     def moveAllToTarget(self):
-        # joint = self.locate(self.motors[19])
-        # self.sim.setObjectPosition(self.trackSphere,(joint[0][3]/1000,joint[2][3]/-1000,joint[1][3]/1000),self.sim.getObject("./Chest_respondable"))
-        self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
-        # for motor in self.motors:
-        #     motor.move(motor.target)
+        if self.is_real:
+            for motor in self.motors:
+                time.sleep(0.01)
+                motor.move(motor.target)
+        else:
+            # joint = self.locate(self.motors[19])
+            # self.sim.setObjectPosition(self.trackSphere,(joint[0][3]/1000,joint[2][3]/-1000,joint[1][3]/1000),self.sim.getObject("./Chest_respondable"))
+            self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
+            # for motor in self.motors:
+            #     motor.move(motor.target)
 
     def initHomePos(self):
         if self.is_real:
@@ -296,7 +307,8 @@ class Robot():
 
     def IMUBalance(self, Xtarget, Ztarget):
         data = self.imu.getData()
-        # print(data)
+        print(math.degrees(data[0]))
+
         xRot = data[0]
         zRot = data[2]
         Xerror = Xtarget - xRot
@@ -305,6 +317,7 @@ class Robot():
         self.imuPIDZ.setError(Zerror)
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
+        # print(math.degrees(newTargetX), math.degrees(newTargetZ))
         self.motors[13].target = (-newTargetZ, 'P')
         self.motors[10].target = (-newTargetX, 'P')
 

@@ -1,5 +1,5 @@
 
-# import adafruit_bno055
+#import adafruit_bno055
 import numpy as np
 import math
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
@@ -18,22 +18,16 @@ class IMU():
             i2c = board.I2C()  # uses board.SCL and board.SDA
             self.sensor = adafruit_bno055.BNO055_I2C(i2c)
 
-            self.zero() # angles/accelerations that correspond to home position
-        
-
+            # self.zero() # angles/accelerations that correspond to home position
+    
     def zero(self):
         if self.isReal:
             self.zeroAngles = self.getDataRaw()
         else:
             raise NotImplementedError("IMU zero not implemented for simulation IMU")
 
-        
-
     def getData(self):
-        if self.isReal:
-            return np.subtract(self.getDataRaw(), self.zeroAngles) # subtract reading from 'zero orientation' to get reading relative to 'zero orientation'
-        else:
-            return self.getDataRaw() # for simulation don't do zero stuff
+        return self.getDataRaw()
 
     # x axis is toward Ava's Left, y axis is up, z axis is toward Ava's front, all from the center of Ava
     # getData returns [x angle (rad), y angle (rad), z angle (rad), x acceleration (m/s^2), y acceleration (m/s^2), z acceleration (m/s^2)]
