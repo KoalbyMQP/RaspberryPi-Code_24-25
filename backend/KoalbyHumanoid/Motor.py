@@ -1,6 +1,7 @@
 """The Motor class hold all information for an abstract motor on the physical robot. It is used to interface with the
 arduino which directly controls the motors"""
 import time
+import math
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid.PID import PID
 
@@ -36,6 +37,7 @@ class Motor():
     
     def set_position(self, position, time=1000):
         if self.is_real:
+            # print(f"moving {self.motor_id} to {position}")
             self.arduino_serial.send_command(f"10 {self.motor_id} {position} {time}")
         else:
             """sends a desired motor position to the Simulation"""
@@ -64,13 +66,17 @@ class Motor():
             self.sim.setJointTargetVelocity(self.handle, velocity)
 
     def move(self, target="TARGET"):
+        targetPos = target[0]
+        if self.is_real:
+            targetPos = math.degrees(targetPos)
+        
         if time.perf_counter() - self.prevTime > 0.001:
             if target == "TARGET":
                 target = self.target
             if target[1] == 'P':
-                self.set_position(target[0])
+                self.set_position(targetPos)
             elif target[1] == 'V':
-                self.set_velocity(target[0])
+                self.set_velocity(targetPos)
             else:
                 raise Exception("Invalid goal")
         self.prevTime = time.perf_counter()
