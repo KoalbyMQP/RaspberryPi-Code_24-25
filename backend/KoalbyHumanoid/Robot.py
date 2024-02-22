@@ -378,3 +378,15 @@ class Robot():
         self.motors[19].target = (newTarget, 'P')
         self.IMUBalance(0, 0)
         return thetaError
+    
+    def checkMotors(self):
+        self.arduino_serial.send_command("50")
+
+        while True:
+            line = self.arduino_serial.read_float()
+            if(line == "END"):
+                return
+
+            print(line)
+        
+        
