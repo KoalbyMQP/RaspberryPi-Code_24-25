@@ -380,6 +380,8 @@ class Robot():
         return thetaError
     
     def checkMotors(self):
+        if(not self.is_real):
+            return
         self.arduino_serial.send_command("50")
 
         while True:
