@@ -6,3 +6,6 @@ coppeliasim-zmqremoteapi-client
 matplotlib
 asyncio
 board
+pyzmq
+cbor
+cbor2 

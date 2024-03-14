@@ -8,7 +8,9 @@
     1. pip install -r requirements.txt
 3. Download and install latest version of CoppeliaSim for your OS
     1. https://coppeliarobotics.com/
-4. Open CoppeliaSim and open wanted scene
+4. Open CoppeliaSim
+    1. For Ubuntu and Mac OSs, open CoppeliaSim through terminal
+5. Open wanted scene in CoppeliaSim
     1. Our scenes are stored in RaspberryPi-Code_23-24/backend/KoalbyHumanoid/Simulation Files
     2. File→Open scene...→ (select the scene file)→ Open
 5. Run the Python script corresponding to what you want to happen in the scene
