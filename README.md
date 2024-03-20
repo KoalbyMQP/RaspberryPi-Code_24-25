@@ -5,7 +5,7 @@
 1. Clone GitHub repo
     1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
 2. Switch to the dev branch of the repository
-3. Install all Python packages in requirements.txt in the base folder of the repository
+3. Install all Python packages in requirements.txt in the root folder of the repository
     1. pip install -r requirements.txt
 4. Download and install latest version of CoppeliaSim for your OS
     1. https://coppeliarobotics.com/
@@ -16,6 +16,7 @@
     2. File→Open scene...→ (select the scene file)→ Open
 7. Run the Python script corresponding to what you want to happen in the scene
     1. Our demo scripts are stored in RaspberryPi-Code_23-24/backend/Demo Scripts
+    2. Make sure to run any scripts from the root folder of the repository
 
 ### Programs
 - KoalbyHumanoid
