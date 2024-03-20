@@ -16,7 +16,7 @@
     2. File→Open scene...→ (select the scene file)→ Open
 7. Run the Python script corresponding to what you want to happen in the scene
     1. Our demo scripts are stored in RaspberryPi-Code_23-24/backend/Demo Scripts
-    2. Make sure to run any scripts from the root folder of the repository
+    2. Make sure to run any scripts locally and from the root folder of the repository
 
 ### Programs
 - KoalbyHumanoid
