@@ -6,7 +6,7 @@
     1. CoppeliaSim: https://coppeliarobotics.com/
     2. Git: https://git-scm.com/downloads/
     3. Python: https://www.python.org/downloads/
-2. Clone GitHub repo
+2. Clone this GitHub repository
     1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
 3. Switch to the dev branch of the repository
 4. Install all Python packages in requirements.txt in the root folder of the repository
