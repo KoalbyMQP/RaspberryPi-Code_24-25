@@ -12,7 +12,7 @@
 4. Install all Python packages in requirements.txt found in the root folder of this repository
     1. pip install -r requirements.txt
 5. Open CoppeliaSim
-    1. For Ubuntu and Mac OSs, you may have to open CoppeliaSim through terminal if not working
+    1. For Ubuntu and macOS, you may have to open CoppeliaSim through terminal if not working
 6. Open wanted scene in CoppeliaSim
     1. Our scenes are located at RaspberryPi-Code_23-24/backend/KoalbyHumanoid/Simulation Files
     2. In CoppeliaSim: File → Open scene... → (select the scene file) → Open
