@@ -2,15 +2,15 @@
 ## Raspberry Pi Side of Koalby/Ava
 
 ### Install and Use
-1. Clone GitHub repo
-    1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
-2. Switch to the dev branch of the repository
-3. Install all Python packages in requirements.txt in the root folder of the repository
-    1. pip install -r requirements.txt
-4. Download and install the latest versions of CoppeliaSim, Git, and Python for your OS
+1. Download and install the latest versions of CoppeliaSim, Git, and Python for your OS
     1. CoppeliaSim: https://coppeliarobotics.com/
     2. Git: https://git-scm.com/downloads/
     3. Python: https://www.python.org/downloads/
+2. Clone GitHub repo
+    1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
+3. Switch to the dev branch of the repository
+4. Install all Python packages in requirements.txt in the root folder of the repository
+    1. pip install -r requirements.txt
 5. Open CoppeliaSim
     1. For Ubuntu and Mac OSs, open CoppeliaSim through terminal
 6. Open wanted scene in CoppeliaSim
