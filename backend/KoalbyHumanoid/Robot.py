@@ -58,7 +58,7 @@ class Robot():
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
-        # self.sim.startSimulation()
+        self.sim.startSimulation()
         # self.sim.startSimulation()
         print("Robot Created and Initialized")
 
@@ -307,7 +307,6 @@ class Robot():
 
     def IMUBalance(self, Xtarget, Ztarget):
         data = self.imu.getData()
-        print(math.degrees(data[0]))
 
         xRot = data[0]
         zRot = data[2]
@@ -390,5 +389,3 @@ class Robot():
                 return
 
             print(line)
-        
-        
