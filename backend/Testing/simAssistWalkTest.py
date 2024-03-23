@@ -16,8 +16,13 @@ robot = Robot(is_real)
 
 print("Setup Complete")
 
-robot.motors[1].target = (math.radians(80), 'P')
-robot.motors[6].target = (math.radians(-80), 'P')
+robot.motors[0].target = (math.radians(-20), 'P')
+robot.motors[1].target = (math.radians(90), 'P')
+robot.motors[3].target = (math.radians(110), 'P')
+
+robot.motors[5].target = (math.radians(20), 'P')
+robot.motors[6].target = (math.radians(-90), 'P')
+robot.motors[8].target = (math.radians(-110), 'P')
 
 robot.motors[17].target = (math.radians(20), 'P')
 robot.motors[18].target = (math.radians(-40), 'P')
@@ -26,22 +31,16 @@ robot.motors[22].target = (math.radians(-20), 'P')
 robot.motors[23].target = (math.radians(40), 'P')
 robot.motors[24].target = (math.radians(20), 'P')
 
-robot.motors[3].target = (math.radians(70), 'P')
-robot.motors[8].target = (math.radians(-70), 'P')
-robot.motors[0].target = (math.radians(20), 'P')
-robot.motors[5].target = (math.radians(-20), 'P')
-
-robot.motors[14].target = (0, 'P')
 
 prevTime = time.time()
 simStartTime = time.time()
 
-while time.time() - simStartTime < 1:
+while time.time() - simStartTime < 8:
     time.sleep(0.01)
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
-## EVEN TO RIGHT FOOT FORW
+## EVEN TO RIGHT FOOT FORWARD
 right_setPointTimes = [[0,0,0], [1,1,1], [2,2,2], [3,3,3], [4,4,4]]
 right_angles = [[math.radians(20),math.radians(-40), math.radians(-20)], 
                 [0.543488, -1.045386, -0.501898], 

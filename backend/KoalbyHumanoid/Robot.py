@@ -317,8 +317,8 @@ class Robot():
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
         # print(math.degrees(newTargetX), math.degrees(newTargetZ))
-        self.motors[13].target = (-newTargetZ, 'P')
-        self.motors[10].target = (-newTargetX, 'P')
+        self.motors[13].target = (newTargetZ, 'P')
+        self.motors[10].target = (newTargetX, 'P')
 
     def VelBalance(self, balancePoint):
         balanceError = balancePoint - self.CoM
