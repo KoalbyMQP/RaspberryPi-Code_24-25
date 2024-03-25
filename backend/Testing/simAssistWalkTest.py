@@ -33,7 +33,7 @@ robot.motors[24].target = (math.radians(20), 'P')
 prevTime = time.time()
 simStartTime = time.time()
 
-while time.time() - simStartTime < 2:
+while time.time() - simStartTime < 4:
     time.sleep(0.01)
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
@@ -69,36 +69,30 @@ while time.time() - startTime < 3:
     robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
 
+time.sleep(2)
 
-startTime = time.time()
-test = TrajPlannerTime(via.lf_test[0], via.lf_test[1], via.lf_test[2], via.lf_test[3])
-while time.time() - startTime < 4:
-    testp = test.getQuinticPositions(time.time() - startTime)
-    robot.motors[20].target = (testp[0], 'P')
-    robot.motors[21].target = (testp[1], 'P')
-    robot.motors[22].target = (testp[2], 'P')
-    robot.motors[23].target = (testp[3], 'P')
-    robot.motors[24].target = (testp[4], 'P')
-    robot.IMUBalance(0, 0)
-    robot.moveAllToTarget()
-
-time.sleep(10)
 ##  Walking
 startTime = time.time()
 while True:
     right_points = rLeg_tj.getQuinticPositions(time.time() - startTime)
     left_points = lLeg_tj.getQuinticPositions(time.time() - startTime)
-    robot.motors[17].target = (right_points[0], 'P')
-    robot.motors[18].target = (right_points[1], 'P')
-    robot.motors[19].target = (right_points[2], 'P')
-    robot.motors[22].target = (left_points[0], 'P')
-    robot.motors[23].target = (left_points[1], 'P')
-    robot.motors[24].target = (left_points[2], 'P')
-    robot.IMUBalance(math.radians(-20), 0)
+
+    robot.motors[15].target = (right_points[0], 'P')
+    robot.motors[16].target = (right_points[1], 'P')
+    robot.motors[17].target = (right_points[2], 'P')
+    robot.motors[18].target = (right_points[3], 'P')
+    robot.motors[19].target = (right_points[4], 'P')
+
+    robot.motors[20].target = (left_points[0], 'P')
+    robot.motors[21].target = (left_points[1], 'P')
+    robot.motors[22].target = (left_points[2], 'P')
+    robot.motors[23].target = (left_points[3], 'P')
+    robot.motors[24].target = (left_points[4], 'P')
+    robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
     match(state):
         case 0: 
-            if(time.time() - startTime >= 4):
+            if(time.time() - startTime >= 3):
                 ##ANGLES TO GO RIGHT TO LEFT
                 rLeg_tj = TrajPlannerTime(via.rf_Right2Left[0], via.rf_Right2Left[1], via.rf_Right2Left[2], via.rf_Right2Left[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Right2Left[0], via.lf_Right2Left[1], via.lf_Right2Left[2], via.lf_Right2Left[3])
@@ -107,7 +101,7 @@ while True:
                 state = 1
             
         case 1: ##Right to Left
-            if(time.time() - startTime >= 4):
+            if(time.time() - startTime >= 3):
                 ##ANGLES TO GO LEFT TO RIGHT
                 rLeg_tj = TrajPlannerTime(via.rf_Left2Right[0], via.rf_Left2Right[1], via.rf_Left2Right[2], via.rf_Left2Right[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Left2Right[0], via.lf_Left2Right[1], via.lf_Left2Right[2], via.lf_Left2Right[3])
