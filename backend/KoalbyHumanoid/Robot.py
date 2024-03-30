@@ -13,6 +13,8 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
 
+TIME_BETWEEN_MOTOR_CHECKS = 2
+
 class Robot():
 
     # Initialization methods
@@ -39,6 +41,8 @@ class Robot():
             self.imuPIDX = PID(0.3,0.005,0.1)
             self.imuPIDZ = PID(0.25,0.0,0.0075)
 
+        self.lastMotorCheck = time.time()
+
         self.imu = IMU(self.is_real, sim=self.sim)
         self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
@@ -58,7 +62,8 @@ class Robot():
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
-        self.sim.startSimulation()
+        if(not is_real):
+            self.sim.startSimulation()
         # self.sim.startSimulation()
         print("Robot Created and Initialized")
 
@@ -320,6 +325,8 @@ class Robot():
         self.motors[13].target = (newTargetZ, 'P')
         self.motors[10].target = (newTargetX, 'P')
 
+        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+
     def VelBalance(self, balancePoint):
         balanceError = balancePoint - self.CoM
         Xerror = balanceError[0]
@@ -378,14 +385,40 @@ class Robot():
         self.IMUBalance(0, 0)
         return thetaError
     
+    def decodeError(self, errorNum : int):
+        errorNum = int(errorNum)
+        errorDict = { 1: "Exceed Input Voltage Limit",
+                      2: "Exceed Allow POT Limit",
+                      4: "Exceed Temperature Limit",
+                      8: "Invalid Packet (8)",
+                      9: "Invalid Packet (9)",
+                      16: "Overload Detected",
+                      32: "Driver Fault Detected",
+                      64: "EEP REG Distorted",
+                      255: "No Communication"}
+                      
+        if(errorNum in errorDict.keys()):
+            return errorDict[errorNum]
+        else:
+            return errorNum
+    
+    # If continuously called, checks motor statuses at the given interval (in seconds)
+    def checkMotorsAtInterval(self, interval):
+        if(time.time() > self.lastMotorCheck + interval):
+            self.lastMotorCheck = time.time()
+            self.checkMotors()
+
+    # Checks the status of all motors
     def checkMotors(self):
         if(not self.is_real):
             return
-        self.arduino_serial.send_command("50")
+        
+        self.arduino_serial.send_command("50") # Check motors command
 
         while True:
             line = self.arduino_serial.read_float()
             if(line == "END"):
                 return
-
-            print(line)
+            
+            msg = line.split(" ")
+            print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
