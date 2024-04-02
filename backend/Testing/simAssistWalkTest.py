@@ -5,7 +5,6 @@ sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid.trajPlannerTime import TrajPlannerTime
 from backend.Testing import assistWalkViaPoints as via
-from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 
 # Edit to declare if you are testing the sim or the real robot
 is_real = False
@@ -30,6 +29,8 @@ robot.motors[22].target = (math.radians(-20), 'P')
 robot.motors[23].target = (math.radians(40), 'P')
 robot.motors[24].target = (math.radians(20), 'P')
 
+
+prevTime = time.time()
 simStartTime = time.time()
 
 while time.time() - simStartTime < 4:
@@ -43,7 +44,11 @@ lLeg_tj = TrajPlannerTime(via.lf_Even2Right[0], via.lf_Even2Right[1], via.lf_Eve
 rArm_tj = TrajPlannerTime(via.ra_grabCart[0], via.ra_grabCart[1], via.ra_grabCart[2], via.ra_grabCart[3])
 lArm_tj = TrajPlannerTime(via.la_grabCart[0], via.la_grabCart[1], via.la_grabCart[2], via.la_grabCart[3])
 
+state = 0
 startTime = time.time()
+
+print("State = 0")
+
 ## Grabbing cart
 while time.time() - startTime < 3:
     r_points = rArm_tj.getQuinticPositions(time.time() - startTime)
@@ -64,14 +69,10 @@ while time.time() - startTime < 3:
     robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
 
-cart = robot.sim.getObject('/Cart')
-forceSensor = robot.sim.getObject('/ForceSensor')
-robot.sim.setObjectParent(cart, forceSensor, True)
 time.sleep(2)
 
 ##  Walking
 startTime = time.time()
-state = 0
 while True:
     right_points = rLeg_tj.getQuinticPositions(time.time() - startTime)
     left_points = lLeg_tj.getQuinticPositions(time.time() - startTime)

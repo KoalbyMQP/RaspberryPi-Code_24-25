@@ -25,8 +25,8 @@ print("Setup Complete")
 # traj = tj.getCubicTraj(30, 100)
 # plotter = Plotter(10, True)
 
-# robot.motors[1].target = (math.radians(-80), 'P') # right abductor
-# robot.motors[6].target = (math.radians(80), 'P') # left abductor
+robot.motors[1].target = (math.radians(-80), 'P') # right abductor
+robot.motors[6].target = (math.radians(80), 'P') # left abductor
 # robot.motors[13].target = (0.1, 'P')
 # robot.motors[3].target = math.radians(90)
 # robot.motors[8].target = math.radians(90)
@@ -34,14 +34,14 @@ print("Setup Complete")
 # robot.motors[17].target = math.radians(90)
 # robot.motors[22].target = math.radians(90)
 
-# robot.motors[17].target = (math.radians(5), 'P') # right kick
-# robot.motors[18].target = (math.radians(2), 'P') # Right knee
-# robot.motors[19].target = (math.radians(5), 'P') # right ankle
+robot.motors[17].target = (math.radians(5), 'P') # right kick
+robot.motors[18].target = (math.radians(2), 'P') # Right knee
+robot.motors[19].target = (math.radians(5), 'P') # right ankle
 
-# robot.motors[20].target = (math.radians(5), 'P')
-# robot.motors[22].target = (math.radians(-5), 'P') # left kick
-# robot.motors[23].target = (math.radians(0), 'P') # left knee
-# robot.motors[24].target = (math.radians(-5), 'P') # left ankle
+robot.motors[20].target = (math.radians(5), 'P')
+robot.motors[22].target = (math.radians(-5), 'P') # left kick
+robot.motors[23].target = (math.radians(0), 'P') # left knee
+robot.motors[24].target = (math.radians(-5), 'P') # left ankle
 
 # angles = poe.calcLegChainIK(robot, T, True)[0]
 # print(angles)
@@ -63,14 +63,15 @@ robot.moveAllToTarget()
 
 time.sleep(1)
 
+exit()
 simStartTime = time.time()
 print("Starting Loop")
 while time.time() - simStartTime < 300:
     robot.IMUBalance(0,0)
     # robot.moveAllToTarget()
-    # robot.moveToTarget(robot.motors[10])
+    robot.moveToTarget(robot.motors[10])
     time.sleep(0.01)
-    # robot.moveToTarget(robot.motors[13])
+    robot.moveToTarget(robot.motors[13])
     
 
 exit()
