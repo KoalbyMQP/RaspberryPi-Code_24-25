@@ -29,21 +29,29 @@ Format of each list goes as follows:
 
 ##first movement to grab the candy
 leftArmTraj1 = [
-    [[0,0,0,0,0], [3,3,3,3,3], [6,6,6,6,6]],
+    [[0,0,0,0,0], [1.5,1.5,1.5,1.5,1.5], [3,3,3,3,3]],
     [[0.349066, -1.570796, 0.000000, -1.919862, 0.000000], ##starting position (0,0,0)
      [0.550746, -0.650519, 0.457600, -1.822806, -0.996616], ## X125, Y50, Z5 : arm left and back
      [0.364398, -0.801358, 0.274735, -1.428318, -0.804733]], ##X175, Y-35, Z-3: arm more left and align with candy
-     [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+     [[0,0,0,0,0],[0.5,0.5,0.5,0.5,0.5],[0,0,0,0,0]],
      [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]]
 
-##second movement to drop the candy
+##second movement to move the candy
 leftArmTraj2 = [
     [[0,0,0,0,0],[3,3,3,3,3],[6,6,6,6,6]],
-     [[0.317468, -0.741816, 0.250788, -1.431064, -0.855117], ##X175, Y-20, Z8: arm up holding candy
-     [0.296623, -1.474594, 0.029807, -1.803107, -0.101194], ##X15, Y10, Z8: arm moves right holding candy then drop
-     [0.349066, -1.570796, 0.000000, -1.919862, 0.000000]],##ending position (0,0,0)
+    [[0.364398, -0.801358, 0.274735, -1.428318, -0.804733], ##X175, Y-35, Z-3: arm more left and align with candy
+     [0.317468, -0.741816, 0.250788, -1.431064, -0.855117], ##X175, Y-20, Z8: arm up holding candy
+     [-0.435214, -1.466633, -0.048268, -1.145674, -0.114711]], ##X15, Y50, Z8: arm moves right holding candy then drop
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]]
+
+#third movement after releasing candy
+leftArmTraj3= [
+    [[0,0,0,0,0],[3,3,3,3,3]],
+    [[-0.435214, -1.466633, -0.048268, -1.145674, -0.114711],
+     [0.349066, -1.570796, 0.000000, -1.919862, 0.000000]], ##ending position (0,0,0)
+    [[0,0,0,0,0], [0,0,0,0,0]],
+    [[0,0,0,0,0], [0,0,0,0,0]]]
 ###############################
 
 
@@ -75,8 +83,6 @@ while time.time() - simStartTime < 5:
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
-## EVEN TO RIGHT FOOT FORWARD
-# rArm_tj = TrajPlannerTime(via.ra_grabCart[0], via.ra_grabCart[1], via.ra_grabCart[2], via.ra_grabCart[3])
 lArm_tj = TrajPlannerTime(leftArmTraj1[0], leftArmTraj1[1], leftArmTraj1[2], leftArmTraj1[3])
 
 state = 0
@@ -84,7 +90,36 @@ startTime = time.time()
 
 print("State = 0")
 
-## Grabbing cart
+## Moving Left Arm to Grab Candy
+while time.time() - startTime < 3:
+    l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
+    
+    robot.motors[5].target = (l_points[0], 'P')
+    robot.motors[6].target = (l_points[1], 'P')
+    robot.motors[7].target = (l_points[2], 'P')
+    robot.motors[8].target = (l_points[3], 'P')
+    robot.motors[9].target = (l_points[4], 'P')
+
+    robot.IMUBalance(0, 0)
+    robot.moveAllToTarget()
+
+print("State = 1")
+## Grab Candy
+sim = robot.sim
+candy = sim.getObject("./candy")
+hand = sim.getObject("./LeftHand_respondable")
+forceSensor = sim.createForceSensor(0, [0,0,0,0,0], [0,0,0,0,0])
+sim.setObjectParent(forceSensor, hand, True)
+sim.setObjectParent(candy, forceSensor, True)
+
+lArm_tj = TrajPlannerTime(leftArmTraj2[0], leftArmTraj2[1], leftArmTraj2[2], leftArmTraj2[3])
+
+state = 0
+startTime = time.time()
+
+print("State = 2")
+
+## Moving Left Arm to Grab Candy
 while time.time() - startTime < 6:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
@@ -97,13 +132,20 @@ while time.time() - startTime < 6:
     robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
 
-## grab object
+time.sleep(2)
+print("State = 3")
+forceSensor = sim.createForceSensor(0, [0,0,0,0,0], [0,0,0,0,0])
 
-lArm_tj = TrajPlannerTime(leftArmTraj2[0], leftArmTraj2[1], leftArmTraj2[2], leftArmTraj2[3])
+# print(sim.getObject("./"))
+table = sim.getObject("./Table")
+sim.setObjectParent(candy, table, True)
+
+## Moving Left Arm With Candy
+lArm_tj = TrajPlannerTime(leftArmTraj3[0], leftArmTraj3[1], leftArmTraj3[2], leftArmTraj3[3])
 startTime = time.time()
-print("State = 1")
+print("State = 4")
 
-while time.time() - startTime < 6:
+while time.time() - startTime < 3:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
