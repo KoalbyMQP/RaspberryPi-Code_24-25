@@ -71,6 +71,7 @@ time.sleep(2)
 
 ##  Walking
 startTime = time.time()
+loopTime = time.time()
 state = 0
 while True:
     right_points = rLeg_tj.getQuinticPositions(time.time() - startTime)
