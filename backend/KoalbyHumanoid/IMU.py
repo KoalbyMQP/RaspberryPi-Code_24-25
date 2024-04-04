@@ -12,11 +12,16 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 class IMU():
     def __init__(self, isReal, sim=None):
         self.isReal = isReal
+        self.isConnected = True
         self.sim = sim
         
         if isReal:
-            i2c = board.I2C()  # uses board.SCL and board.SDA
-            self.sensor = adafruit_bno055.BNO055_I2C(i2c)
+            try:
+                i2c = board.I2C()  # uses board.SCL and board.SDA
+                self.sensor = adafruit_bno055.BNO055_I2C(i2c)
+            except:
+                print("No IMU detected, disabling IMU")
+                self.isConnected = False
 
             # self.zero() # angles/accelerations that correspond to home position
     
@@ -32,6 +37,8 @@ class IMU():
     # x axis is toward Ava's Left, y axis is up, z axis is toward Ava's front, all from the center of Ava
     # getData returns [x angle (rad), y angle (rad), z angle (rad), x acceleration (m/s^2), y acceleration (m/s^2), z acceleration (m/s^2)]
     def getDataRaw(self): 
+        if not self.isConnected:
+            return [0, 0, 0, 0, 0, 0]
         if self.isReal:
             # in terms of right hand rule convention for positive directions:
             # sensor.euler returns: (yaw (opposite convention), roll (normal convention), pitch (opposite convention))
