@@ -7,7 +7,7 @@ from backend.KoalbyHumanoid.trajPlannerTime import TrajPlannerTime
 # from backend.Testing import finlyViaPoints as via
 
 # Edit to declare if you are testing the sim or the real robot
-is_real = False
+is_real = True
 
 robot = Robot(is_real)
 
