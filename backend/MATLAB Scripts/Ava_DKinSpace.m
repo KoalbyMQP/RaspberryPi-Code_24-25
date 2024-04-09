@@ -40,11 +40,11 @@ thetalist0 = [deg2rad(-20); deg2rad(90); deg2rad(0); deg2rad(110); deg2rad(0)];
 % thetalist0 =[deg2rad(0); deg2rad(0); deg2rad(-20); deg2rad(40); deg2rad(20)];
 
 eomg = 1;
-ev = 0.001;
+ev = 0.01;
 [thetalist, success] = IKinBody(Slist, M, T, thetalist0, eomg, ev);
-J = JacobianBody(Slist, thetalist);
+J = JacobianBody(Slist, thetalist)
 
-Vd = [0; 0; 0; 0; 0; 0]; % Desired end-effector velocity
+Vd = [1; 0; 0; 0; 0; 0]; % Desired end-effector velocity
 qDot = pinv(J) * Vd;
 
 % Print the row vector separated by commas
