@@ -1,11 +1,13 @@
 import time
 import serial
+from serial.tools import list_ports
 
 class ArduinoSerial(object):
 
     def __init__(self):
         # to run connected to Arduino
-        self.ser = serial.Serial('COM3', 115200, timeout=1)
+        ports = list_ports.comports()
+        self.ser = serial.Serial(ports[0].device, 115200, timeout=1)
 
         self.ser.reset_input_buffer()
         time.sleep(3)

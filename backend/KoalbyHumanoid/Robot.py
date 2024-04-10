@@ -58,7 +58,8 @@ class Robot():
         self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
-        self.sim.startSimulation()
+        if(not self.is_real): 
+            self.sim.startSimulation()
         # self.sim.startSimulation()
         print("Robot Created and Initialized")
 
