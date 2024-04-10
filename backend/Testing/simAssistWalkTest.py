@@ -14,14 +14,14 @@ robot = Robot(is_real)
 
 print("Setup Complete")
 
-#Starting Agnles
+#Starting Angles
 robot.motors[0].target = (math.radians(-20), 'P')
 robot.motors[1].target = (math.radians(-90), 'P')
 robot.motors[3].target = (math.radians(100), 'P')
 
 robot.motors[5].target = (math.radians(20), 'P')
 robot.motors[6].target = (math.radians(90), 'P')
-robot.motors[8].target = (math.radians(100), 'P')
+robot.motors[8].target = (math.radians(-100), 'P')
 
 robot.motors[17].target = (math.radians(5), 'P')
 robot.motors[18].target = (math.radians(10), 'P')
@@ -92,7 +92,7 @@ while True:
     robot.moveAllToTarget()
     match(state):
         case 0: 
-            if(time.time() - startTime >= 3):
+            if(time.time() - startTime >= 1):
                 ##ANGLES TO GO RIGHT TO LEFT
                 rLeg_tj = TrajPlannerTime(via.rf_Right2Left[0], via.rf_Right2Left[1], via.rf_Right2Left[2], via.rf_Right2Left[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Right2Left[0], via.lf_Right2Left[1], via.lf_Right2Left[2], via.lf_Right2Left[3])
@@ -101,7 +101,7 @@ while True:
                 state = 1
             
         case 1: ##Right to Left
-            if(time.time() - startTime >= 3):
+            if(time.time() - startTime >= 1):
                 ##ANGLES TO GO LEFT TO RIGHT
                 rLeg_tj = TrajPlannerTime(via.rf_Left2Right[0], via.rf_Left2Right[1], via.rf_Left2Right[2], via.rf_Left2Right[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Left2Right[0], via.lf_Left2Right[1], via.lf_Left2Right[2], via.lf_Left2Right[3])
