@@ -28,9 +28,9 @@ Format of each list goes as follows:
 """
 
 ##first movement to grab the candy
-leftArmTraj1 = np.array( [
+leftArmTraj1 = np.arrray([
     [[0,0,0,0,0], [1.5,1.5,1.5,1.5,1.5], [3,3,3,3,3]],
-    [[0.349066, -1.570796, 0.000000, -1.919862, 0.000000], ##starting position (0,0,0)
+    [[0.312359, -1.570665, -0.000032, -1.893138, -0.000039], ##starting position (0,0,0)
      [0.550746, -0.650519, 0.457600, -1.822806, -0.996616], ## X125, Y50, Z5 : arm left and back
      [0.364398, -0.801358, 0.274735, -1.428318, -0.804733]], ##X175, Y-35, Z-3: arm more left and align with candy
      [[0,0,0,0,0],[0.5,0.5,0.5,0.5,0.5],[0,0,0,0,0]],
@@ -41,26 +41,26 @@ leftArmTraj2 = np.array([
     [[0,0,0,0,0],[3,3,3,3,3],[6,6,6,6,6]],
     [[0.364398, -0.801358, 0.274735, -1.428318, -0.804733], ##X175, Y-35, Z-3: arm more left and align with candy
      [0.317468, -0.741816, 0.250788, -1.431064, -0.855117], ##X175, Y-20, Z8: arm up holding candy
-     [-0.435214, -1.466633, -0.048268, -1.145674, -0.114711]], ##X15, Y50, Z8: arm moves right holding candy then drop
+     [0.234358, -1.377705, 0.043753, -2.013297, -0.195953]], ##X15, Y50, Z8: arm moves right holding candy then drop -- here is where numbers change
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]]) * -1
 
 #third movement after releasing candy
 leftArmTraj3= np.array([
     [[0,0,0,0,0],[3,3,3,3,3]],
-    [[-0.435214, -1.466633, -0.048268, -1.145674, -0.114711],
+    [[0.234358, -1.377705, 0.043753, -2.013297, -0.195953],
      [0.349066, -1.570796, 0.000000, -1.919862, 0.000000]], ##ending position (0,0,0)
-    [[0,0,0,0,0], [0,0,0,0,0]],
+    [[0.1,0.1,0.1,0.1,0.1], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0]]]) * -1
 ###############################
 
 
 #Starting Agnles
-robot.motors[0].target = (math.radians(20), 'P')
+robot.motors[0].target = (math.radians(10), 'P')
 robot.motors[1].target = (math.radians(-90), 'P')
 robot.motors[3].target = (math.radians(-100), 'P')
 
-robot.motors[5].target = (math.radians(-20), 'P')
+robot.motors[5].target = (math.radians(-10), 'P')
 robot.motors[6].target = (math.radians(90), 'P')
 robot.motors[8].target = (math.radians(100), 'P')
 

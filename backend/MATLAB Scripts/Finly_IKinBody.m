@@ -3,10 +3,10 @@ addpath(scriptpath)
 addpath('mr')
 clc;
 clear;
-
-deltaX = 175;
-deltaY = -35;
-deltaZ = -3;
+%%below values are in millimeters 
+deltaX = 0;
+deltaY = 0;
+deltaZ = 0;
 
 %% LEFT ARM
 Slist = [[1;0;0;0; 8.68; 2.4], ...
