@@ -28,7 +28,7 @@ Format of each list goes as follows:
 """
 
 ##first movement to grab the candy
-leftArmTraj1 = np.arrray([
+leftArmTraj1 = np.array([
     [[0,0,0,0,0], [1.5,1.5,1.5,1.5,1.5], [3,3,3,3,3]],
     [[0.312359, -1.570665, -0.000032, -1.893138, -0.000039], ##starting position (0,0,0)
      [0.550746, -0.650519, 0.457600, -1.822806, -0.996616], ## X125, Y50, Z5 : arm left and back
@@ -48,7 +48,7 @@ leftArmTraj2 = np.array([
 #third movement after releasing candy
 leftArmTraj3= np.array([
     [[0,0,0,0,0],[3,3,3,3,3]],
-    [[0.234358, -1.377705, 0.043753, -2.013297, -0.195953],
+    [[0.234358, -1.377705, -0.043753, -2.013297, -0.195953],
      [0.349066, -1.570796, 0.000000, -1.919862, 0.000000]], ##ending position (0,0,0)
     [[0.1,0.1,0.1,0.1,0.1], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0]]]) * -1
