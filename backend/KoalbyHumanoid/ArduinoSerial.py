@@ -27,4 +27,4 @@ class ArduinoSerial(object):
             line = line.decode('utf-8').strip()
             return line
         else:
-            return ""
+            return None
