@@ -147,7 +147,7 @@ print("State = 4")
 while time.time() - startTime < 3:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
-    robot.motors[10].target = (l_points[0], 'P')
+    robot.motors[5].target = (l_points[0], 'P')
     robot.motors[6].target = (l_points[1], 'P')
     robot.motors[7].target = (l_points[2], 'P')
     robot.motors[8].target = (l_points[3], 'P')
