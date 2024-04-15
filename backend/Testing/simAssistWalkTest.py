@@ -32,9 +32,9 @@ robot.motors[24].target = (math.radians(5), 'P')
 
 simStartTime = time.time()
 
-robot.electromagnet.turnOn()
+# robot.electromagnet.turnOn()
 
-while True: #time.time() - simStartTime < 4:
+while time.time() - simStartTime < 4:
     time.sleep(0.01)
     robot.IMUBalance(0,0)
     robot.moveAllToTarget()
