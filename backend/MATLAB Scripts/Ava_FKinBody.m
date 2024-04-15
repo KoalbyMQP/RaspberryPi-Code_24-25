@@ -11,7 +11,7 @@ Slist = [[0;0;1; 468.7500; 22.6300; 0], ...
         [-1;0;0; 0; 29.1400; 266.5500], ...
         [-1;0;0; 0; 29.1400; 35]];
 M = [[1, 0, 0, 22.63]; [0, 1, 0, -468.74]; [0, 0, 1, 12.74]; [0, 0, 0, 1]];
-thetalist =[deg2rad(0); deg2rad(0); deg2rad(-2.5); deg2rad(-5); deg2rad(2.5)];
+thetalist =[deg2rad(0); deg2rad(0); deg2rad(-5); deg2rad(-10); deg2rad(5)];
 
 %% JUST RIGHT LEG
 % Slist = [[0;0;1; 468.7500; -22.6300; 0], ...
@@ -20,7 +20,7 @@ thetalist =[deg2rad(0); deg2rad(0); deg2rad(-2.5); deg2rad(-5); deg2rad(2.5)];
 %         [1;0;0; 0; -29.1400; -266.5500], ...
 %         [-1;0;0; 0; 29.1400; 35]];
 % M = [[1, 0, 0, -22.63]; [0, 1, 0, -468.74]; [0, 0, 1, 12.74]; [0, 0, 0, 1]];
-% thetalist =[deg2rad(0); deg2rad(0); deg2rad(2.5); deg2rad(5); deg2rad(-2.5)];
+% thetalist =[deg2rad(0); deg2rad(0); deg2rad(5); deg2rad(10); deg2rad(-5)];
 
 %% RIGHT ARM
 % Slist = [[-1;0;0; 0; -37.5100; 8.7000], ...
@@ -29,7 +29,7 @@ thetalist =[deg2rad(0); deg2rad(0); deg2rad(-2.5); deg2rad(-5); deg2rad(2.5)];
 %         [0;1;0; -12.9800; 0; 161.7500], ...
 %         [0;-1;0; 7; 0; -52]];
 % M = [[1, 0, 0, -343.73]; [0, 1, 0, -8.7]; [0, 0, 1, -36.51]; [0, 0, 0, 1]];
-% thetalist = [deg2rad(-20); deg2rad(90); deg2rad(0); deg2rad(110); deg2rad(0)];
+% thetalist = [deg2rad(0); deg2rad(-90); deg2rad(0); deg2rad(90); deg2rad(0)];
 
 %% LEFT ARM
 % Slist = [[1;0;0;0; 37.51; -8.2], ...
@@ -38,7 +38,7 @@ thetalist =[deg2rad(0); deg2rad(0); deg2rad(-2.5); deg2rad(-5); deg2rad(2.5)];
 %         [0;1;0;-12.9800; 0; -161.7500], ...
 %         [0;-1;0; 7; 0; 52]];
 % M = [[1, 0, 0, 343.73]; [0, 1, 0, -8.2]; [0, 0, 1, -36.51]; [0, 0, 0, 1]];
-% thetalist =[deg2rad(20); deg2rad(-90); deg2rad(0); deg2rad(-110); deg2rad(0)];
+% thetalist =[deg2rad(0); deg2rad(90); deg2rad(0); deg2rad(-90); deg2rad(0)];
 
 
 T = FKinBody(M, Slist, thetalist)
