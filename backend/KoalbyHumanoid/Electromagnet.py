@@ -1,4 +1,12 @@
-import RPi.GPIO as GPIO
+on_raspi = True
+
+try:
+    import RPi.GPIO as GPIO
+except:
+    print("Not on Raspberry Pi, cannot initialize GPIO. If on Raspberry Pi, ensure RPi.GPIO is installed.")
+    on_raspi = False
+    
+import signal
 from enum import Enum
 
 ELECTROMAGNET_GPIO_PIN = 14
@@ -10,17 +18,27 @@ class ElectromagnetState(Enum):
 class Electromagnet():
     def __init__(self, pin=ELECTROMAGNET_GPIO_PIN):
         self.pin = pin
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(pin, GPIO.OUT)
+        if(on_raspi):
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(pin, GPIO.OUT)
         self.state = ElectromagnetState.OFF
         self.turnOff() # off by default
+
+        # Turns off upon ctrl+c
+        signal.signal(signal.SIGINT, self.onExit)
+    
+    def onExit(self, sig, frame):
+        self.turnOff()
+        exit(0)
         
     def turnOn(self):
-        GPIO.output(self.pin, GPIO.LOW)
+        if(on_raspi):
+            GPIO.output(self.pin, GPIO.LOW)
         self.state = ElectromagnetState.ON
         
     def turnOff(self):
-        GPIO.output(self.pin, GPIO.HIGH) 
+        if(on_raspi):
+            GPIO.output(self.pin, GPIO.HIGH) 
         self.state = ElectromagnetState.OFF
         
     def toggle(self):

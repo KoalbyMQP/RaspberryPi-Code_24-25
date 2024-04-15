@@ -67,7 +67,7 @@ simStartTime = time.time()
 print("Starting Loop")
 while time.time() - simStartTime < 300:
     robot.IMUBalance(0,0)
-    # robot.moveAllToTarget()
+    robot.moveAllToTarget()
     # robot.moveToTarget(robot.motors[10])
     time.sleep(0.01)
     # robot.moveToTarget(robot.motors[13])

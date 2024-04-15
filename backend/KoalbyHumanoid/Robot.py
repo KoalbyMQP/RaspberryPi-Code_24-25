@@ -12,7 +12,7 @@ from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.IMU import IMU
-# from backend.KoalbyHumanoid.Electromagnet import Electromagnet
+from backend.KoalbyHumanoid.Electromagnet import Electromagnet
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
 
@@ -32,7 +32,7 @@ class Robot():
             self.imuPIDX = PID(0.2,0,0.1) # 1
             self.imuPIDZ = PID(0.25,0.0,0.0075)
             
-            # self.electromagnet = Electromagnet()
+            self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
 
@@ -420,8 +420,11 @@ class Robot():
 
         while True:
             line = self.arduino_serial.read_float()
-            if(line == "END"):
+            if(line == "END" or line == None):
                 return
             
             msg = line.split(" ")
-            print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
+            if(len(msg) >= 3):
+                print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
+            else:
+                print(line)
