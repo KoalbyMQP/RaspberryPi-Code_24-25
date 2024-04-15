@@ -92,7 +92,7 @@ while True:
     robot.moveAllToTarget()
     match(state):
         case 0: 
-            if(time.time() - startTime >= 1):
+            if(time.time() - startTime >= 3):
                 ##ANGLES TO GO RIGHT TO LEFT
                 rLeg_tj = TrajPlannerTime(via.rf_Right2Left[0], via.rf_Right2Left[1], via.rf_Right2Left[2], via.rf_Right2Left[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Right2Left[0], via.lf_Right2Left[1], via.lf_Right2Left[2], via.lf_Right2Left[3])
@@ -101,7 +101,7 @@ while True:
                 state = 1
             
         case 1: ##Right to Left
-            if(time.time() - startTime >= 1):
+            if(time.time() - startTime >= 3):
                 ##ANGLES TO GO LEFT TO RIGHT
                 rLeg_tj = TrajPlannerTime(via.rf_Left2Right[0], via.rf_Left2Right[1], via.rf_Left2Right[2], via.rf_Left2Right[3])
                 lLeg_tj = TrajPlannerTime(via.lf_Left2Right[0], via.lf_Left2Right[1], via.lf_Left2Right[2], via.lf_Left2Right[3])
