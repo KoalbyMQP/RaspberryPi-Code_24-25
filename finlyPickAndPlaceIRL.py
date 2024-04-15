@@ -60,9 +60,9 @@ robot.motors[0].target = (math.radians(20), 'P')
 robot.motors[1].target = (math.radians(-90), 'P')
 robot.motors[3].target = (math.radians(-120), 'P')
 
-#robot.motors[5].target = (math.radians(-20), 'P')
-#robot.motors[6].target = (math.radians(90), 'P')
-#robot.motors[8].target = (math.radians(120), 'P')
+robot.motors[5].target = (math.radians(-20), 'P')
+robot.motors[6].target = (math.radians(90), 'P')
+robot.motors[8].target = (math.radians(120), 'P')
 
 robot.motors[18].target = (math.radians(90), 'P')
 robot.motors[17].target = (math.radians(-90), 'P')
@@ -94,7 +94,7 @@ print("State = 0")
 while time.time() - startTime < 3:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
-    robot.motors[10].target = (l_points[0], 'P')
+    robot.motors[5].target = (l_points[0], 'P')
     robot.motors[6].target = (l_points[1], 'P')
     robot.motors[7].target = (l_points[2], 'P')
     robot.motors[8].target = (l_points[3], 'P')
@@ -122,7 +122,7 @@ print("State = 2")
 while time.time() - startTime < 6:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
-    robot.motors[10].target = (l_points[0], 'P')
+    robot.motors[5].target = (l_points[0], 'P')
     robot.motors[6].target = (l_points[1], 'P')
     robot.motors[7].target = (l_points[2], 'P')
     robot.motors[8].target = (l_points[3], 'P')
