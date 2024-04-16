@@ -11,7 +11,7 @@ Slist = [[0;0;1; 468.7500; 22.6300; 0], ...
         [-1;0;0; 0; 29.1400; 266.5500], ...
         [-1;0;0; 0; 29.1400; 35]];
 M = [[1, 0, 0, 22.63]; [0, 1, 0, -468.74]; [0, 0, 1, 12.74]; [0, 0, 0, 1]];
-thetalist =[deg2rad(0); deg2rad(0); deg2rad(-5); deg2rad(-10); deg2rad(5)];
+thetalist =[deg2rad(0); deg2rad(0); deg2rad(-20); deg2rad(-20); deg2rad(20)];
 
 %% JUST RIGHT LEG
 % Slist = [[0;0;1; 468.7500; -22.6300; 0], ...
@@ -20,7 +20,7 @@ thetalist =[deg2rad(0); deg2rad(0); deg2rad(-5); deg2rad(-10); deg2rad(5)];
 %         [1;0;0; 0; -29.1400; -266.5500], ...
 %         [-1;0;0; 0; 29.1400; 35]];
 % M = [[1, 0, 0, -22.63]; [0, 1, 0, -468.74]; [0, 0, 1, 12.74]; [0, 0, 0, 1]];
-% thetalist =[deg2rad(0); deg2rad(0); deg2rad(5); deg2rad(10); deg2rad(-5)];
+% thetalist =[deg2rad(0); deg2rad(0); deg2rad(20); deg2rad(20); deg2rad(-20)];
 
 %% RIGHT ARM
 % Slist = [[-1;0;0; 0; -37.5100; 8.7000], ...
