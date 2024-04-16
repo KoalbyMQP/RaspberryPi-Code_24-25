@@ -31,25 +31,25 @@ Format of each list goes as follows:
 leftArmTraj1 = [
     [[0,0,0,0,0], [1.5,1.5,1.5,1.5,1.5], [3,3,3,3,3]],
     [[0.000000, 1.570796, 0.000000, 1.570796, 0.000000], ##starting position (0,0,0)
-     [0.103642, 0.988347, -0.061619, 1.164262, 0.584558], ## X125, Y50, Z5 : arm left and back
-     [0.005915, 0.544161, -0.007570, 1.334053, 1.026445]], ##X175, Y-35, Z-3: arm more left and align with candy
+     [-0.399673, 0.908213, 0.258504, 1.653297, 0.702046], ## X125, Y0, Z50 : arm left and back
+     [-0.266709, 0.697618, 0.206337, 1.413457, 0.890253]], ##X175, Y-3, Z-35: arm more left and align with candy
      [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
      [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]]
 
 ##second movement to move the candy
 leftArmTraj2 = [
     [[0,0,0,0,0],[3,3,3,3,3],[6,6,6,6,6]],
-    [[0.005915, 0.544161, -0.007570, 1.334053, 1.026445], ##X175, Y-35, Z-3: arm more left and align with candy
-     [-0.031576, 0.612065, 0.028271, 1.322218, 0.956882], ##X175, Y-20, Z8: arm up holding candy
-     [0.062354, 1.493083, -0.004533, 1.324950, 0.076236]], ##X15, Y50, Z8: arm moves right holding candy then drop -- here is where numbers change
+    [[-0.266709, 0.697618, 0.206337, 1.413457, 0.890253], ##X175, Y-35, Z-3: arm more left and align with candy
+     [0.121513, 0.669234, -0.101738, 1.342783, -0.905241], ##X175, Y8, Z-20: arm up holding candy
+     [-0.804261, 1.486360, 0.088339, 0.689863, -0.122708]], ##X15, Y10, Z120: arm moves right holding candy then drop -- here is where numbers change
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]]
 
 #third movement after releasing candy
 leftArmTraj3= [
     [[0,0,0,0,0],[3,3,3,3,3]],
-    [[0.062354, 1.493083, -0.004533, 1.324950, 0.076236],
-     [0.000000, 1.570798, 0.000000, 1.570796, -0.000000]], ##ending position (0,0,0)
+    [[-0.804261, 1.486360, 0.088339, 0.689863, -0.122708],
+     [0.000000, 1.570798, 0.000000, 1.570796, 0.000000]], ##ending position (0,0,0)
     [[0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0]]]
 ###############################
@@ -70,9 +70,9 @@ robot.motors[23].target = (math.radians(-90), 'P')
 robot.motors[22].target = (math.radians(90), 'P')
 
 robot.motors[5].target = (math.radians(0), 'P')
-robot.motors[6].target = (math.radians(0), 'P')
+robot.motors[6].target = (math.radians(90), 'P')
 robot.motors[7].target = (math.radians(0), 'P')
-robot.motors[8].target = (math.radians(0), 'P')
+robot.motors[8].target = (math.radians(90), 'P')
 robot.motors[9].target = (math.radians(0), 'P')
 
 prevTime = time.time()
@@ -92,6 +92,7 @@ print("State = 0")
 
 ## Moving Left Arm to Grab Candy
 while time.time() - startTime < 3:
+    time.sleep(0.01)
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -99,7 +100,7 @@ while time.time() - startTime < 3:
     robot.motors[7].target = (l_points[2], 'P')
     robot.motors[8].target = (l_points[3], 'P')
     robot.motors[9].target = (l_points[4], 'P')
-
+    #robot.motors[8].target = (math.radians(45), 'P')
     #robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
 
@@ -120,6 +121,7 @@ startTime = time.time()
 print("State = 2")
 ## Moving Left Arm to Grab Candy
 while time.time() - startTime < 6:
+    time.sleep(0.01)
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -145,6 +147,7 @@ startTime = time.time()
 print("State = 4")
 
 while time.time() - startTime < 3:
+    time.sleep(0.01)
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
