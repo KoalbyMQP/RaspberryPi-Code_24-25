@@ -26,8 +26,8 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.2,0,0.1) # 1
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
+           # self.imuPIDX = PID(0.2,0,0.1) # 1
+           # self.imuPIDZ = PID(0.25,0.0,0.0075)
         else:
             self.checkCoppeliaSimResponding()
 

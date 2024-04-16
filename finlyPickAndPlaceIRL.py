@@ -31,24 +31,24 @@ Format of each list goes as follows:
 leftArmTraj1 = [
     [[0,0,0,0,0], [1.5,1.5,1.5,1.5,1.5], [3,3,3,3,3]],
     [[0.000000, 1.570796, 0.000000, 1.570796, 0.000000], ##starting position (0,0,0)
-     [-0.399673, 0.908213, 0.258504, 1.653297, 0.702046], ## X125, Y0, Z50 : arm left and back
-     [-0.266709, 0.697618, 0.206337, 1.413457, 0.890253]], ##X175, Y-3, Z-35: arm more left and align with candy
+     [-0.399673, 0.908213, 0.258504, 1.653297, 0.000000], ## X125, Y0, Z50 : arm left and back
+     [-0.266709, 0.697618, 0.206337, 1.413457, 0.000000]], ##X175, Y-3, Z-35: arm more left and align with candy
      [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
      [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]]
 
 ##second movement to move the candy
 leftArmTraj2 = [
     [[0,0,0,0,0],[3,3,3,3,3],[6,6,6,6,6]],
-    [[-0.266709, 0.697618, 0.206337, 1.413457, 0.890253], ##X175, Y-35, Z-3: arm more left and align with candy
-     [0.121513, 0.669234, -0.101738, 1.342783, -0.905241], ##X175, Y8, Z-20: arm up holding candy
-     [-0.804261, 1.486360, 0.088339, 0.689863, -0.122708]], ##X15, Y10, Z120: arm moves right holding candy then drop -- here is where numbers change
+    [[-0.266709, 0.697618, 0.206337, 1.413457, 0.000000], ##X175, Y-35, Z-3: arm more left and align with candy
+     [0.121513, 0.669234, -0.101738, 1.342783, 0.000000], ##X175, Y8, Z-20: arm up holding candy
+     [-0.804261, 1.486360, 0.088339, 0.689863, 0.000000]], ##X15, Y10, Z120: arm moves right holding candy then drop -- here is where numbers change
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]]
 
 #third movement after releasing candy
 leftArmTraj3= [
     [[0,0,0,0,0],[3,3,3,3,3]],
-    [[-0.804261, 1.486360, 0.088339, 0.689863, -0.122708],
+    [[-0.804261, 1.486360, 0.088339, 0.689863, 0.000000],
      [0.000000, 1.570798, 0.000000, 1.570796, 0.000000]], ##ending position (0,0,0)
     [[0,0,0,0,0], [0,0,0,0,0]],
     [[0,0,0,0,0], [0,0,0,0,0]]]
@@ -57,8 +57,8 @@ leftArmTraj3= [
 
 #Starting Agnles
 robot.motors[0].target = (math.radians(20), 'P')
-robot.motors[1].target = (math.radians(-90), 'P')
-robot.motors[3].target = (math.radians(-120), 'P')
+robot.motors[1].target = (math.radians(-80), 'P')
+robot.motors[3].target = (math.radians(-90), 'P')
 
 robot.motors[5].target = (math.radians(-20), 'P')
 robot.motors[6].target = (math.radians(90), 'P')
@@ -75,10 +75,11 @@ robot.motors[7].target = (math.radians(0), 'P')
 robot.motors[8].target = (math.radians(90), 'P')
 robot.motors[9].target = (math.radians(0), 'P')
 
+robot.motors[27].target = (math.radians(-15), 'P')
 prevTime = time.time()
-simStartTime = time.time()
+startTime = time.time()
 
-while time.time() - simStartTime < 4:
+while time.time() - startTime <= 4:
     #robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
@@ -90,7 +91,7 @@ startTime = time.time()
 print("State = 0")
 
 ## Moving Left Arm to Grab Candy
-while time.time() - startTime < 3:
+while time.time() - startTime <= 3:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -100,10 +101,9 @@ while time.time() - startTime < 3:
     robot.motors[9].target = (l_points[4], 'P')
     #robot.motors[8].target = (math.radians(45), 'P')
     #robot.IMUBalance(0, 0)
+    #robot.moveAllToTarget()
+    #robot.motors[27].target = (math.radians(15), 'P')
     robot.moveAllToTarget()
-    robot.motors[27].target = (math.radians(15), 'P')
-    robot.moveAllToTarget()
-print("State = 1")
 ## Grab Candy
 #sim = robot.sim
 #candy = sim.getObject("./candy")
@@ -117,9 +117,9 @@ lArm_tj = TrajPlannerTime(leftArmTraj2[0], leftArmTraj2[1], leftArmTraj2[2], lef
 state = 0
 startTime = time.time()
 
-print("State = 2")
+print("State = 1")
 ## Moving Left Arm to Grab Candy
-while time.time() - startTime < 6:
+while time.time() - startTime <= 6:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -130,9 +130,8 @@ while time.time() - startTime < 6:
 
     #robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
-
-time.sleep(2)
-print("State = 3")
+    robot.motors[27].target = (math.radians(20), 'P')
+    robot.moveAllToTarget()
 #forceSensor = sim.createForceSensor(0, [0,0,0,0,0], [0,0,0,0,0])
 
 # print(sim.getObject("./"))
@@ -142,10 +141,9 @@ print("State = 3")
 ## Moving Left Arm With Candy
 lArm_tj = TrajPlannerTime(leftArmTraj3[0], leftArmTraj3[1], leftArmTraj3[2], leftArmTraj3[3])
 startTime = time.time()
-print("State = 4")
+print("State = 2")
 
-while time.time() - startTime < 3:
-    time.sleep(0.01)
+while time.time() - startTime <= 3:
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -155,5 +153,7 @@ while time.time() - startTime < 3:
     robot.motors[9].target = (l_points[4], 'P')
 
     #robot.IMUBalance(0, 0)
+    robot.moveAllToTarget()
+    robot.motors[27].target = (math.radians(0), 'P')
     robot.moveAllToTarget()
 ##while loop for traj
