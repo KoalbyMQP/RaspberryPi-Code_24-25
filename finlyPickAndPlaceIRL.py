@@ -79,7 +79,6 @@ prevTime = time.time()
 simStartTime = time.time()
 
 while time.time() - simStartTime < 4:
-    time.sleep(0.01)
     #robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
@@ -92,7 +91,6 @@ print("State = 0")
 
 ## Moving Left Arm to Grab Candy
 while time.time() - startTime < 3:
-    time.sleep(0.01)
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
@@ -103,7 +101,8 @@ while time.time() - startTime < 3:
     #robot.motors[8].target = (math.radians(45), 'P')
     #robot.IMUBalance(0, 0)
     robot.moveAllToTarget()
-
+    robot.motors[27].target = (math.radians(15), 'P')
+    robot.moveAllToTarget()
 print("State = 1")
 ## Grab Candy
 #sim = robot.sim
@@ -121,7 +120,6 @@ startTime = time.time()
 print("State = 2")
 ## Moving Left Arm to Grab Candy
 while time.time() - startTime < 6:
-    time.sleep(0.01)
     l_points = lArm_tj.getQuinticPositions(time.time() - startTime)
     
     robot.motors[5].target = (l_points[0], 'P')
