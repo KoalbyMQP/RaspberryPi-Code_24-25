@@ -21,7 +21,7 @@ class ArduinoSerial(object):
             message = str.encode(command + "\n") # Firmware looks for '\n' as command terminator
             self.ser.write(message)
 
-    def read_float(self): # reads a float message from the arduino (all messages are floats)
+    def read_line(self): # reads a message from the arduino
         if(self.ser):
             line = self.ser.readline()
             line = line.decode('utf-8').strip()

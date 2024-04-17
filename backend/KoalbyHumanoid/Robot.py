@@ -178,7 +178,7 @@ class Robot():
     def readBatteryLevel(self):
         if self.is_real:
             self.arduino_serial.send_command("30")
-            return self.arduino_serial.read_float()
+            return self.arduino_serial.read_line()
 
     def shutdown(self):
         if self.is_real:
@@ -419,7 +419,7 @@ class Robot():
         self.arduino_serial.send_command("50") # Check motors command
 
         while True:
-            line = self.arduino_serial.read_float()
+            line = self.arduino_serial.read_line()
             if(line == "END" or line == None):
                 return
             
