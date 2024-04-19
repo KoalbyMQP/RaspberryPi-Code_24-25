@@ -48,7 +48,7 @@ rAnkleOffset = -0
 lf_Even2Right = [
     [[0,0,0,0,0], [3,3,3,3,3]],
     [[math.radians(leftAbd), -0.000000, -0.349066, -0.349066, 0.349066 + math.radians(lAnkleOffset)], # 0 0 0
-               [math.radians(leftAbd), -0.000000, -0.160209, -0.247416, 0.087207 + math.radians(lAnkleOffset)]], # 0 0 -40
+               [math.radians(leftAbd), -0.000000, -0.337710, -0.415672, 0.427027 + math.radians(lAnkleOffset)]], # 0 0 -20
     [[0,0,0,0,0],[0,0,0,0,0]],
     [[0,0,0,0,0],[0,0,0,0,0]]
 ]
@@ -62,7 +62,7 @@ lf_Left2Right = [
 ]
 lf_Right2Left = [
     [[0,0,0,0,0], [1,1,1,1,1], [2,2,2,2,2], [3,3,3,3,3]],
-    [[math.radians(leftAbd), -0.000000, -0.267420, -0.466076, 0.150410 + math.radians(lAnkleOffset)], # 0 0 -60
+    [[math.radians(leftAbd), -0.000000, -0.337710, -0.415672, 0.427027 + math.radians(lAnkleOffset)], # 0 0 -20
                [math.radians(leftAbd), -0.000000, -0.636551, -1.286623, 0.650072+ math.radians(lAnkleOffset)], # 0 80 -80
                [math.radians(leftAbd), -0.000000, -0.936060, -1.312802, 0.725808 + math.radians(lAnkleOffset)], # 0 80 0
                [math.radians(leftAbd), -0.000000, -0.349066, -0.349066, 0.349066 + math.radians(lAnkleOffset)]], # 0 0 -0
@@ -84,14 +84,14 @@ rf_Even2Right = [
 rf_Right2Left = [
     [[0,0,0,0,0], [3,3,3,3,3]],
     [[math.radians(rightAbd), -0.000000, 0.349066, 0.349066, -0.349066 + math.radians(rAnkleOffset)], # 0 0 0
-               [math.radians(rightAbd), -0.000000, 0.186358, 0.207539, -0.021180 + math.radians(rAnkleOffset)]], # 0 0 -20
+               [math.radians(rightAbd), -0.000000, 0.337710, 0.415672, -0.427027 + math.radians(rAnkleOffset)]], # 0 0 -20
     [[0,0,0,0,0],[0,0,0,0,0]],
     [[0,0,0,0,0],[0,0,0,0,0]]
 ]
 
 rf_Left2Right = [
     [[0,0,0,0,0], [1,1,1,1,1], [2,2,2,2,2], [3,3,3,3,3]],
-    [[math.radians(rightAbd), -0.000000, 0.267420, 0.466076, -0.150410 + math.radians(rAnkleOffset)], # 0 0 -60
+    [[math.radians(rightAbd), -0.000000,0.337710, 0.415672, -0.427027 + math.radians(rAnkleOffset)], # 0 0 -60
                [math.radians(rightAbd), -0.000000, 0.636551, 1.286623, -0.650072+ math.radians(rAnkleOffset)], # 0 80 -80
                [math.radians(rightAbd), -0.000000, 0.936060, 1.312802, -0.725808 + math.radians(rAnkleOffset)], # 0 80 0
                [math.radians(rightAbd), -0.000000, 0.349066, 0.349066, -0.349066 + math.radians(rAnkleOffset)]], # 0 0 -0
