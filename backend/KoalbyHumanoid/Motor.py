@@ -37,7 +37,8 @@ class Motor():
     
     def set_position(self, position, time=1000):
         if self.is_real:
-            # print(f"moving {self.motor_id} to {position}")
+            # if(self.motor_id == 9 or self.motor_id == 8):
+                # print(f"moving {self.motor_id} to {position}")
             self.arduino_serial.send_command(f"10 {self.motor_id} {position} {time}")
         else:
             """sends a desired motor position to the Simulation"""

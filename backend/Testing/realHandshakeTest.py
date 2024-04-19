@@ -9,12 +9,12 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 from backend.KoalbyHumanoid.Config import Joints
 import copy
 
-WAIST_OFFSET = 7 
-ANKLE_OFFSET = -7 - WAIST_OFFSET
+WAIST_OFFSET = 7
+ANKLE_OFFSET = -3 - WAIST_OFFSET
 RIGHT_ROTATOR_OFFET = 5
 LEFT_ROTATOR_OFFET = -5
-LEFT_ABD_OFFSET = -3
-RIGHT_ABD_OFFSET = 3
+LEFT_ABD_OFFSET = 0
+RIGHT_ABD_OFFSET = 0
 
 
 
@@ -125,31 +125,31 @@ def main():
         rArm_points = rArm_tj.getQuinticPositions(currentTime)
         lArm_points = lArm_tj.getQuinticPositions(currentTime)
         
-        # # Right Arm
-        # robot.motors[0].target = (rArm_points[0], 'P')
-        # robot.motors[1].target = (rArm_points[1], 'P')
-        # robot.motors[2].target = (rArm_points[2], 'P')
-        # robot.motors[3].target = (rArm_points[3], 'P') #pos
-        # robot.motors[4].target = (rArm_points[4], 'P')
-
-        # # Left Arm
-        # robot.motors[5].target = (lArm_points[0], 'P')
-        # robot.motors[6].target = (lArm_points[1], 'P')
-        # robot.motors[7].target = (lArm_points[2], 'P')
-        # robot.motors[8].target = (lArm_points[3], 'P')#neg
-        # robot.motors[9].target = (lArm_points[4], 'P') 
-        
-        # Right arm
-        robot.motors[0].target = (math.radians(-20), 'P')
-        robot.motors[1].target = (math.radians(-90), 'P') 
-        robot. motors[3].target = (math.radians(90), 'P') #pos
-        robot.motors[4].target = (math.radians(-15), 'P')
+        # Right Arm
+        robot.motors[0].target = (rArm_points[0], 'P')
+        robot.motors[1].target = (rArm_points[1], 'P')
+        robot.motors[2].target = (rArm_points[2], 'P')
+        robot.motors[3].target = (rArm_points[3], 'P') #pos
+        robot.motors[4].target = (rArm_points[4], 'P')
 
         # Left Arm
-        robot.motors[5].target = (math.radians(20), 'P')
-        robot.motors[6].target = (math.radians(90), 'P')
-        robot.motors[8].target = (math.radians(-90), 'P')#neg
-        robot.motors[9].target = (math.radians(15), 'P') 
+        robot.motors[5].target = (lArm_points[0], 'P')
+        robot.motors[6].target = (lArm_points[1], 'P')
+        robot.motors[7].target = (lArm_points[2], 'P')
+        robot.motors[8].target = (lArm_points[3], 'P')#neg
+        robot.motors[9].target = (lArm_points[4], 'P') 
+        
+        # # Right arm
+        # robot.motors[0].target = (math.radians(-20), 'P')
+        # robot.motors[1].target = (math.radians(-90), 'P') 
+        # robot. motors[3].target = (math.radians(90), 'P') #pos
+        # robot.motors[4].target = (math.radians(-15), 'P')
+
+        # # Left Arm
+        # robot.motors[5].target = (math.radians(20), 'P')
+        # robot.motors[6].target = (math.radians(90), 'P')
+        # robot.motors[8].target = (math.radians(-90), 'P')#neg
+        # robot.motors[9].target = (math.radians(15), 'P') 
 
         # Right Leg
         robot.motors[15].target = (right_points[0], 'P')
