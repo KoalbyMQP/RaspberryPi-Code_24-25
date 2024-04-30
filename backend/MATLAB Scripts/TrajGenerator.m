@@ -30,13 +30,17 @@ for i = 1:col
     p = [p new_p];
 end
 
-figure;
-plot(tvec, p)
+% figure;
+% plot(tvec, p)
 
 figure;
 plot(tvec, q)
 hold all
-plot(tpts, wpts, 'x')
+plot(tpts, wpts(1,:), 'x')
+plot(tpts, wpts(2,:), 'x')
+plot(tpts, wpts(3,:), 'x')
+plot(tpts, wpts(4,:), 'x')
+plot(tpts, wpts(5,:), 'x')
 xlabel('t')
 ylabel('Angles')
 % legend('X-positions','Y-positions')
