@@ -2,8 +2,8 @@ import modern_robotics as mr
 import numpy as np
 import math
 import sys
-sys.path.append("./")
 from backend.KoalbyHumanoid import Config
+sys.path.append("./")
 
 def rodriguez(twist, theta):
     # R = I + sin(theta) * [w] + (1-cos(theta)) * [w]^2
@@ -52,8 +52,8 @@ def calcLimbCoM(motors, links):
         motor = motors[i]
         link = links[i]
         Slist.append(motor.twist)
-        thetaList.append(motor.theta)
-        linkCoM = mr.FKinSpace(link.M, Slist, thetaList)
+        thetaList.append(motor.get_position())
+        linkCoM = mr.FKinSpace(link.M, np.transpose(Slist), thetaList)
         weightX += linkCoM[0,3] * link.mass
         weightY += linkCoM[1,3] * link.mass
         weightZ += linkCoM[2,3] * link.mass
@@ -66,15 +66,29 @@ def calcLegCoM(robot, motors, links):
     weightY = 0
     weightZ = 0
     Slist = [robot.motors[11].twist, robot.motors[13].twist, robot.motors[10].twist, robot.motors[12].twist, robot.motors[14].twist]
-    thetaList = [robot.motors[11].theta, robot.motors[13].theta, robot.motors[10].theta, robot.motors[12].theta, robot.motors[14].theta]
+    thetaList = [robot.motors[11].get_position(), robot.motors[13].get_position(), robot.motors[10].get_position(), robot.motors[12].get_position(), robot.motors[14].get_position()]
     for i in range(len(motors)):
         motor = motors[i]
         link = links[i]
         Slist.append(motor.twist)
-        thetaList.append(motor.theta)
-        linkCoM = mr.FKinSpace(link.M, Slist, thetaList)
+        thetaList.append(motor.get_position())
+        linkCoM = mr.FKinSpace(link.M, np.transpose(Slist), thetaList)
         weightX += linkCoM[0,3] * link.mass
         weightY += linkCoM[1,3] * link.mass
         weightZ += linkCoM[2,3] * link.mass
         massSum += link.mass
     return [weightX/massSum, weightY/massSum, weightZ/massSum]
+
+def calcLegChainIK(robot, T, rightToLeft):
+    Slist = Config.rightToLeftFootTwists[0]
+    M = Config.rightToLeftFootTwists[1]
+    thetaList = [robot.motors[19].get_position(), robot.motors[18].get_position(), robot.motors[17].get_position(), robot.motors[16].get_position(), robot.motors[15].get_position(), 
+             robot.motors[20].get_position(), robot.motors[21].get_position(), robot.motors[22].get_position(), robot.motors[23].get_position(), robot.motors[24].get_position()]
+    print(thetaList)
+    thetaList = [math.radians(-20), math.radians(-40), math.radians(20), 0, 0, 
+                0, 0, math.radians(-20), math.radians(40), math.radians(20)]
+    if not rightToLeft:
+        thetaList.reverse()
+    eomg = 0.01
+    ev = 0.001
+    return mr.IKinSpace(np.transpose(Slist), M, T, thetaList, eomg, ev)

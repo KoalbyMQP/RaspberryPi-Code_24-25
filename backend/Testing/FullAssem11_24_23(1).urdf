@@ -3,7 +3,7 @@
      Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot
-  name="FullAssem11_24_23(1)">
+  name="FullAssem11_25_23">
   <link
     name="Chest">
     <inertial>
@@ -26,7 +26,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Chest.STL" />
+          filename="package://FullAssem11_25_23/meshes/Chest.STL" />
       </geometry>
       <material
         name="">
@@ -40,7 +40,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Chest.STL" />
+          filename="package://FullAssem11_25_23/meshes/Chest.STL" />
       </geometry>
     </collision>
   </link>
@@ -66,7 +66,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Neck.STL" />
+          filename="package://FullAssem11_25_23/meshes/Neck.STL" />
       </geometry>
       <material
         name="">
@@ -80,7 +80,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Neck.STL" />
+          filename="package://FullAssem11_25_23/meshes/Neck.STL" />
       </geometry>
     </collision>
   </link>
@@ -124,7 +124,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Head.STL" />
+          filename="package://FullAssem11_25_23/meshes/Head.STL" />
       </geometry>
       <material
         name="">
@@ -138,7 +138,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Head.STL" />
+          filename="package://FullAssem11_25_23/meshes/Head.STL" />
       </geometry>
     </collision>
   </link>
@@ -182,7 +182,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShoulder1.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShoulder1.STL" />
       </geometry>
       <material
         name="">
@@ -196,7 +196,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShoulder1.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShoulder1.STL" />
       </geometry>
     </collision>
   </link>
@@ -240,7 +240,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShoulder2.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShoulder2.STL" />
       </geometry>
       <material
         name="">
@@ -254,7 +254,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShoulder2.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShoulder2.STL" />
       </geometry>
     </collision>
   </link>
@@ -298,7 +298,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftBicep.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftBicep.STL" />
       </geometry>
       <material
         name="">
@@ -312,7 +312,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftBicep.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftBicep.STL" />
       </geometry>
     </collision>
   </link>
@@ -356,7 +356,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftForearm.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftForearm.STL" />
       </geometry>
       <material
         name="">
@@ -370,7 +370,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftForearm.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftForearm.STL" />
       </geometry>
     </collision>
   </link>
@@ -414,7 +414,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHand.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHand.STL" />
       </geometry>
       <material
         name="">
@@ -428,7 +428,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHand.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHand.STL" />
       </geometry>
     </collision>
   </link>
@@ -472,7 +472,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShoulder1.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShoulder1.STL" />
       </geometry>
       <material
         name="">
@@ -486,7 +486,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShoulder1.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShoulder1.STL" />
       </geometry>
     </collision>
   </link>
@@ -530,7 +530,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShoulder2.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShoulder2.STL" />
       </geometry>
       <material
         name="">
@@ -544,7 +544,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShoulder2.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShoulder2.STL" />
       </geometry>
     </collision>
   </link>
@@ -588,7 +588,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightBicep.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightBicep.STL" />
       </geometry>
       <material
         name="">
@@ -602,7 +602,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightBicep.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightBicep.STL" />
       </geometry>
     </collision>
   </link>
@@ -646,7 +646,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightForearm.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightForearm.STL" />
       </geometry>
       <material
         name="">
@@ -660,7 +660,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightForearm.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightForearm.STL" />
       </geometry>
     </collision>
   </link>
@@ -704,7 +704,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHand.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHand.STL" />
       </geometry>
       <material
         name="">
@@ -718,7 +718,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHand.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHand.STL" />
       </geometry>
     </collision>
   </link>
@@ -762,7 +762,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/ChestMotors.STL" />
+          filename="package://FullAssem11_25_23/meshes/ChestMotors.STL" />
       </geometry>
       <material
         name="">
@@ -776,7 +776,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/ChestMotors.STL" />
+          filename="package://FullAssem11_25_23/meshes/ChestMotors.STL" />
       </geometry>
     </collision>
   </link>
@@ -820,7 +820,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Torso.STL" />
+          filename="package://FullAssem11_25_23/meshes/Torso.STL" />
       </geometry>
       <material
         name="">
@@ -834,7 +834,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Torso.STL" />
+          filename="package://FullAssem11_25_23/meshes/Torso.STL" />
       </geometry>
     </collision>
   </link>
@@ -849,7 +849,7 @@
     <child
       link="Torso" />
     <axis
-      xyz="0 -1 0" />
+      xyz="-1 0 0" />
     <limit
       lower="0"
       upper="0"
@@ -878,7 +878,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Belly.STL" />
+          filename="package://FullAssem11_25_23/meshes/Belly.STL" />
       </geometry>
       <material
         name="">
@@ -892,7 +892,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Belly.STL" />
+          filename="package://FullAssem11_25_23/meshes/Belly.STL" />
       </geometry>
     </collision>
   </link>
@@ -936,7 +936,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/BellyMotors.STL" />
+          filename="package://FullAssem11_25_23/meshes/BellyMotors.STL" />
       </geometry>
       <material
         name="">
@@ -950,7 +950,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/BellyMotors.STL" />
+          filename="package://FullAssem11_25_23/meshes/BellyMotors.STL" />
       </geometry>
     </collision>
   </link>
@@ -965,7 +965,7 @@
     <child
       link="BellyMotors" />
     <axis
-      xyz="0 0 -1" />
+      xyz="0 0 1" />
     <limit
       lower="0"
       upper="0"
@@ -994,7 +994,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Pelvis.STL" />
+          filename="package://FullAssem11_25_23/meshes/Pelvis.STL" />
       </geometry>
       <material
         name="">
@@ -1008,7 +1008,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/Pelvis.STL" />
+          filename="package://FullAssem11_25_23/meshes/Pelvis.STL" />
       </geometry>
     </collision>
   </link>
@@ -1023,7 +1023,7 @@
     <child
       link="Pelvis" />
     <axis
-      xyz="-1 0 0" />
+      xyz="1 0 0" />
     <limit
       lower="0"
       upper="0"
@@ -1052,7 +1052,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHip.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHip.STL" />
       </geometry>
       <material
         name="">
@@ -1066,7 +1066,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHip.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHip.STL" />
       </geometry>
     </collision>
   </link>
@@ -1110,7 +1110,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHip2.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHip2.STL" />
       </geometry>
       <material
         name="">
@@ -1124,7 +1124,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightHip2.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightHip2.STL" />
       </geometry>
     </collision>
   </link>
@@ -1168,7 +1168,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightThigh.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightThigh.STL" />
       </geometry>
       <material
         name="">
@@ -1182,7 +1182,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightThigh.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightThigh.STL" />
       </geometry>
     </collision>
   </link>
@@ -1226,7 +1226,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShin.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShin.STL" />
       </geometry>
       <material
         name="">
@@ -1240,7 +1240,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightShin.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightShin.STL" />
       </geometry>
     </collision>
   </link>
@@ -1284,7 +1284,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightFoot.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightFoot.STL" />
       </geometry>
       <material
         name="">
@@ -1298,7 +1298,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/RightFoot.STL" />
+          filename="package://FullAssem11_25_23/meshes/RightFoot.STL" />
       </geometry>
     </collision>
   </link>
@@ -1342,7 +1342,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHip.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHip.STL" />
       </geometry>
       <material
         name="">
@@ -1356,7 +1356,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHip.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHip.STL" />
       </geometry>
     </collision>
   </link>
@@ -1400,7 +1400,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHip2.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHip2.STL" />
       </geometry>
       <material
         name="">
@@ -1414,7 +1414,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftHip2.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftHip2.STL" />
       </geometry>
     </collision>
   </link>
@@ -1458,7 +1458,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftThigh.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftThigh.STL" />
       </geometry>
       <material
         name="">
@@ -1472,7 +1472,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftThigh.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftThigh.STL" />
       </geometry>
     </collision>
   </link>
@@ -1516,7 +1516,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShin.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShin.STL" />
       </geometry>
       <material
         name="">
@@ -1530,7 +1530,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftShin.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftShin.STL" />
       </geometry>
     </collision>
   </link>
@@ -1574,7 +1574,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftFoot.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftFoot.STL" />
       </geometry>
       <material
         name="">
@@ -1588,7 +1588,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://FullAssem11_24_23(1)/meshes/LeftFoot.STL" />
+          filename="package://FullAssem11_25_23/meshes/LeftFoot.STL" />
       </geometry>
     </collision>
   </link>
