@@ -29,8 +29,8 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.2,0,0.1) # 1
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
+            self.imuPIDX = PID(0.5,0,0.2) # 1
+            self.imuPIDZ = PID(0.5,0.0,0.1)
             
             self.electromagnet = Electromagnet()
         else:
@@ -57,12 +57,16 @@ class Robot():
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
-        self.PID = PID(0.25,0.1,0)
+        self.PID = PID(0.25,0.1,0.3)
         # self.imuPIDX = PID(0.3,0.005,0.1)
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
         self.PIDVel = PID(0.0,0,0)
-        self.VelPIDX = PID(0.002, 0, 0)
-        self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
+        self.VelPIDX = PID(0.0025, 0, 0)
+        # self.VelPIDZ1 = PID(0.0005, 0.0006, 0.0005)
+        # self.VelPIDZ = PID(0.0005, 0.0004, 0.0005)
+        self.VelPIDZ1 = PID(0.0014, 0.00, 0.0035)
+        self.VelPIDZ = PID(0.00628, 0.001, 0.000217)
+        self.VelPIDY = PID(0.005, 0.005, 0.007)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
@@ -128,6 +132,7 @@ class Robot():
         for motorConfig in Config.motors:
             print("Beginning to stream", motorConfig[3])
             handle = self.sim.getObject("/" + motorConfig[3])
+
             motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], sim=self.sim, handle=handle)
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
@@ -276,22 +281,6 @@ class Robot():
             locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
         return locations
     
-    def updateBalancePoint(self):
-        rightAnkle = self.locate(self.motors[Config.Joints.Right_Ankle_Joint.value])
-        leftAnkle = self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])
-        rightAnkleToSole = np.array([[1,0,0,-24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        leftAnkleToSole = np.array([[1,0,0,24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        rightSole = np.matmul(rightAnkle,rightAnkleToSole)
-        leftSole = np.matmul(leftAnkle,leftAnkleToSole)
-        rightPolyCoords = rightSole[0:3,3]
-        leftPolyCoords = leftSole[0:3,3]
-        self.rightFootBalancePoint = rightPolyCoords
-        self.leftFootBalancePoint = leftPolyCoords
-        centerPoint = (rightPolyCoords+leftPolyCoords)/2
-        self.balancePoint = centerPoint
-        # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
-        return centerPoint
-    
     def IK(self, motor, T, thetaGuess):
         """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
 
@@ -315,7 +304,7 @@ class Robot():
 
     def IMUBalance(self, Xtarget, Ztarget):
         data = self.imu.getData()
-
+        
         xRot = data[0]
         zRot = data[2]
         Xerror = Xtarget - xRot
@@ -326,20 +315,32 @@ class Robot():
         newTargetZ = self.imuPIDZ.calculate()
         # print(math.degrees(newTargetX), math.degrees(newTargetZ))
         self.motors[13].target = (newTargetZ, 'P')
-        self.motors[10].target = (newTargetX, 'P')
+        self.motors[10].target = (-newTargetX, 'P')
 
         self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
     def VelBalance(self, balancePoint):
-        balanceError = balancePoint - self.CoM
-        Xerror = balanceError[0]
-        Zerror = balanceError[2]
+        balanceErrorX = balancePoint[0] - self.CoM[0]
+        balanceErrorY = balancePoint[1] - self.CoM[1]
+        balanceErrorZ = balancePoint[2] - self.CoM[2]
+        Xerror = balanceErrorX
+        Yerror = balanceErrorY
+        Zerror = balanceErrorZ
         self.VelPIDX.setError(Xerror)
+        self.VelPIDZ1.setError(Zerror)
         self.VelPIDZ.setError(Zerror)
+        self.VelPIDY.setError(Yerror)
         newTargetX = self.VelPIDX.calculate()
+        newTargetZ1 = self.VelPIDY.calculate()
         newTargetZ = self.VelPIDZ.calculate()
-        self.motors[13].target = (newTargetX, 'V')
-        self.motors[10].target = (-newTargetZ, 'V')
+        newTargetY = self.VelPIDY.calculate()
+        self.motors[13].target = (newTargetX, 'V') #for hips
+        self.motors[10].target = (-newTargetZ, 'V') #for hips
+        self.motors[14].target = (newTargetZ1, 'V') #for chest
+        # self.motors[25].target = (newTargetZ1, 'V') #for head
+        # self.motors[18].target = (-newTargetZ1, 'V') #right knee
+        # self.motors[23].target = (newTargetZ1, 'V') #left knee
+        balanceError = [balanceErrorX, balanceErrorY, balanceErrorZ]
         return balanceError
 
     def balanceAngle(self):
