@@ -1082,11 +1082,11 @@
       link="RightHip" />
     <axis
       xyz="0 0 1" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightHip2">
@@ -1140,11 +1140,11 @@
       link="RightHip2" />
     <axis
       xyz="0 -1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightThigh">
@@ -1198,11 +1198,11 @@
       link="RightThigh" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightShin">
@@ -1256,11 +1256,11 @@
       link="RightShin" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightFoot">
@@ -1314,11 +1314,11 @@
       link="RightFoot" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftHip">
@@ -1372,11 +1372,11 @@
       link="LeftHip" />
     <axis
       xyz="0 0 1" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftHip2">
@@ -1430,11 +1430,11 @@
       link="LeftHip2" />
     <axis
       xyz="0 -1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftThigh">
@@ -1488,11 +1488,11 @@
       link="LeftThigh" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftShin">
@@ -1546,11 +1546,11 @@
       link="LeftShin" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftFoot">
@@ -1604,10 +1604,10 @@
       link="LeftFoot" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
 </robot>

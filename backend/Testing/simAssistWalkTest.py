@@ -4,7 +4,7 @@ import numpy as np
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid.trajPlannerTime import TrajPlannerTime
-from backend.Testing import assistWalkViaPoints as via
+from backend.DemoScripts import assistWalkViaPoints as via
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 from backend.KoalbyHumanoid.Config import Joints
 import copy
@@ -44,7 +44,6 @@ def createTrajectories(rightLeg, leftLeg, rightArm, leftArm):
     leftLeg_tj  = TrajPlannerTime(leftLeg[0],  leftLeg[1],  leftLeg[2],  leftLeg[3])
     rightArm_tj = TrajPlannerTime(rightArm[0], rightArm[1], rightArm[2], rightArm[3])
     leftArm_tj  = TrajPlannerTime(leftArm[0],  leftArm[1],  leftArm[2],  leftArm[3])
-
     return rightLeg_tj, leftLeg_tj, rightArm_tj, leftArm_tj
 
 def main():
