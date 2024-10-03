@@ -49,6 +49,13 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     model.set_rhs('dpos', ddpos)
     model.set_rhs('dtheta', ddtheta)
     #Im not sure if I need the position vector right now as I am just trying to control the swing of the IP
+    #next steps is have the dynamic equations and then the cost function 
     
-         
+    
+    
+    
+    # Build the model
+    model.setup()
+
+    return model
     
