@@ -62,10 +62,10 @@ class Robot():
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
         self.PIDVel = PID(0.0,0,0)
         self.VelPIDX = PID(0.0025, 0, 0)
-        # self.VelPIDZ1 = PID(0.0005, 0.0006, 0.0005)
-        # self.VelPIDZ = PID(0.0005, 0.0004, 0.0005)
-        self.VelPIDZ1 = PID(0.0014, 0.00, 0.0035)
-        self.VelPIDZ = PID(0.00628, 0.001, 0.000217)
+        self.VelPIDX1 = PID(0.001, 0, 0)
+        self.VelPIDZ1 = PID(0.00, 0.00, 0.0)
+        # 0.00628, 0.001, 0.000217
+        self.VelPIDZ = PID(0.035, 0.00, 0.00)
         self.VelPIDY = PID(0.005, 0.005, 0.007)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
@@ -320,6 +320,8 @@ class Robot():
         self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
     def VelBalance(self, balancePoint):
+        self.updateRobotCoM()
+        print("CoM: ", self.CoM)
         balanceErrorX = balancePoint[0] - self.CoM[0]
         balanceErrorY = balancePoint[1] - self.CoM[1]
         balanceErrorZ = balancePoint[2] - self.CoM[2]
@@ -331,15 +333,17 @@ class Robot():
         self.VelPIDZ.setError(Zerror)
         self.VelPIDY.setError(Yerror)
         newTargetX = self.VelPIDX.calculate()
-        newTargetZ1 = self.VelPIDY.calculate()
+        newTargetX1 = self.VelPIDX1.calculate()
+        newTargetZ1 = self.VelPIDZ.calculate()
         newTargetZ = self.VelPIDZ.calculate()
         newTargetY = self.VelPIDY.calculate()
         self.motors[13].target = (newTargetX, 'V') #for hips
-        self.motors[10].target = (-newTargetZ, 'V') #for hips
-        self.motors[14].target = (newTargetZ1, 'V') #for chest
-        # self.motors[25].target = (newTargetZ1, 'V') #for head
-        # self.motors[18].target = (-newTargetZ1, 'V') #right knee
-        # self.motors[23].target = (newTargetZ1, 'V') #left knee
+        # self.motors[0].target = (newTargetZ, 'V')
+        # self.motors[5].target = (-newTargetZ, 'V')
+        # self.motors[10].target = (-newTargetZ, 'V') #for hips
+        self.motors[14].target = (newTargetZ, 'V') #for chest
+        self.motors[11].target = (-newTargetX1, 'V') # for chest
+        #self.motors[25].target = (newTargetZ1, 'V') #for head
         balanceError = [balanceErrorX, balanceErrorY, balanceErrorZ]
         return balanceError
 

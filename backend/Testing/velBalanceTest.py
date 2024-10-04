@@ -27,7 +27,7 @@ def main():
     # creates trajectory of movements
     simStartTime = time.time()
     prevCoM = [0,0,0]
-    setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
+    setPoints = [[0,  0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
     notFalling = True
@@ -43,28 +43,23 @@ def main():
     while notFalling:
         for point in traj:
             #tells robot trajectory is specifically for arms
-            robot.motors[0].target = (point[1], 'P') # for shoulder rotators
-            robot.motors[5].target = (point[2], 'P') # for shoulder rotators
+            robot.motors[18].target = (point[1], 'P') # for right knee
+            robot.motors[23].target = (point[2], 'P') # for left knee
             robot.moveAllToTarget()
 
-            time.sleep(0.01)
-            robot.updateRobotCoM()
-            print("CoM: ", robot.CoM)
+            time.sleep(0.01) 
             robot.VelBalance(prevCoM)
 
-            if abs(robot.CoM[0] - prevCoM[0]) > 10 or abs(robot.CoM[1] - prevCoM[1]) > 10:
-                print("CoM: ", robot.CoM)
+            if abs(robot.CoM[0] - prevCoM[0]) > 15:
                 print("FALLING")
                 notFalling = False
                 break
+
             prevCoM = robot.CoM
             count = count + 1
-                #abs(robot.CoM[0] - prevCoM[0]) > 10 or 
+            print("Count: ", count)
     print("Dead")
     print(count, " / ", len(traj))
-    time.sleep(1)
-    robot.updateRobotCoM()
-    print("CoM: ", robot.CoM)
 
 
 if(__name__ == "__main__"):
