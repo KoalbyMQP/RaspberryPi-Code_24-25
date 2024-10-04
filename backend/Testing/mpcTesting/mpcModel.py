@@ -20,6 +20,8 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     
     #set parameters 
     m0 = 3.255 #mass of whole robot in kg
+    m_com = 2.101 #mass of chest, arms, head in kg
+    m_leg = 1.149 #mass of legs kg
     L0= .4572 #arbitrary m (18 in), distance from COM to ground, In the future I see this as 
     l0 =L0/2
     j0= (m0*l0**2) /3 #inertia
@@ -50,7 +52,24 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     model.set_rhs('dtheta', ddtheta)
     #Im not sure if I need the position vector right now as I am just trying to control the swing of the IP
     #next steps is have the dynamic equations and then the cost function 
+    euler_lagrange = vertcat(
+        #1
+        (m0 + m_com)*ddpos + m_com*(ddtheta*cos(theta)-(ddtheta**2)* sin(theta)),
+        #2
+        m_com*g*l0*sin(theta)+m_com*l0*ddpos*cos(theta)+m_com*l0**2*ddtheta
+    )
+    model.set_alg('euler_lagrange', euler_lagrange)
     
+    # Expressions for kinetic and potential energy
+    E_kin_robot = 1 / 2 * m0 * dpos**2
+    E_kin_p1 = 1 / 2 * m_com * (
+        (dpos + l0 * dtheta[0] * cos(theta[0]))**2 +
+        (l0 * dtheta[0] * sin(theta[0]))**2) + 1 / 2 * j0 * dtheta[0]**2
+    E_kin = E_kin_robot +E_kin_p1
+    E_pot = m0 * g * l0 * cos(theta[0]) + m_com * g * (l0 * cos(theta[0]))
+    
+    model.set_expression('E_kin', E_kin)
+    model.set_expression('E_pot', E_pot)
     
     
     
