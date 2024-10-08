@@ -47,27 +47,27 @@ rcParams['ytick.labelsize'] = 'xx-large'
 
 import time
 
-from template_mpc import template_mpc
-from template_simulator import template_simulator
-from template_model import template_model
+from mpcController import template_mpc
+from mpcSim import template_simulator
+from mpcModel import ip_model
 
 """ User settings: """
 show_animation = True
 store_animation = False
 store_results = False
 
-# Define obstacles to avoid (cicles)
-obstacles = [
-    {'x': 0., 'y': 0.6, 'r': 0.3},
-]
+# # Define obstacles to avoid (cicles)
+# obstacles = [
+#     {'x': 0., 'y': 0.6, 'r': 0.3},
+# ]
 
-scenario = 2  # 1 = down-down start, 2 = up-up start, both with setpoint change.
+scenario = 1  # 1 = down-down start, 2 = up-up start, both with setpoint change.
 
 """
 Get configured do-mpc modules:
 """
 
-model = template_model(obstacles)
+model = ip_model()
 simulator = template_simulator(model)
 mpc = template_mpc(model)
 estimator = do_mpc.estimator.StateFeedback(model)
@@ -99,7 +99,7 @@ Setup graphic:
 
 # Function to create lines:
 L1 = 0.5  #m, length of the first rod
-L2 = 0.5  #m, length of the second rod
+
 def pendulum_bars(x):
     x = x.flatten()
     # Get the x,y coordinates of the two bars for the given state x.
@@ -113,20 +113,10 @@ def pendulum_bars(x):
         L1*np.cos(x[1])
     ])
 
-    line_2_x = np.array([
-        line_1_x[1],
-        line_1_x[1] + L2*np.sin(x[2])
-    ])
-
-    line_2_y = np.array([
-        line_1_y[1],
-        line_1_y[1] + L2*np.cos(x[2])
-    ])
 
     line_1 = np.stack((line_1_x, line_1_y))
-    line_2 = np.stack((line_2_x, line_2_y))
 
-    return line_1, line_2
+    return line_1
 
 mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
 
@@ -166,13 +156,13 @@ bar1 = ax1.plot([],[], '-o', linewidth=5, markersize=10)
 bar2 = ax1.plot([],[], '-o', linewidth=5, markersize=10)
 
 
-for obs in obstacles:
-    circle = Circle((obs['x'], obs['y']), obs['r'])
-    ax1.add_artist(circle)
+# for obs in obstacles:
+#     circle = Circle((obs['x'], obs['y']), obs['r'])
+#     ax1.add_artist(circle)
 
-ax1.set_xlim(-1.8,1.8)
-ax1.set_ylim(-1.2,1.2)
-ax1.set_axis_off()
+# ax1.set_xlim(-1.8,1.8)
+# ax1.set_ylim(-1.2,1.2)
+# ax1.set_axis_off()
 
 fig.align_ylabels()
 fig.tight_layout()
@@ -215,8 +205,8 @@ if store_animation:
     x_arr = mpc.data['_x']
     def update(t_ind):
         line1, line2 = pendulum_bars(x_arr[t_ind])
-        bar1[0].set_data(line1[0],line1[1])
-        bar2[0].set_data(line2[0],line2[1])
+        bar1[0].set_data(line1[0])
+        bar2[0].set_data(line2[0])
         mpc_graphics.plot_results(t_ind)
         mpc_graphics.plot_predictions(t_ind)
         mpc_graphics.reset_axes()

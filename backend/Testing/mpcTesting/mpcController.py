@@ -64,30 +64,30 @@ def template_mpc(model, silence_solver = False):
     mpc.bounds['lower','_u','force'] = -4
     mpc.bounds['upper','_u','force'] = 4
 
-    # Avoid the obstacles:
-    mpc.set_nl_cons('obstacles', -model.aux['obstacle_distance'], 0)
+    # # Avoid the obstacles:
+    # mpc.set_nl_cons('obstacles', -model.aux['obstacle_distance'], 0)
 
-    # Values for the masses (for robust MPC)
-    m1_var = 0.2*np.array([1, 0.95, 1.05])
-    m2_var = 0.2*np.array([1, 0.95, 1.05])
-    mpc.set_uncertainty_values(m1=m1_var, m2=m2_var)
+    # # Values for the masses (for robust MPC)
+    # m1_var = 0.2*np.array([1, 0.95, 1.05])
+    # # m2_var = 0.2*np.array([1, 0.95, 1.05])
+    # mpc.set_uncertainty_values(m1=m1_var)
 
 
-    tvp_template = mpc.get_tvp_template()
+    # tvp_template = mpc.get_tvp_template()
 
-    # When to switch setpoint:
-    t_switch = 4    # seconds
-    ind_switch = t_switch // mpc.settings.t_step
+    # # When to switch setpoint:
+    # t_switch = 4    # seconds
+    # ind_switch = t_switch // mpc.settings.t_step
 
-    def tvp_fun(t_ind):
-        ind = t_ind // mpc.settings.t_step
-        if ind <= ind_switch:
-            tvp_template['_tvp',:, 'pos_set'] = -0.8
-        else:
-            tvp_template['_tvp',:, 'pos_set'] = 0.8
-        return tvp_template
+    # def tvp_fun(t_ind):
+    #     ind = t_ind // mpc.settings.t_step
+    #     if ind <= ind_switch:
+    #         tvp_template['_tvp',:, 'pos_set'] = -0.8
+    #     else:
+    #         tvp_template['_tvp',:, 'pos_set'] = 0.8
+    #     return tvp_template
 
-    mpc.set_tvp_fun(tvp_fun)
+    # mpc.set_tvp_fun(tvp_fun)
 
     mpc.setup()
 

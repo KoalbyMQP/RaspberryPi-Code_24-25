@@ -71,8 +71,6 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     model.set_expression('E_kin', E_kin)
     model.set_expression('E_pot', E_pot)
     
-    
-    
     # Build the model
     model.setup()
 
