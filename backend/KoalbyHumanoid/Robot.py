@@ -63,10 +63,9 @@ class Robot():
         self.PIDVel = PID(0.0,0,0)
         self.VelPIDX = PID(0.0025, 0, 0)
         self.VelPIDX1 = PID(0.001, 0, 0)
-        self.VelPIDZ1 = PID(0.00, 0.00, 0.0)
-        # 0.00628, 0.001, 0.000217
-        self.VelPIDZ = PID(0.035, 0.00, 0.00)
-        self.VelPIDY = PID(0.005, 0.005, 0.007)
+        self.VelPIDZ1 = PID(0.0, 0.00, 0.00)
+        self.VelPIDZ = PID(0.00909, 0.0037, 0.0031)
+        self.VelPIDY = PID(0.000, 0.000, 0.000)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
@@ -338,12 +337,12 @@ class Robot():
         newTargetZ = self.VelPIDZ.calculate()
         newTargetY = self.VelPIDY.calculate()
         self.motors[13].target = (newTargetX, 'V') #for hips
-        # self.motors[0].target = (newTargetZ, 'V')
-        # self.motors[5].target = (-newTargetZ, 'V')
-        # self.motors[10].target = (-newTargetZ, 'V') #for hips
-        self.motors[14].target = (newTargetZ, 'V') #for chest
+        # self.motors[0].target = (newTargetZ1, 'V')
+        # self.motors[5].target = (-newTargetZ1, 'V')
+        if 0.004 > newTargetZ > -0.005:
+            self.motors[10].target = (-newTargetZ, 'V') #for hips
+        #self.motors[14].target = (newTargetZ, 'V') #for chest
         self.motors[11].target = (-newTargetX1, 'V') # for chest
-        #self.motors[25].target = (newTargetZ1, 'V') #for head
         balanceError = [balanceErrorX, balanceErrorY, balanceErrorZ]
         return balanceError
 
