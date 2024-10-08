@@ -306,50 +306,18 @@ from backend.Testing import assistWalkViaPoints as via
 # from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 # from backend.KoalbyHumanoid.Config import Joints
 
-WAIST_OFFSET = 0 
-ANKLE_OFFSET = -0 - WAIST_OFFSET
-RIGHT_ROTATOR_OFFET = 5
-LEFT_ROTATOR_OFFET = -5
-LEFT_ABD_OFFSET = -3
-RIGHT_ABD_OFFSET = 3
-
 left_leg_chain = Chain.from_urdf_file(
     "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
-    base_elements=['LeftHip', 'LeftLegRotator']
+    base_elements=['Pelvis', 'LeftLegAbductor']
 )
 
 right_leg_chain = Chain.from_urdf_file(
     "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
-    base_elements=['RightHip', 'RightLegRotator']
+    base_elements=['Pelvis', 'RightLegAbductor']
 )
 
-# Applies the given offset as a vector to the given trajectory
-def applyOffsets(trajectory, offset):
-    trajectory = copy.deepcopy(trajectory)
-
-    for i in range(len(trajectory[1])):
-        for j in range(len(trajectory[1][i])):
-            trajectory[1][i][j] += math.radians(offset[j])
-
-    return trajectory
-    
-# Creates and returns the trajectories for each of the joints
-def createTrajectories(rightLeg, leftLeg, rightArm, leftArm):
-
-    # Applies static offsets to joint poisitions (used for tweaking trajectories)
-    rightOffset = [RIGHT_ABD_OFFSET, RIGHT_ROTATOR_OFFET, WAIST_OFFSET, 0, -ANKLE_OFFSET]
-    leftOffset = [LEFT_ABD_OFFSET, LEFT_ROTATOR_OFFET, -WAIST_OFFSET, 0, ANKLE_OFFSET]
-    rightArmOffset = [0, 0, 0, -5, -5]
-    rightLeg = applyOffsets(rightLeg, rightOffset)
-    leftLeg = applyOffsets(leftLeg, leftOffset)
-    rightArm = applyOffsets(rightArm, rightArmOffset)
-
-    # Generates trajectories
-    rightLeg_tj = TrajPlannerTime(rightLeg[0], rightLeg[1], rightLeg[2], rightLeg[3])
-    leftLeg_tj  = TrajPlannerTime(leftLeg[0],  leftLeg[1],  leftLeg[2],  leftLeg[3])
-    rightArm_tj = TrajPlannerTime(rightArm[0], rightArm[1], rightArm[2], rightArm[3])
-    leftArm_tj  = TrajPlannerTime(leftArm[0],  leftArm[1],  leftArm[2],  leftArm[3])
-    return rightLeg_tj, leftLeg_tj, rightArm_tj, leftArm_tj
+# for link in enumerate(left_leg_chain.links):
+#     print(link)
 
 def findEndEffectorPos(right_leg_chain, left_leg_chain):
     # Create arrays to store the results
@@ -361,38 +329,44 @@ def findEndEffectorPos(right_leg_chain, left_leg_chain):
     leftEEpose_Right2Left = []
     leftEEpose_Left2Right = []
 
+
     # Iterate through the "Even2Right" poses for right leg
     for i in range(4):  # Assuming there are 2 positions (start and final)
-        rightEEpose_Even2Right.append(right_leg_chain.forward_kinematics(via.rf_Even2Right[1][i])[:3, 3])
+            # Assuming the joint vector has 5 values
+        joint_vector = via.rf_Even2Right[1][i]
 
-    # Iterate through the "Right2Left" poses for right leg
-    for i in range(2):  # Assuming there are 2 positions (start and final)
-        rightEEpose_Right2Left.append(right_leg_chain.forward_kinematics(via.rf_Right2Left[1][i])[:3, 3])
+        # Prepend 0 at the start of the joint vector
+        joint_vector = np.insert(joint_vector,0, len(joint_vector)-1 ) 
+        rightEEpose_Even2Right.append(right_leg_chain.forward_kinematics(joint_vector)[:3, 3])
 
-    # Iterate through the "Left2Right" poses for right leg
-    for i in range(4):  # Assuming there are 4 positions
-        rightEEpose_Left2Right.append(right_leg_chain.forward_kinematics(via.rf_Left2Right[1][i])[:3, 3])
+    # # Iterate through the "Right2Left" poses for right leg
+    # for i in range(2):  # Assuming there are 2 positions (start and final)
+    #     rightEEpose_Right2Left.append(right_leg_chain.forward_kinematics(via.rf_Right2Left[1][i])[:3, 3])
 
-    # Iterate through the "Even2Right" poses for left leg
-    for i in range(2):  # Assuming there are 2 positions (start and final)
-        leftEEpose_Even2Right.append(left_leg_chain.forward_kinematics(via.lf_Even2Right[1][i])[:3, 3])
+    # # Iterate through the "Left2Right" poses for right leg
+    # for i in range(4):  # Assuming there are 4 positions
+    #     rightEEpose_Left2Right.append(right_leg_chain.forward_kinematics(via.rf_Left2Right[1][i])[:3, 3])
 
-    # Iterate through the "Right2Left" poses for left leg
-    for i in range(4):  # Assuming there are 4 positions (start and final)
-        leftEEpose_Right2Left.append(left_leg_chain.forward_kinematics(via.lf_Right2Left[1][i])[:3, 3])
+    # # Iterate through the "Even2Right" poses for left leg
+    # for i in range(2):  # Assuming there are 2 positions (start and final)
+    #     leftEEpose_Even2Right.append(left_leg_chain.forward_kinematics(via.lf_Even2Right[1][i])[:3, 3])
 
-    # Iterate through the "Left2Right" poses for left leg
-    for i in range(2):  # Assuming there are 2 positions
-        leftEEpose_Left2Right.append(left_leg_chain.forward_kinematics(via.lf_Left2Right[1][i])[:3, 3])
+    # # Iterate through the "Right2Left" poses for left leg
+    # for i in range(4):  # Assuming there are 4 positions (start and final)
+    #     leftEEpose_Right2Left.append(left_leg_chain.forward_kinematics(via.lf_Right2Left[1][i])[:3, 3])
+
+    # # Iterate through the "Left2Right" poses for left leg
+    # for i in range(2):  # Assuming there are 2 positions
+    #     leftEEpose_Left2Right.append(left_leg_chain.forward_kinematics(via.lf_Left2Right[1][i])[:3, 3])
 
     # Return all computed poses as a dictionary for better structure
     return {
-        'rightEEpose_Even2Right': rightEEpose_Even2Right,
-        'rightEEpose_Right2Left': rightEEpose_Right2Left,
-        'rightEEpose_Left2Right': rightEEpose_Left2Right,
-        'leftEEpose_Even2Right': leftEEpose_Even2Right,
-        'leftEEpose_Right2Left': leftEEpose_Right2Left,
-        'leftEEpose_Left2Right': leftEEpose_Left2Right
+        'rightEEpose_Even2Right': rightEEpose_Even2Right
+        # 'rightEEpose_Right2Left': rightEEpose_Right2Left,
+        # 'rightEEpose_Left2Right': rightEEpose_Left2Right,
+        # 'leftEEpose_Even2Right': leftEEpose_Even2Right,
+        # 'leftEEpose_Right2Left': leftEEpose_Right2Left,
+        # 'leftEEpose_Left2Right': leftEEpose_Left2Right
     }
 
 
@@ -401,18 +375,15 @@ def findEndEffectorPos(right_leg_chain, left_leg_chain):
 
 poses = findEndEffectorPos(right_leg_chain, left_leg_chain)
 rightPose1 = poses['rightEEpose_Even2Right']
-rightPose2 = poses['rightEEpose_Right2Left']
-rightPose3 = poses['rightEEpose_Left2Right']
-leftPose1 = poses['leftEEpose_Even2Right']
-leftPose2 = poses['leftEEpose_Right2Left']
-leftPose3 = poses['leftEEpose_Left2Right']
+# rightPose2 = poses['rightEEpose_Right2Left']
+# rightPose3 = poses['rightEEpose_Left2Right']
+# leftPose1 = poses['leftEEpose_Even2Right']
+# leftPose2 = poses['leftEEpose_Right2Left']
+# leftPose3 = poses['leftEEpose_Left2Right']
 
-print(rightPose1)
-print(rightPose2)
-print(rightPose3)
-print(leftPose1)
-print(leftPose2)
-print(leftPose3)
+print(via.rf_Even2Right[1], sep='\n\n')
+print(rightPose1, sep='\n\n')
+print(right_leg_chain.inverse_kinematics(rightPose1[0]), right_leg_chain.inverse_kinematics(rightPose1[1]), right_leg_chain.inverse_kinematics(rightPose1[2]), right_leg_chain.inverse_kinematics(rightPose1[3]), sep='\n\n')
 
 
 # # Define initial and final positions

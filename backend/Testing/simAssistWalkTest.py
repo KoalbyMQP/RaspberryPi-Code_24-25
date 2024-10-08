@@ -115,11 +115,14 @@ def main():
     # lArm_tj = TrajPlannerTime(via.la_leftDown[0], via.la_leftDown[1], via.la_leftDown[2], via.la_leftDown[3])
 
     rightLegEven2RightTask = findEE(right_leg_chain, left_leg_chain)['rightEEpose_Even2Right']
-    rightLegEven2RightJoint = [via.rf_Even2Right[0],[right_leg_chain.inverse_kinematics(rightLegEven2RightTask[0]),right_leg_chain.inverse_kinematics(rightLegEven2RightTask[1])],via.rf_Even2Right[2],via.rf_Even2Right[3]]
+    rightLegEven2RightJoint = [via.rf_Even2Right[0],via.rf_Even2Right[1],via.rf_Even2Right[2],via.rf_Even2Right[3]]
     print(rightLegEven2RightJoint)
+
+    # [right_leg_chain.inverse_kinematics(rightLegEven2RightTask[0]),right_leg_chain.inverse_kinematics(rightLegEven2RightTask[1])]
+    # [left_leg_chain.inverse_kinematics(leftLegEven2RightTask[0]), left_leg_chain.inverse_kinematics(leftLegEven2RightTask[1])]
     
     leftLegEven2RightTask = findEE(right_leg_chain, left_leg_chain)['leftEEpose_Even2Right']
-    leftLegEven2RightJoint = [via.lf_Even2Right[0],[left_leg_chain.inverse_kinematics(leftLegEven2RightTask)],via.lf_Even2Right[2],via.lf_Even2Right[3]]
+    leftLegEven2RightJoint = [via.lf_Even2Right[0],via.lf_Even2Right[1],via.lf_Even2Right[2],via.lf_Even2Right[3]]
 
     [rLeg_tj, lLeg_tj, rArm_tj, lArm_tj] = createTrajectories(
         rightLegEven2RightJoint, 
@@ -209,9 +212,9 @@ def main():
                     # rArm_tj = TrajPlannerTime(via.ra_leftDown[0], via.ra_leftDown[1], via.ra_leftDown[2], via.ra_leftDown[3])
                     # lArm_tj = TrajPlannerTime(via.la_leftDown[0], via.la_leftDown[1], via.la_leftDown[2], via.la_leftDown[3])
                     rightLegRight2LeftTask = findEE(right_leg_chain, left_leg_chain)['rightEEpose_Right2Left']
-                    rightLegRight2LeftJoint = [via.rf_Right2Left[0],[right_leg_chain.inverse_kinematics(rightLegRight2LeftTask)],via.rf_Right2Left[2],via.rf_Right2Left[3]]
+                    rightLegRight2LeftJoint = [via.rf_Right2Left[0],[right_leg_chain.inverse_kinematics(rightLegRight2LeftTask[0]), right_leg_chain.inverse_kinematics(rightLegRight2LeftTask[1])],via.rf_Right2Left[2],via.rf_Right2Left[3]]
                     leftLegRight2LeftTask = findEE(right_leg_chain, left_leg_chain)['leftEEpose_Right2Left']
-                    leftLegRight2LeftJoint = [via.lf_Right2Left[0],[left_leg_chain.inverse_kinematics(leftLegRight2LeftTask)],via.lf_Right2Left[2],via.lf_Right2Left[3]]
+                    leftLegRight2LeftJoint = [via.lf_Right2Left[0],[left_leg_chain.inverse_kinematics(leftLegRight2LeftTask[0]), left_leg_chain.inverse_kinematics(leftLegRight2LeftTask[1])],via.lf_Right2Left[2],via.lf_Right2Left[3]]
                     [rLeg_tj, lLeg_tj, rArm_tj, lArm_tj] = createTrajectories(
                         rightLegRight2LeftJoint, 
                         leftLegRight2LeftJoint, 
@@ -229,9 +232,9 @@ def main():
                     # rArm_tj = TrajPlannerTime(via.ra_rightDown[0], via.ra_rightDown[1], via.ra_rightDown[2], via.ra_rightDown[3])
                     # lArm_tj = TrajPlannerTime(via.la_rightDown[0], via.la_rightDown[1], via.la_rightDown[2], via.la_rightDown[3])
                     rightLegLeft2RightTask = findEE(right_leg_chain, left_leg_chain)['rightEEpose_Left2Right']
-                    rightLegLeft2RightJoint = [via.rf_Left2Right[0],[right_leg_chain.inverse_kinematics(rightLegLeft2RightTask)],via.rf_Left2Right[2],via.rf_Left2Right[3]]
+                    rightLegLeft2RightJoint = [via.rf_Left2Right[0],[right_leg_chain.inverse_kinematics(rightLegLeft2RightTask[0]), right_leg_chain.inverse_kinematics(rightLegLeft2RightTask[1])],via.rf_Left2Right[2],via.rf_Left2Right[3]]
                     leftLegLeft2RightTask = findEE(right_leg_chain, left_leg_chain)['leftEEpose_Left2Right']
-                    leftLegLeft2RightJoint = [via.lf_Left2Right[0],[left_leg_chain.inverse_kinematics(leftLegLeft2RightTask)],via.lf_Left2Right[2],via.lf_Left2Right[3]]
+                    leftLegLeft2RightJoint = [via.lf_Left2Right[0],[left_leg_chain.inverse_kinematics(leftLegLeft2RightTask[0]), left_leg_chain.inverse_kinematics(leftLegLeft2RightTask[1])],via.lf_Left2Right[2],via.lf_Left2Right[3]]
                     [rLeg_tj, lLeg_tj, rArm_tj, lArm_tj] = createTrajectories(
                         rightLegLeft2RightJoint, 
                         leftLegLeft2RightJoint, 
