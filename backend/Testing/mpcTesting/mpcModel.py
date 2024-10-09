@@ -9,7 +9,7 @@ rel_do_mpc_path = os.path.join('..','..')
 sys.path.append(rel_do_mpc_path)
 import do_mpc
 
-def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will be bounds of foot), and type of model
+def ip_model(symvar_type='SX'): #takes in obstacles(in this case will be bounds of foot), and type of model
     """
     --------------------------------------------------------------------------
     template_model: Variables / RHS / AUX
@@ -32,7 +32,6 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     # Setpoint x:
     pos_set = model.set_variable('_tvp', 'pos_set')
 
-
     # States struct (optimization variables):
     pos = model.set_variable('_x',  'pos')
     theta = model.set_variable('_x',  'theta', (2,1))
@@ -53,10 +52,11 @@ def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will
     #Im not sure if I need the position vector right now as I am just trying to control the swing of the IP
     #next steps is have the dynamic equations and then the cost function 
     euler_lagrange = vertcat(
-        #1
-        (m0 + m_com)*ddpos + m_com*(ddtheta*cos(theta)-(ddtheta**2)* sin(theta)),
-        #2
-        m_com*g*l0*sin(theta)+m_com*l0*ddpos*cos(theta)+m_com*l0**2*ddtheta
+        # #1
+        # (m0 + m_com)*ddpos + m_com*(ddtheta*cos(theta)-(ddtheta**2)* sin(theta)),
+        # #2
+        # m_com*g*l0*sin(theta)+m_com*l0*ddpos*cos(theta)+m_com*l0**2*ddtheta
+        m_com*(-dpos*l0*dtheta*sin(theta)+(l0**2*ddtheta)) + m_com*dpos*l0*dtheta*sin(theta)
     )
     model.set_alg('euler_lagrange', euler_lagrange)
     

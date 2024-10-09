@@ -67,7 +67,7 @@ scenario = 1  # 1 = down-down start, 2 = up-up start, both with setpoint change.
 Get configured do-mpc modules:
 """
 
-model = ip_model()
+model = ip_model
 simulator = template_simulator(model)
 mpc = template_mpc(model)
 estimator = do_mpc.estimator.StateFeedback(model)
