@@ -9,7 +9,7 @@ rel_do_mpc_path = os.path.join('..','..')
 sys.path.append(rel_do_mpc_path)
 import do_mpc
 
-def ip_model(symvar_type='SX'): #takes in obstacles(in this case will be bounds of foot), and type of model
+def ip_model(obstacles, symvar_type='SX'): #takes in obstacles(in this case will be bounds of foot), and type of model
     """
     --------------------------------------------------------------------------
     template_model: Variables / RHS / AUX
@@ -71,8 +71,29 @@ def ip_model(symvar_type='SX'): #takes in obstacles(in this case will be bounds 
     model.set_expression('E_kin', E_kin)
     model.set_expression('E_pot', E_pot)
     
+     # Coordinates of the nodes:
+    node0_x = model.x['pos']
+    node0_y = np.array([0])
+
+    node1_x = node0_x+l0*sin(model.x['theta',0])
+    node1_y = node0_y+l0*cos(model.x['theta',0])
+
+
+    obstacle_distance = []
+
+    for obs in obstacles:
+        d0 = sqrt((node0_x-obs['x'])**2+(node0_y-obs['y'])**2)-obs['r']*1.05
+        d1 = sqrt((node1_x-obs['x'])**2+(node1_y-obs['y'])**2)-obs['r']*1.05
+        obstacle_distance.extend([d0, d1])
+
+
+    model.set_expression('obstacle_distance',vertcat(*obstacle_distance))
+    model.set_expression('tvp', pos_set)
+    
     # Build the model
     model.setup()
+    
+    # print(model._getvar('_x'))
 
     return model
     

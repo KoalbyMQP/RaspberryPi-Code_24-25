@@ -56,10 +56,10 @@ show_animation = True
 store_animation = False
 store_results = False
 
-# # Define obstacles to avoid (cicles)
-# obstacles = [
-#     {'x': 0., 'y': 0.6, 'r': 0.3},
-# ]
+# Define obstacles to avoid (cicles)
+obstacles = [
+    {'x': 0., 'y': 0.6, 'r': 0.3},
+]
 
 scenario = 1  # 1 = down-down start, 2 = up-up start, both with setpoint change.
 
@@ -67,7 +67,7 @@ scenario = 1  # 1 = down-down start, 2 = up-up start, both with setpoint change.
 Get configured do-mpc modules:
 """
 
-model = ip_model
+model = ip_model(obstacles)
 simulator = template_simulator(model)
 mpc = template_mpc(model)
 estimator = do_mpc.estimator.StateFeedback(model)
@@ -156,13 +156,13 @@ bar1 = ax1.plot([],[], '-o', linewidth=5, markersize=10)
 bar2 = ax1.plot([],[], '-o', linewidth=5, markersize=10)
 
 
-# for obs in obstacles:
-#     circle = Circle((obs['x'], obs['y']), obs['r'])
-#     ax1.add_artist(circle)
+for obs in obstacles:
+    circle = Circle((obs['x'], obs['y']), obs['r'])
+    ax1.add_artist(circle)
 
-# ax1.set_xlim(-1.8,1.8)
-# ax1.set_ylim(-1.2,1.2)
-# ax1.set_axis_off()
+ax1.set_xlim(-1.8,1.8)
+ax1.set_ylim(-1.2,1.2)
+ax1.set_axis_off()
 
 fig.align_ylabels()
 fig.tight_layout()
