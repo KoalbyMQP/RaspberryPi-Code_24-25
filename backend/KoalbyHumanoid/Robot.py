@@ -68,11 +68,8 @@ class Robot():
         
         self.VelPIDY = PID(0.000, 0.000, 0.000)
 
-        self.VelPIDZ1 = PID(0.0, 0.00, 0.00) #for chest front2back
         self.VelPIDZ = PID(0.00909, 0.0037, 0.0031) #for hips front2back
 
-        # self.trackSphere = self.sim.getObject("./trackSphere")
-        # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
             self.sim.startSimulation()
         # self.sim.startSimulation()
@@ -334,12 +331,10 @@ class Robot():
         Zerror = balanceErrorZ
         self.VelPIDX.setError(Xerror)
         self.VelPIDY.setError(Yerror)
-        self.VelPIDZ1.setError(Zerror)
         self.VelPIDZ.setError(Zerror)
         newTargetX = self.VelPIDX.calculate()
         newTargetX1 = self.VelPIDX1.calculate()
         newTargetY = self.VelPIDY.calculate()
-        newTargetZ1 = self.VelPIDZ.calculate()
         newTargetZ = self.VelPIDZ.calculate()
 
         #PID Control in X direction

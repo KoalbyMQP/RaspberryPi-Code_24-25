@@ -25,7 +25,7 @@ def main():
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
     prevCoM = [0,0,0]
-    setPoints = [[0,  0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
+    setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
     notFalling = True
@@ -42,8 +42,8 @@ def main():
     while notFalling:
         for point in traj:
             #tells robot trajectory is specifically for arms
-            robot.motors[18].target = (point[1], 'P') # for right knee
-            robot.motors[23].target = (point[2], 'P') # for left knee
+            robot.motors[0].target = (point[1], 'P') # for right arm
+            robot.motors[5].target = (point[2], 'P') # for left arm
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
