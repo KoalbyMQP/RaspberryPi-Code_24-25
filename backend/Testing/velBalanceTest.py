@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
 
 # Edit to declare if you are testing the sim or the real robot
-
 is_real = False
 robot = Robot(is_real)
 print("Setup Complete")
@@ -17,14 +16,13 @@ print("Setup Complete")
 
 def main():
 
-    # moves arms down
+    # moves arms down from T-pose
     robot.motors[1].target = (math.radians(80), 'P') # for RightShoulderAbductor
     robot.motors[6].target = (math.radians(-80), 'P') # for LeftShoulderAbductor
-
     robot.moveAllToTarget()
     print("Initial Pose Done")
 
-    # creates trajectory of movements
+    # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
     prevCoM = [0,0,0]
     setPoints = [[0,  0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
@@ -39,7 +37,8 @@ def main():
         prevCoM = robot.CoM
         count = 0
     print("Initialized")
-    # moves arm to each traj point until it falls
+
+    # moves knees to each traj point until it falls
     while notFalling:
         for point in traj:
             #tells robot trajectory is specifically for arms
@@ -48,18 +47,18 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            robot.VelBalance(prevCoM)
+            robot.VelBalance(prevCoM) #where PID is used and CoM is updated
 
-            if abs(robot.CoM[0] - prevCoM[0]) > 15:
+            if abs(robot.CoM[0] - prevCoM[0]) > 15: # detects falling sometimes
                 print("FALLING")
                 notFalling = False
                 break
 
             prevCoM = robot.CoM
-            count = count + 1
+            count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")
-    print(count, " / ", len(traj))
+    print(count, " / ", len(traj)) # prints percentage of completion of balance test if falling was detected
 
 
 if(__name__ == "__main__"):

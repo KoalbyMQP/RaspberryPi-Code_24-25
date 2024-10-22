@@ -61,11 +61,16 @@ class Robot():
         # self.imuPIDX = PID(0.3,0.005,0.1)
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
         self.PIDVel = PID(0.0,0,0)
-        self.VelPIDX = PID(0.0025, 0, 0)
-        self.VelPIDX1 = PID(0.001, 0, 0)
-        self.VelPIDZ1 = PID(0.0, 0.00, 0.00)
-        self.VelPIDZ = PID(0.00909, 0.0037, 0.0031)
+
+        # VEL BALANCE TEST PID VALUES
+        self.VelPIDX = PID(0.0025, 0, 0) #for hips side2side
+        self.VelPIDX1 = PID(0.001, 0, 0) #for chest side2side
+        
         self.VelPIDY = PID(0.000, 0.000, 0.000)
+
+        self.VelPIDZ1 = PID(0.0, 0.00, 0.00) #for chest front2back
+        self.VelPIDZ = PID(0.00909, 0.0037, 0.0031) #for hips front2back
+
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
@@ -318,7 +323,7 @@ class Robot():
 
         self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
-    def VelBalance(self, balancePoint):
+    def VelBalance(self, balancePoint): # PID control over upper body
         self.updateRobotCoM()
         print("CoM: ", self.CoM)
         balanceErrorX = balancePoint[0] - self.CoM[0]
@@ -328,21 +333,23 @@ class Robot():
         Yerror = balanceErrorY
         Zerror = balanceErrorZ
         self.VelPIDX.setError(Xerror)
+        self.VelPIDY.setError(Yerror)
         self.VelPIDZ1.setError(Zerror)
         self.VelPIDZ.setError(Zerror)
-        self.VelPIDY.setError(Yerror)
         newTargetX = self.VelPIDX.calculate()
         newTargetX1 = self.VelPIDX1.calculate()
+        newTargetY = self.VelPIDY.calculate()
         newTargetZ1 = self.VelPIDZ.calculate()
         newTargetZ = self.VelPIDZ.calculate()
-        newTargetY = self.VelPIDY.calculate()
-        self.motors[13].target = (newTargetX, 'V') #for hips
-        # self.motors[0].target = (newTargetZ1, 'V')
-        # self.motors[5].target = (-newTargetZ1, 'V')
-        if 0.004 > newTargetZ > -0.005:
-            self.motors[10].target = (-newTargetZ, 'V') #for hips
-        #self.motors[14].target = (newTargetZ, 'V') #for chest
-        self.motors[11].target = (-newTargetX1, 'V') # for chest
+
+        #PID Control in X direction
+        self.motors[13].target = (newTargetX, 'V') #for hips side2side
+        self.motors[11].target = (-newTargetX1, 'V') # for chest side2side
+
+        if 0.004 > newTargetZ > -0.005: #thresholds to control movement
+            self.motors[10].target = (-newTargetZ, 'V') #for hips front2back
+        #self.motors[14].target = (newTargetZ1, 'V') #for chest
+       
         balanceError = [balanceErrorX, balanceErrorY, balanceErrorZ]
         return balanceError
 
