@@ -34,10 +34,11 @@ def main():
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
         robot.updateRobotCoM()
-        prevCoM = robot.CoM
+        prevCoP = robot.updateCoP()
+        prevIMU = robot.imu.getData()
         count = 0
     print("Initialized")
-
+    print("PrevIMU: ", prevIMU)
     # moves knees to each traj point until it falls
     while notFalling:
         for point in traj:
@@ -47,14 +48,19 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            robot.VelBalance(prevCoM) #where PID is used and CoM is updated
+            # robot.VelBalance(prevCoM) #where PID is used and CoM is updated
 
-            if abs(robot.CoM[0] - prevCoM[0]) > 15: # detects falling sometimes
-                print("FALLING")
+            robot.CoPBalance(prevCoP)
+            
+            # if inside tolerances (0 & 2 Xdir, 1 & 3 Zdir), make microadjustments according to IMU to make future easier
+            if abs(robot.feetCoP[0]) < 0.05 or abs(robot.feetCoP[1]) < 0.1 or abs(robot.feetCoP[2]) < 0.05 or abs(robot.feetCoP[3]) < 0.1:
+                robot.IMUBalance(prevIMU[0], prevIMU[2])
+                print("Trying to Fix it")
                 notFalling = False
                 break
-
-            prevCoM = robot.CoM
+            
+            prevCoP = robot.feetCoP
+            prevIMU = robot.CoM
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")

@@ -58,16 +58,16 @@ class Robot():
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0.3)
+
+        self.feetCoP = [0, 0, 0, 0]
         # self.imuPIDX = PID(0.3,0.005,0.1)
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
-        self.PIDVel = PID(0.0,0,0)
+        # self.PIDVel = PID(0.0,0,0)
 
-        # VEL BALANCE TEST PID VALUES
+        # # VEL BALANCE TEST PID VALUES
         self.VelPIDX = PID(0.0025, 0, 0) #for hips side2side
         self.VelPIDX1 = PID(0.001, 0, 0) #for chest side2side
-        
         self.VelPIDY = PID(0.000, 0.000, 0.000)
-
         self.VelPIDZ = PID(0.00909, 0.0037, 0.0031) #for hips front2back
 
         if(not is_real):
@@ -314,13 +314,49 @@ class Robot():
         self.imuPIDZ.setError(Zerror)
         newTargetX = self.imuPIDX.calculate()
         newTargetZ = self.imuPIDZ.calculate()
-        # print(math.degrees(newTargetX), math.degrees(newTargetZ))
         self.motors[13].target = (newTargetZ, 'P')
         self.motors[10].target = (-newTargetX, 'P')
 
         self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
-    def VelBalance(self, balancePoint): # PID control over upper body
+    def updateCoP(self): #get position of main pressure point on foot
+        #foot dimensions are needed to calculate positions
+        footWidth = 0
+        footLength = 0
+
+        #get pressure value from each pressure sensor on left foot
+        leftL = self.CoP.getValue()
+        rightL = self.CoP.getValue()
+        topL = self.CoP.getValue()
+        bottomL = self.CoP.getValue()
+
+        self.feetCoP[0] = (leftL - rightL) / footWidth
+        self.feetCoP[1] = (topL - bottomL) / footLength
+       
+
+        #get pressure value from each pressure sensor on right foot
+        leftR = self.CoP.getValue()
+        rightR = self.CoP.getValue()
+        topR = self.CoP.getValue()
+        bottomR = self.CoP.getValue()
+
+        self.feetCoP[2] = (leftR - rightR) / footWidth
+        self.feetCoP[3] = (topR - bottomR) / footLength
+        return self.feetCoP # first two terms in list is the left foot, second two terms in list is right foot
+
+
+    def CoPBalance(self, CoPs):
+        self.updateCoP()
+        ErrorXL = CoPs[0] - self.feetCoP[0]
+        ErrorZL = CoPs[1] - self.feetCoP[1]
+        ErrorXR = CoPs[2] - self.feetCoP[2]
+        ErrorZR = CoPs[3] - self.feetCoP[3]
+        
+
+
+
+
+    def VelBalance(self, balancePoint): # CoM PID control over upper body
         self.updateRobotCoM()
         print("CoM: ", self.CoM)
         balanceErrorX = balancePoint[0] - self.CoM[0]
@@ -350,24 +386,12 @@ class Robot():
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM
-        
-        # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
-        # kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
-        # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
-        # thetaError = targetTheta - currTheta
-        # self.PID.setError(thetaError)
-        # newTarget = self.PID.calculate()
 
         self.PIDVel.setError(balanceError[2])
         newTarget = self.PIDVel.calculate()
         
         self.motors[10].target = (-0.000001*newTarget, 'V')
-        
-        # self.motors[22].target = (0.001*newTarget, 'V')
-        # # self.motors[24].target = (-10, 'V')
-        # self.motors[17].target = (-0.001*newTarget, 'V')
-        # self.motors[19].target = (10, 'V')
-        # self.IMUBalance(0, 0)
+
         return balanceError
 
     def balanceAngleOLD(self):
