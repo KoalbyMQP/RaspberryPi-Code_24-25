@@ -11,13 +11,11 @@ from backend.KoalbyHumanoid.Robot import Robot
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 from backend.KoalbyHumanoid.Config import Joints
 
-# Initialize the robot
 def setup_robot(is_real):
     robot = Robot(is_real)
     print("Setup Complete")
     return robot
 
-# Trajectory generation and motor control
 def update_trajectory_and_control(robot, n_points, right_points, left_points, start_time):
     currentTime = time.time() - start_time
 
@@ -37,12 +35,10 @@ def update_trajectory_and_control(robot, n_points, right_points, left_points, st
 
     robot.moveAllToTarget()
 
-# Main function
 def main():
     is_real = False
     robot = setup_robot(is_real)
 
-    # Load IK chains and define the target trajectories
     left_leg_chain = Chain.from_urdf_file(
         "backend/Testing/robotChain.urdf",
         base_elements=['LeftHip', 'LeftLegRotator']
@@ -53,25 +49,21 @@ def main():
         base_elements=['RightHip', 'RightLegRotator']
     )
 
-    y_avg_position = -0.27
-    z_avg_position = -0.27
+    y_avg_position = -0.385
+    z_avg_position = 0.0
+    y_scale = 2
+    z_scale = 1
     target_positions_left = np.array([
-        [0.05, y_avg_position + 0.0, z_avg_position - 0.000],
-        [0.05, y_avg_position + 0.1, z_avg_position + 0.025],
-        [0.05, y_avg_position + 0.1, z_avg_position + 0.050],
-        [0.05, y_avg_position + 0.0, z_avg_position + 0.050],
-        [0.05, y_avg_position - 0.1, z_avg_position + 0.050],
-        [0.05, y_avg_position - 0.1, z_avg_position + 0.025],
-        [0.05, y_avg_position + 0.0, z_avg_position + 0.000]
+        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
+        [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
+        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.1],
+        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0]
     ])
     target_positions_right = np.array([
-        [-0.05, y_avg_position - 0.0, z_avg_position + 0.050],
-        [-0.05, y_avg_position - 0.1, z_avg_position + 0.050],
-        [-0.05, y_avg_position - 0.1, z_avg_position + 0.025],
-        [-0.05, y_avg_position - 0.0, z_avg_position + 0.000],
-        [-0.05, y_avg_position + 0.1, z_avg_position + 0.025],
-        [-0.05, y_avg_position + 0.1, z_avg_position + 0.050],
-        [-0.05, y_avg_position - 0.0, z_avg_position + 0.050]
+        [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
+        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.1],
+        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
+        [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1]
     ])
 
     n_points = 100
@@ -86,23 +78,31 @@ def main():
     left_points = []
     right_points = []
 
+    target_orientation = [0, 0, 0.05]
+
     start_time = time.time()
     state = 0
 
     while True:
         for frame in range(n_points):
             target_position_left = trajectory_left[frame]
-            ik_solution_left = left_leg_chain.inverse_kinematics(target_position_left)
+            ik_solution_left = left_leg_chain.inverse_kinematics(
+                target_position=target_position_left,
+                target_orientation=target_orientation,
+                orientation_mode="Z"
+            )
             
             if len(ik_solution_left) >= 6:
                 left_points[:] = [ik_solution_left[1], ik_solution_left[2], ik_solution_left[3], ik_solution_left[4], ik_solution_left[5]]
             else:
                 left_points[:] = ik_solution_left[1:]
 
-            print(left_points)
-
             target_position_right = trajectory_right[frame]
-            ik_solution_right = right_leg_chain.inverse_kinematics(target_position_right)
+            ik_solution_right = right_leg_chain.inverse_kinematics(
+                target_position=target_position_right,
+                target_orientation=target_orientation,
+                orientation_mode="Z"
+            )
             
             if len(ik_solution_right) >= 6:
                 right_points[:] = [ik_solution_right[1], ik_solution_right[2], ik_solution_right[3], ik_solution_right[4], ik_solution_right[5]]
