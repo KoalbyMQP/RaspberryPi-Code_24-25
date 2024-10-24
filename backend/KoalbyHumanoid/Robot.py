@@ -60,6 +60,8 @@ class Robot():
         self.PID = PID(0.25,0.1,0.3)
 
         self.feetCoP = [0, 0, 0, 0]
+        self.CoPPIDX = PID(0, 0, 0)
+        self.CoPPIDZ = PID(0, 0, 0)
         # self.imuPIDX = PID(0.3,0.005,0.1)
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
         # self.PIDVel = PID(0.0,0,0)
@@ -351,9 +353,15 @@ class Robot():
         ErrorZL = CoPs[1] - self.feetCoP[1]
         ErrorXR = CoPs[2] - self.feetCoP[2]
         ErrorZR = CoPs[3] - self.feetCoP[3]
-        
+        avgX = (ErrorXL + ErrorXR) / 2
+        avgZ = (ErrorZL + ErrorZR) / 2
+        self.CoPPIDX.setError(avgX)
+        self.CoPPIDZ.setError(avgZ)
+        targetX = self.CoPPIDX.calculate()
+        targetZ = self.CoPPIDZ.calculate()
 
-
+        self.motors[13].target = (targetX, 'V') #for hips side2side
+        self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
 
     def VelBalance(self, balancePoint): # CoM PID control over upper body
