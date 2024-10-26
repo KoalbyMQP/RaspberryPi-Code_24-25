@@ -3,6 +3,8 @@ import time
 import math
 import numpy as np
 
+sys.path.append("D:/Documents/College/Humanoid MQP Project/RaspberryPi-Code_23-24")
+sys.path.append("C:/Users/Gabriel/AppData/Local/Programs/Python/Python312/Lib/site-packages")
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
 from backend.KoalbyHumanoid.Link import Link
@@ -11,8 +13,8 @@ from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
-from backend.KoalbyHumanoid.IMU import IMU
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
+from backend.KoalbyHumanoid.IMU import IMU, IMUManager
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
 
@@ -46,7 +48,8 @@ class Robot():
 
         self.lastMotorCheck = time.time()
 
-        self.imu = IMU(self.is_real, sim=self.sim)
+        # Use IMUManager to manage multiple IMUs
+        self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
@@ -57,20 +60,13 @@ class Robot():
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
-        self.PID = PID(0.25,0.1,0.3)
-
-        self.feetCoP = [0, 0, 0, 0]
-        self.CoPPIDX = PID(0, 0, 0)
-        self.CoPPIDZ = PID(0, 0, 0)
-        # self.imuPIDX = PID(0.3,0.005,0.1)
-        # self.imuPIDZ = PID(0.25,0.0,0.0075)
-        # self.PIDVel = PID(0.0,0,0)
-
-        # # VEL BALANCE TEST PID VALUES
-        self.VelPIDX = PID(0.0025, 0, 0) #for hips side2side
-        self.VelPIDX1 = PID(0.001, 0, 0) #for chest side2side
+        self.PID = PID(0.25, 0.1, 0.3)
+        self.PIDVel = PID(0.0, 0, 0)
+        self.VelPIDX = PID(0.0025, 0, 0)
+        self.VelPIDX1 = PID(0.001, 0, 0)
+        self.VelPIDZ1 = PID(0.0, 0.00, 0.00)
+        self.VelPIDZ = PID(0.00909, 0.0037, 0.0031)
         self.VelPIDY = PID(0.000, 0.000, 0.000)
-        self.VelPIDZ = PID(0.00909, 0.0037, 0.0031) #for hips front2back
 
         if(not is_real):
             self.sim.startSimulation()
@@ -170,13 +166,19 @@ class Robot():
         if self.is_real:
             for motor in self.motors:
                 time.sleep(0.01)
+                if not isinstance(motor.target, tuple) or len(motor.target) != 2:
+                    # Set a default target if the motor target is not set correctly
+                    motor.target = (motor.theta, 'P')  # Use the current position as a default target
                 motor.move(motor.target)
         else:
-            # joint = self.locate(self.motors[19])
-            # self.sim.setObjectPosition(self.trackSphere,(joint[0][3]/1000,joint[2][3]/-1000,joint[1][3]/1000),self.sim.getObject("./Chest_respondable"))
-            self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
-            # for motor in self.motors:
-            #     motor.move(motor.target)
+            # Check for invalid targets and set a safe default
+            for motor in self.motors:
+                if not isinstance(motor.target, tuple) or len(motor.target) != 2:
+                    motor.target = (motor.theta, 'P')  # Default to the current position if no valid target
+            # Call CoppeliaSim API with valid motor targets
+            self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,
+                                        [motor.handle for motor in self.motors],
+                                        [motor.target[0] for motor in self.motors])  # Only the first element (angle) is needed
 
     def initHomePos(self):
         if self.is_real:
@@ -303,11 +305,9 @@ class Robot():
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
 
-    # methods to balance (unassisted standing)
-
     def IMUBalance(self, Xtarget, Ztarget):
-        data = self.imu.getData()
-        
+        imu_data = self.imu_manager.getAllIMUData()
+        data = imu_data["CenterOfMass"]
         xRot = data[0]
         zRot = data[2]
         Xerror = Xtarget - xRot
@@ -318,88 +318,134 @@ class Robot():
         newTargetZ = self.imuPIDZ.calculate()
         self.motors[13].target = (newTargetZ, 'P')
         self.motors[10].target = (-newTargetX, 'P')
+        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
         self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
-    def updateCoP(self): #get position of main pressure point on foot
-        #foot dimensions are needed to calculate positions
-        footWidth = 0
-        footLength = 0
+    # New method to get data from all IMUs
+    def getAllIMUData(self):
+        imu_data = {name: imu.getData() for name, imu in self.imus.items()}
+        return imu_data
+    
+    # def updateCoP(self): #get position of main pressure point on foot
+    #     #foot dimensions are needed to calculate positions
+    #     footWidth = 0
+    #     footLength = 0
 
-        #get pressure value from each pressure sensor on left foot
-        leftL = self.CoP.getValue()
-        rightL = self.CoP.getValue()
-        topL = self.CoP.getValue()
-        bottomL = self.CoP.getValue()
+    #     #get pressure value from each pressure sensor on left foot
+    #     leftL = self.CoP.getValue()
+    #     rightL = self.CoP.getValue()
+    #     topL = self.CoP.getValue()
+    #     bottomL = self.CoP.getValue()
 
-        self.feetCoP[0] = (leftL - rightL) / footWidth
-        self.feetCoP[1] = (topL - bottomL) / footLength
+    #     self.feetCoP[0] = (leftL - rightL) / footWidth
+    #     self.feetCoP[1] = (topL - bottomL) / footLength
        
 
-        #get pressure value from each pressure sensor on right foot
-        leftR = self.CoP.getValue()
-        rightR = self.CoP.getValue()
-        topR = self.CoP.getValue()
-        bottomR = self.CoP.getValue()
+    #     #get pressure value from each pressure sensor on right foot
+    #     leftR = self.CoP.getValue()
+    #     rightR = self.CoP.getValue()
+    #     topR = self.CoP.getValue()
+    #     bottomR = self.CoP.getValue()
 
-        self.feetCoP[2] = (leftR - rightR) / footWidth
-        self.feetCoP[3] = (topR - bottomR) / footLength
-        return self.feetCoP # first two terms in list is the left foot, second two terms in list is right foot
-
-
-    def CoPBalance(self, CoPs):
-        self.updateCoP()
-        ErrorXL = CoPs[0] - self.feetCoP[0]
-        ErrorZL = CoPs[1] - self.feetCoP[1]
-        ErrorXR = CoPs[2] - self.feetCoP[2]
-        ErrorZR = CoPs[3] - self.feetCoP[3]
-        avgX = (ErrorXL + ErrorXR) / 2
-        avgZ = (ErrorZL + ErrorZR) / 2
-        self.CoPPIDX.setError(avgX)
-        self.CoPPIDZ.setError(avgZ)
-        targetX = self.CoPPIDX.calculate()
-        targetZ = self.CoPPIDZ.calculate()
-
-        self.motors[13].target = (targetX, 'V') #for hips side2side
-        self.motors[10].target = (-targetZ, 'V') #for hips front2back
+    #     self.feetCoP[2] = (leftR - rightR) / footWidth
+    #     self.feetCoP[3] = (topR - bottomR) / footLength
+    #     return self.feetCoP # first two terms in list is the left foot, second two terms in list is right foot
 
 
-    def VelBalance(self, balancePoint): # CoM PID control over upper body
+    # def CoPBalance(self, CoPs):
+    #     self.updateCoP()
+    #     ErrorXL = CoPs[0] - self.feetCoP[0]
+    #     ErrorZL = CoPs[1] - self.feetCoP[1]
+    #     ErrorXR = CoPs[2] - self.feetCoP[2]
+    #     ErrorZR = CoPs[3] - self.feetCoP[3]
+    #     avgX = (ErrorXL + ErrorXR) / 2
+    #     avgZ = (ErrorZL + ErrorZR) / 2
+    #     self.CoPPIDX.setError(avgX)
+    #     self.CoPPIDZ.setError(avgZ)
+    #     targetX = self.CoPPIDX.calculate()
+    #     targetZ = self.CoPPIDZ.calculate()
+
+    #     self.motors[13].target = (targetX, 'V') #for hips side2side
+    #     self.motors[10].target = (-targetZ, 'V') #for hips front2back
+
+
+    def VelBalance(self, balancePoint):
         self.updateRobotCoM()
         print("CoM: ", self.CoM)
+
+        # Calculate errors based on CoM and balance point
         balanceErrorX = balancePoint[0] - self.CoM[0]
         balanceErrorY = balancePoint[1] - self.CoM[1]
         balanceErrorZ = balancePoint[2] - self.CoM[2]
-        Xerror = balanceErrorX
-        Yerror = balanceErrorY
-        Zerror = balanceErrorZ
-        self.VelPIDX.setError(Xerror)
-        self.VelPIDY.setError(Yerror)
-        self.VelPIDZ.setError(Zerror)
+
+        # Get IMU data for current pitch (forward/backward lean) from CenterOfMass IMU
+        imu_data = self.imu_manager.getAllIMUData()
+        xRot = imu_data["CenterOfMass"][0]  # X-axis rotation (pitch) for CenterOfMass
+
+        # Set PID errors for different axes
+        self.VelPIDX.setError(balanceErrorX)
+        self.VelPIDZ.setError(balanceErrorZ)
+        self.VelPIDY.setError(balanceErrorY)
+
+        # Use IMU data to set error and calculate correction for the pitch
+        self.imuPIDX.setError(xRot)
+        IMUCompensation = -self.imuPIDX.calculate()  # Compensate lean based on X-rotation
+
+        # Calculate PID corrections
         newTargetX = self.VelPIDX.calculate()
-        newTargetX1 = self.VelPIDX1.calculate()
-        newTargetY = self.VelPIDY.calculate()
         newTargetZ = self.VelPIDZ.calculate()
+        newTargetY = self.VelPIDY.calculate()
 
-        #PID Control in X direction
-        self.motors[13].target = (newTargetX, 'V') #for hips side2side
-        self.motors[11].target = (-newTargetX1, 'V') # for chest side2side
+        # Adjust torso lean based on CoM Y-position (proxy for squat depth)
+        maxCoMBackShift = 500  # Max backward shift of CoM in mm (adjust as needed)
+        CoMDepthFactor = min(1.0, abs(balanceErrorY) / maxCoMBackShift)  # Scale from 0 to 1 based on backward CoM shift
 
-        if 0.004 > newTargetZ > -0.005: #thresholds to control movement
-            self.motors[10].target = (-newTargetZ, 'V') #for hips front2back
-        #self.motors[14].target = (newTargetZ1, 'V') #for chest
-       
+        # Adjust torso and chest lean dynamically based on squat depth and IMU compensation
+        dynamicTorsoLean = (-CoMDepthFactor * 6.0 + IMUCompensation * 1.5)  # More aggressive forward lean
+        dynamicChestLean = (-CoMDepthFactor * 3.5 + (IMUCompensation * 1.0))  # Stronger chest lean with IMU compensation
+
+        # Ensure the lean values don’t saturate at the extremes
+        maxLeanValue = 2.0  # Increase max lean value to allow stronger forward lean
+        dynamicTorsoLean = np.clip(dynamicTorsoLean, -maxLeanValue, maxLeanValue)
+        dynamicChestLean = np.clip(dynamicChestLean, -maxLeanValue, maxLeanValue)
+
+        # Print debug values for lean adjustments
+        print(f"IMU Compensation: {IMUCompensation}, CoM Depth Factor: {CoMDepthFactor}")
+        print(f"Dynamic Torso Lean: {dynamicTorsoLean}, Dynamic Chest Lean: {dynamicChestLean}")
+
+        # Apply calculated targets to motors
+        self.motors[13].target = (newTargetX, 'V')  # Hips control for lateral balance
+        self.motors[10].target = (dynamicTorsoLean, 'V')  # Adjust torso lean for forward/backward balance
+        self.motors[14].target = (dynamicChestLean, 'V')  # Slightly adjust chest lean
+
+        # Chest side-to-side adjustment based on X-axis correction
+        self.motors[11].target = (-newTargetX, 'V')
+
+        # Return balance errors for reference
         balanceError = [balanceErrorX, balanceErrorY, balanceErrorZ]
         return balanceError
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM
+        
+        # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
+        # kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
+        # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
+        # thetaError = targetTheta - currTheta
+        # self.PID.setError(thetaError)
+        # newTarget = self.PID.calculate()
 
         self.PIDVel.setError(balanceError[2])
         newTarget = self.PIDVel.calculate()
         
         self.motors[10].target = (-0.000001*newTarget, 'V')
-
+        
+        # self.motors[22].target = (0.001*newTarget, 'V')
+        # # self.motors[24].target = (-10, 'V')
+        # self.motors[17].target = (-0.001*newTarget, 'V')
+        # self.motors[19].target = (10, 'V')
+        # self.IMUBalance(0, 0)
         return balanceError
 
     def balanceAngleOLD(self):

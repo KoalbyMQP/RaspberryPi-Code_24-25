@@ -22,6 +22,10 @@ def main():
     robot.moveAllToTarget()
     print("Initial Pose Done")
 
+    # Initial IMU data
+    imu_data_initial = robot.imu_manager.getAllIMUData()
+    print("Initial IMU Readings:", imu_data_initial)
+
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
     prevCoM = [0,0,0]
@@ -29,14 +33,15 @@ def main():
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
     notFalling = True
-    
+    count = 0  # Initialize outside of the stabilization loop for consistent counting
+
+
     #stabilizes itself before starting test
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
         robot.updateRobotCoM()
-        prevCoP = robot.updateCoP()
-        prevIMU = robot.imu.getData()
-        count = 0
+        #prevCoP = robot.updateCoP()
+        prevIMU = robot.imu_manager.getAllIMUData()
     print("Initialized")
     print("PrevIMU: ", prevIMU)
     # moves knees to each traj point until it falls
@@ -48,18 +53,23 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            # robot.VelBalance(prevCoM) #where PID is used and CoM is updated
+            robot.VelBalance(prevCoM) #where PID is used and CoM is updated
 
-            robot.CoPBalance(prevCoP)
+            #robot.CoPBalance(prevCoP)
             
+            imu_data = robot.imu_manager.getAllIMUData()
+            print("IMU Readings at step {}: {}".format(count, imu_data))
+
+
             # if inside tolerances (0 & 2 Xdir, 1 & 3 Zdir), make microadjustments according to IMU to make future easier
-            if abs(robot.feetCoP[0]) < 0.05 or abs(robot.feetCoP[1]) < 0.1 or abs(robot.feetCoP[2]) < 0.05 or abs(robot.feetCoP[3]) < 0.1:
+            if abs(robot.CoM[0] - prevCoM[0]) > 15:  # Adjust threshold if needed
+                #if abs(robot.feetCoP[0]) < 0.05 or abs(robot.feetCoP[1]) < 0.1 or abs(robot.feetCoP[2]) < 0.05 or abs(robot.feetCoP[3]) < 0.1:
                 robot.IMUBalance(prevIMU[0], prevIMU[2])
                 print("Trying to Fix it")
                 notFalling = False
                 break
             
-            prevCoP = robot.feetCoP
+            #prevCoP = robot.feetCoP
             prevIMU = robot.CoM
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
