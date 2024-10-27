@@ -52,7 +52,7 @@ def main():
     y_avg_position = -0.385
     z_avg_position = 0.0
     y_scale = 2
-    z_scale = 1
+    z_scale = 1 
     target_positions_left = np.array([
         [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
         [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
@@ -60,10 +60,10 @@ def main():
         [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0]
     ])
     target_positions_right = np.array([
-        [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
-        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.1],
-        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
-        [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1]
+        [-0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
+        [-0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.1],
+        [-0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
+        [-0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1]
     ])
 
     n_points = 100
@@ -78,7 +78,7 @@ def main():
     left_points = []
     right_points = []
 
-    target_orientation = [0, 0, 0.05]
+    target_orientation = [0, 0, 0]
 
     start_time = time.time()
     state = 0
@@ -89,7 +89,7 @@ def main():
             ik_solution_left = left_leg_chain.inverse_kinematics(
                 target_position=target_position_left,
                 target_orientation=target_orientation,
-                orientation_mode="Z"
+                orientation_mode="all"
             )
             
             if len(ik_solution_left) >= 6:
@@ -101,7 +101,7 @@ def main():
             ik_solution_right = right_leg_chain.inverse_kinematics(
                 target_position=target_position_right,
                 target_orientation=target_orientation,
-                orientation_mode="Z"
+                orientation_mode="all"
             )
             
             if len(ik_solution_right) >= 6:
