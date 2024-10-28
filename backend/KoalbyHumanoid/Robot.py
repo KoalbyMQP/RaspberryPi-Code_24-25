@@ -15,6 +15,7 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
 from backend.KoalbyHumanoid.IMU import IMU, IMUManager
+from backend.KoalbyHumanoid.PressureSensor import PressureSensor
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
 
@@ -304,28 +305,6 @@ class Robot():
         eomg = 0.01
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
-
-    def IMUBalance(self, Xtarget, Ztarget):
-        imu_data = self.imu_manager.getAllIMUData()
-        data = imu_data["CenterOfMass"]
-        xRot = data[0]
-        zRot = data[2]
-        Xerror = Xtarget - xRot
-        Zerror = Ztarget - zRot
-        self.imuPIDX.setError(Xerror)
-        self.imuPIDZ.setError(Zerror)
-        newTargetX = self.imuPIDX.calculate()
-        newTargetZ = self.imuPIDZ.calculate()
-        self.motors[13].target = (newTargetZ, 'P')
-        self.motors[10].target = (-newTargetX, 'P')
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
-
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
-
-    # New method to get data from all IMUs
-    def getAllIMUData(self):
-        imu_data = {name: imu.getData() for name, imu in self.imus.items()}
-        return imu_data
     
     # def updateCoP(self): #get position of main pressure point on foot
     #     #foot dimensions are needed to calculate positions
@@ -370,7 +349,7 @@ class Robot():
     #     self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
 
-    def VelBalance(self, balancePoint):
+    def IMUBalance(self, balancePoint):
         self.updateRobotCoM()
         print("CoM: ", self.CoM)
 

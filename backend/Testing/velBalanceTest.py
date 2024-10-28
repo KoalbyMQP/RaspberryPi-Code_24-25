@@ -25,6 +25,7 @@ def main():
     # Initial IMU data
     imu_data_initial = robot.imu_manager.getAllIMUData()
     print("Initial IMU Readings:", imu_data_initial)
+    prevIMU = imu_data_initial
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
@@ -53,7 +54,7 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            robot.VelBalance(prevCoM) #where PID is used and CoM is updated
+            robot.IMUBalance(prevIMU) #where PID is used
 
             #robot.CoPBalance(prevCoP)
             
@@ -61,16 +62,14 @@ def main():
             print("IMU Readings at step {}: {}".format(count, imu_data))
 
 
-            # if inside tolerances (0 & 2 Xdir, 1 & 3 Zdir), make microadjustments according to IMU to make future easier
             if abs(robot.CoM[0] - prevCoM[0]) > 15:  # Adjust threshold if needed
-                #if abs(robot.feetCoP[0]) < 0.05 or abs(robot.feetCoP[1]) < 0.1 or abs(robot.feetCoP[2]) < 0.05 or abs(robot.feetCoP[3]) < 0.1:
                 robot.IMUBalance(prevIMU[0], prevIMU[2])
                 print("Trying to Fix it")
                 notFalling = False
                 break
             
             #prevCoP = robot.feetCoP
-            prevIMU = robot.CoM
+            prevIMU = imu_data
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")
