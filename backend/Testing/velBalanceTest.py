@@ -26,6 +26,8 @@ def main():
     imu_data_initial = robot.imu_manager.getAllIMUData()
     print("Initial IMU Readings:", imu_data_initial)
     prevIMU = imu_data_initial
+    forceInitial = robot.forceManager.getAllForces()
+    print("Initial Forces", forceInitial)
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
@@ -40,9 +42,9 @@ def main():
     #stabilizes itself before starting test
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
-        robot.updateRobotCoM()
-        #prevCoP = robot.updateCoP()
+        #robot.updateRobotCoM()
         prevIMU = robot.imu_manager.getAllIMUData()
+        prevCoP = robot.forceManager.getAllForces()
     print("Initialized")
     print("PrevIMU: ", prevIMU)
     # moves knees to each traj point until it falls
@@ -55,12 +57,12 @@ def main():
 
             time.sleep(0.01) 
             robot.IMUBalance(prevIMU) #where PID is used
-
-            #robot.CoPBalance(prevCoP)
+            robot.CoPBalance(prevCoP)
             
             imu_data = robot.imu_manager.getAllIMUData()
+            pressureSensors = robot.forceManager.getAllForces()
             print("IMU Readings at step {}: {}".format(count, imu_data))
-
+            print("Force Readings at step {}: {}".format(count, pressureSensors))
 
             if abs(robot.CoM[0] - prevCoM[0]) > 15:  # Adjust threshold if needed
                 robot.IMUBalance(prevIMU[0], prevIMU[2])
@@ -68,7 +70,7 @@ def main():
                 notFalling = False
                 break
             
-            #prevCoP = robot.feetCoP
+            prevCoP = pressureSensors
             prevIMU = imu_data
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
