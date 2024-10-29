@@ -23,11 +23,13 @@ def main():
     print("Initial Pose Done")
 
     # Initial IMU data
-    imu_data_initial = robot.imu_manager.getAllIMUData()
-    print("Initial IMU Readings:", imu_data_initial)
-    prevIMU = imu_data_initial
+    # imu_data_initial = robot.imu_manager.getAllIMUData()
+    # print("Initial IMU Readings:", imu_data_initial)
+    # prevIMU = imu_data_initial
     forceInitial = robot.forceManager.getAllForces()
     print("Initial Forces", forceInitial)
+    CoP = robot.updateCoP()
+    print("CoP", CoP)
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
@@ -43,10 +45,9 @@ def main():
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
         #robot.updateRobotCoM()
-        prevIMU = robot.imu_manager.getAllIMUData()
+        # prevIMU = robot.imu_manager.getAllIMUData()
         prevCoP = robot.forceManager.getAllForces()
     print("Initialized")
-    print("PrevIMU: ", prevIMU)
     # moves knees to each traj point until it falls
     while notFalling:
         for point in traj:
@@ -56,10 +57,10 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            robot.IMUBalance(prevIMU) #where PID is used
+            # robot.IMUBalance(prevIMU) #where PID is used
             robot.CoPBalance(prevCoP)
             
-            imu_data = robot.imu_manager.getAllIMUData()
+            # imu_data = robot.imu_manager.getAllIMUData()
             pressureSensors = robot.forceManager.getAllForces()
             print("IMU Readings at step {}: {}".format(count, imu_data))
             print("Force Readings at step {}: {}".format(count, pressureSensors))
@@ -71,7 +72,7 @@ def main():
                 break
             
             prevCoP = pressureSensors
-            prevIMU = imu_data
+            # prevIMU = imu_data
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")
