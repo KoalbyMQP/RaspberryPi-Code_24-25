@@ -15,7 +15,7 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
 from backend.KoalbyHumanoid.IMU import IMU, IMUManager
-from backend.KoalbyHumanoid.PressureSensor import PressureSensor
+from backend.KoalbyHumanoid.PressureSensor import PressureSensor, ForceManager
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
 
@@ -51,6 +51,11 @@ class Robot():
 
         # Use IMUManager to manage multiple IMUs
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
+        self.forceManager = ForceManager(self.is_real, sim=self.sim)
+        self.feetCoP = [0, 0, 0, 0]
+        self.CoPPIDX = PID(0, 0, 0)
+        self.CoPPIDZ = PID(0, 0, 0)
+
         self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
@@ -306,47 +311,44 @@ class Robot():
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
     
-    # def updateCoP(self): #get position of main pressure point on foot
-    #     #foot dimensions are needed to calculate positions
-    #     footWidth = 0
-    #     footLength = 0
+    def updateCoP(self): #get position of main pressure point on foot
+        #foot dimensions are needed to calculate positions
+        footWidth = 0
+        footLength = 0
+        diffBetweenFeet = [0, 0]
 
-    #     #get pressure value from each pressure sensor on left foot
-    #     leftL = self.CoP.getValue()
-    #     rightL = self.CoP.getValue()
-    #     topL = self.CoP.getValue()
-    #     bottomL = self.CoP.getValue()
+        #get pressure value from each pressure sensor
+        data = self.forceManager.getAllForces()
 
-    #     self.feetCoP[0] = (leftL - rightL) / footWidth
-    #     self.feetCoP[1] = (topL - bottomL) / footLength
-       
+        rightTop= (data[0] + data[1]) / 2 #right foot
+        rightBottom = (data[2] + data[3]) / 2 #right foot
+        rightLeft = (data[1] + data[3]) / 2 #right foot
+        rightRight = (data[0] + data[2]) / 2 #right foot
+        rightCoPX = (rightRight - rightLeft) / footWidth #right foot
+        rightCoPY = (rightTop - rightBottom) / footLength #right foot
 
-    #     #get pressure value from each pressure sensor on right foot
-    #     leftR = self.CoP.getValue()
-    #     rightR = self.CoP.getValue()
-    #     topR = self.CoP.getValue()
-    #     bottomR = self.CoP.getValue()
+        leftTop= (data[4] + data[5]) / 2 #left foot
+        leftBottom = (data[6] + data[7]) / 2 #left foot
+        leftLeft = (data[5] + data[7]) / 2 #leftt foot
+        leftRight = (data[4] + data[6]) / 2 #left foot
+        leftCoPX = (leftRight - leftLeft) / footWidth #left foot
+        leftCoPY = (leftTop - leftBottom) / footLength #left foot
+        self.feetCoP[0] = (rightCoPX + leftCoPX) / diffBetweenFeet[0]
+        self.feetCoP[1] = (rightCoPY + leftCoPY) / diffBetweenFeet[1]
+        return self.feetCoP # first term is x, second term is y
 
-    #     self.feetCoP[2] = (leftR - rightR) / footWidth
-    #     self.feetCoP[3] = (topR - bottomR) / footLength
-    #     return self.feetCoP # first two terms in list is the left foot, second two terms in list is right foot
 
+    def CoPBalance(self, CoPs):
+        self.updateCoP()
+        ErrorX = CoPs[0] - self.feetCoP[0]
+        ErrorY = CoPs[1] - self.feetCoP[1]
+        self.CoPPIDX.setError(ErrorX)
+        self.CoPPIDZ.setError(ErrorY)
+        targetX = self.CoPPIDX.calculate()
+        targetZ = self.CoPPIDZ.calculate()
 
-    # def CoPBalance(self, CoPs):
-    #     self.updateCoP()
-    #     ErrorXL = CoPs[0] - self.feetCoP[0]
-    #     ErrorZL = CoPs[1] - self.feetCoP[1]
-    #     ErrorXR = CoPs[2] - self.feetCoP[2]
-    #     ErrorZR = CoPs[3] - self.feetCoP[3]
-    #     avgX = (ErrorXL + ErrorXR) / 2
-    #     avgZ = (ErrorZL + ErrorZR) / 2
-    #     self.CoPPIDX.setError(avgX)
-    #     self.CoPPIDZ.setError(avgZ)
-    #     targetX = self.CoPPIDX.calculate()
-    #     targetZ = self.CoPPIDZ.calculate()
-
-    #     self.motors[13].target = (targetX, 'V') #for hips side2side
-    #     self.motors[10].target = (-targetZ, 'V') #for hips front2back
+        self.motors[13].target = (targetX, 'V') #for hips side2side
+        self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
 
     def IMUBalance(self, balancePoint):
