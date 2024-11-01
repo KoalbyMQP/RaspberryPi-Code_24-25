@@ -41,12 +41,12 @@ def main():
 
     left_leg_chain = Chain.from_urdf_file(
         "backend/Testing/robotChain.urdf",
-        base_elements=['LeftHip', 'LeftLegRotator']
+        base_elements=['Chest', 'TorsoFront2Back', 'Torso', 'HipsRotate', 'Belly', 'HipsSide2Side', 'BellyMotors', 'HipsFront2Back', 'Pelvis', 'LeftLegAbductor']
     )
 
     right_leg_chain = Chain.from_urdf_file(
         "backend/Testing/robotChain.urdf",
-        base_elements=['RightHip', 'RightLegRotator']
+        base_elements=['Chest', 'TorsoFront2Back', 'Torso', 'HipsRotate', 'Belly', 'HipsSide2Side', 'BellyMotors', 'HipsFront2Back', 'Pelvis', 'RightLegAbductor']
     )
 
     y_avg_position = -0.385
@@ -78,7 +78,7 @@ def main():
     left_points = []
     right_points = []
 
-    target_orientation = [0, 0, 0]
+    # target_orientation = [0, 0, 0.1]
 
     start_time = time.time()
     state = 0
@@ -87,9 +87,9 @@ def main():
         for frame in range(n_points):
             target_position_left = trajectory_left[frame]
             ik_solution_left = left_leg_chain.inverse_kinematics(
-                target_position=target_position_left,
-                target_orientation=target_orientation,
-                orientation_mode="all"
+                target_position=target_position_left
+                # target_orientation=target_orientation,
+                # orientation_mode="Z"
             )
             
             if len(ik_solution_left) >= 6:
@@ -99,9 +99,9 @@ def main():
 
             target_position_right = trajectory_right[frame]
             ik_solution_right = right_leg_chain.inverse_kinematics(
-                target_position=target_position_right,
-                target_orientation=target_orientation,
-                orientation_mode="all"
+                target_position=target_position_right
+                # target_orientation=target_orientation,
+                # orientation_mode="Z"
             )
             
             if len(ik_solution_right) >= 6:

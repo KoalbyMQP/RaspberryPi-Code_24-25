@@ -7,12 +7,12 @@ from scipy.interpolate import CubicSpline
 
 left_leg_chain = Chain.from_urdf_file(
     "backend/Testing/robotChain.urdf",
-    base_elements=['Chest', 'TorsoSide2Side']
+    base_elements=['Chest', 'TorsoFront2Back', 'Torso', 'HipsRotate', 'Belly', 'HipsSide2Side', 'BellyMotors', 'HipsFront2Back', 'Pelvis', 'LeftLegAbductor', 'LeftHip', 'LeftLegRotator', 'LeftHip2', 'LeftKick', 'LeftThigh', 'LeftKnee', 'LeftShin', 'LeftAnkle', 'LeftFoot']
 )
 
 right_leg_chain = Chain.from_urdf_file(
     "backend/Testing/robotChain.urdf",
-    base_elements=['Chest', 'TorsoSide2Side']
+    base_elements=['Chest', 'TorsoFront2Back', 'Torso', 'HipsRotate', 'Belly', 'HipsSide2Side', 'BellyMotors', 'HipsFront2Back', 'Pelvis', 'RightLegAbductor', 'RightHip', 'RightLegRotator', 'RightHip2', 'RightKick', 'RightThigh', 'RightKnee', 'RightShin', 'RightAnkle', 'RightFoot']
 )
 
 for link in enumerate(right_leg_chain.links):
