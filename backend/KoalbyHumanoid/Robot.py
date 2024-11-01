@@ -315,7 +315,10 @@ class Robot():
         #foot dimensions are needed to calculate positions
         footWidth = 53.6
         footLength = 146.6
-        diffBetweenFeet = [1, 1]
+        imu_data = self.imu_manager.getAllIMUData()
+        xDiff = imu_data["RightFoot"][0] - imu_data["LeftFoot"][0]
+        yDiff = imu_data["RightFoot"][1] - imu_data["LeftFoot"][1]
+        diffBetweenFeet = [xDiff, yDiff]
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
@@ -334,10 +337,9 @@ class Robot():
         leftRight = (data[4] + data[6]) / 2 #left foot
         leftCoPX = (leftRight - leftLeft) / footWidth #left foot
         leftCoPY = (leftTop - leftBottom) / footLength #left foot
-        
+
         self.feetCoP[0] = (rightCoPX + leftCoPX) / diffBetweenFeet[0]
         self.feetCoP[1] = (rightCoPY + leftCoPY) / diffBetweenFeet[1]
-        print("feetCoP", self.feetCoP)
         return self.feetCoP # first term is x, second term is y
 
 

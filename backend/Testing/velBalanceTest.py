@@ -23,12 +23,10 @@ def main():
     print("Initial Pose Done")
 
     # Initial IMU data
-    # imu_data_initial = robot.imu_manager.getAllIMUData()
-    # print("Initial IMU Readings:", imu_data_initial)
-    # prevIMU = imu_data_initial
-    forceInitial = robot.forceManager.getAllForces()
-    print("Initial Forces", forceInitial)
-    CoP = robot.updateCoP()
+    imu_data_initial = robot.imu_manager.getAllIMUData()
+    print("Initial IMU Readings:", imu_data_initial)
+    prevIMU = imu_data_initial
+    prevCoP = robot.updateCoP()
     print("CoP", CoP)
 
     # creates trajectory of movements (squatting knees to 80 degrees)
@@ -44,7 +42,7 @@ def main():
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
         #robot.updateRobotCoM()
-        # prevIMU = robot.imu_manager.getAllIMUData()
+        prevIMU = robot.imu_manager.getAllIMUData()
         prevCoP = robot.forceManager.getAllForces()
     print("Initialized")
 
@@ -59,15 +57,17 @@ def main():
             # robot.IMUBalance(prevIMU) #where PID is used
             robot.CoPBalance(prevCoP)
             
-            # imu_data = robot.imu_manager.getAllIMUData()
+            IMU = robot.imu_manager.getAllIMUData()
             pressureSensors = robot.forceManager.getAllForces()
+            robot.CoPBalance(prevCoP)
+            robot.IMUBalance(prevIMU)
             # print("IMU Readings at step {}: {}".format(count, imu_data))
             print("Force Readings at step {}: {}".format(count, pressureSensors))
 
             # robot.IMUBalance(prevIMU[0], prevIMU[2])
             
             prevCoP = pressureSensors
-            # prevIMU = imu_data
+            prevIMU = IMU
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")
