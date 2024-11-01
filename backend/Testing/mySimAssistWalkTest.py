@@ -70,8 +70,8 @@ def main():
     target_positions_left = np.array([
         [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.0],
         [0.04,  -0.285 , -0.05],
-        [0.04,  y_avg_position + y_scale*0.000 , z_avg_position + z_scale*0.1],
-        [0.04,  -0.385 , -0.1]
+        [0.04,  -0.385 , -0.1],
+        [0.04,  -0.385 , -0.2]
     ])
     target_positions_right = np.array([
         [0.04,  y_avg_position + y_scale*0.050 , z_avg_position + z_scale*0.1],
@@ -112,7 +112,7 @@ def main():
     target_orientation = [0, 0, 0.05]
 
     state = 0
-    initial_position_left = [-0.9574527745422127, -6.677834432572358, 3.362498794795048, 0, 0]
+    initial_position_left = [0, 0, 0, 0, 0]
 
     initial_position_right = [-0.8818984203844015, 2.090247231413886, -7.376601873229693e-06, 0, 0]
 
@@ -127,18 +127,22 @@ def main():
                 target_position_left = left_quintic
                 ik_solution_left = left_leg_chain.inverse_kinematics(
                     target_position_left,
+                    initial_position=initial_position_left,
                     target_orientation=target_orientation,
                     orientation_mode='Z' 
                 )
+                initial_position_left = ik_solution_left
                 # print(ik_solution_left)
                    
                 target_position_right = right_quintic
                 ik_solution_right = right_leg_chain.inverse_kinematics(
                     target_position_right,
+                    initial_position=initial_position_right,
                     target_orientation=target_orientation,
                     orientation_mode='Z'
                 )
-                print(left_quintic)
+                initial_position_right = ik_solution_right
+                # print(left_quintic)
                 print(ik_solution_left)
                 
                 update_trajectory_and_control(robot, n_points, ik_solution_right, ik_solution_left, start_time)
