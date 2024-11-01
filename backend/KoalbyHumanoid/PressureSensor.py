@@ -81,12 +81,12 @@ class ForceManager():
     def pressurePerSensor(self):
         pressures = [0, 0, 0, 0, 0, 0, 0, 0]
         data = self.getAllForces()
-        pressures[0] = math.sqrt( (data["RTR"][0] ** 2) + (data["RTR"][2] ** 2) )
-        pressures[1] = math.sqrt( (data["RTL"][0] ** 2) + (data["RTL"][2] ** 2) )
-        pressures[2] = math.sqrt( (data["RBR"][0] ** 2) + (data["RBR"][2] ** 2) )
-        pressures[3] = math.sqrt( (data["RBL"][0] ** 2) + (data["RBL"][2] ** 2) )
-        pressures[4] = math.sqrt( (data["LTR"][0] ** 2) + (data["LTR"][2] ** 2) )
-        pressures[5] = math.sqrt( (data["LTL"][0] ** 2) + (data["LTL"][2] ** 2) )
-        pressures[6] = math.sqrt( (data["LBR"][0] ** 2) + (data["LBR"][2] ** 2) )
-        pressures[7] = math.sqrt( (data["LBL"][0] ** 2) + (data["LBL"][2] ** 2) )
+        pressures[0] = math.sqrt( (data["RTR"][0] ** 2) + (data["RTR"][1] ** 2) + (data["RTR"][2] ** 2) )
+        pressures[1] = math.sqrt( (data["RTL"][0] ** 2) + (data["RTL"][1] ** 2) + (data["RTL"][2] ** 2) )
+        pressures[2] = math.sqrt( (data["RBR"][0] ** 2) + (data["RBR"][1] ** 2) + (data["RBR"][2] ** 2) )
+        pressures[3] = math.sqrt( (data["RBL"][0] ** 2) + (data["RBL"][1] ** 2) + (data["RBL"][2] ** 2) )
+        pressures[4] = math.sqrt( (data["LTR"][0] ** 2) + (data["LTR"][1] ** 2) + (data["LTR"][2] ** 2) )
+        pressures[5] = math.sqrt( (data["LTL"][0] ** 2) + (data["LTL"][1] ** 2) + (data["LTL"][2] ** 2) )
+        pressures[6] = math.sqrt( (data["LBR"][0] ** 2) + (data["LBR"][1] ** 2) + (data["LBR"][2] ** 2) )
+        pressures[7] = math.sqrt( (data["LBL"][0] ** 2) + (data["LBL"][1] ** 2) + (data["LBL"][2] ** 2) )
         return pressures

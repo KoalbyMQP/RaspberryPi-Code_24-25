@@ -33,7 +33,6 @@ def main():
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
-    prevCoM = [0,0,0]
     setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
@@ -48,7 +47,7 @@ def main():
         # prevIMU = robot.imu_manager.getAllIMUData()
         prevCoP = robot.forceManager.getAllForces()
     print("Initialized")
-    # moves knees to each traj point until it falls
+
     while notFalling:
         for point in traj:
             #tells robot trajectory is specifically for arms
@@ -62,14 +61,10 @@ def main():
             
             # imu_data = robot.imu_manager.getAllIMUData()
             pressureSensors = robot.forceManager.getAllForces()
-            print("IMU Readings at step {}: {}".format(count, imu_data))
+            # print("IMU Readings at step {}: {}".format(count, imu_data))
             print("Force Readings at step {}: {}".format(count, pressureSensors))
 
-            if abs(robot.CoM[0] - prevCoM[0]) > 15:  # Adjust threshold if needed
-                robot.IMUBalance(prevIMU[0], prevIMU[2])
-                print("Trying to Fix it")
-                notFalling = False
-                break
+            # robot.IMUBalance(prevIMU[0], prevIMU[2])
             
             prevCoP = pressureSensors
             # prevIMU = imu_data

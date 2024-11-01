@@ -52,7 +52,7 @@ class Robot():
         # Use IMUManager to manage multiple IMUs
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
-        self.feetCoP = [0, 0, 0, 0]
+        self.feetCoP = [0, 0]
         self.CoPPIDX = PID(0, 0, 0)
         self.CoPPIDZ = PID(0, 0, 0)
 
@@ -313,9 +313,9 @@ class Robot():
     
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
-        footWidth = 0
-        footLength = 0
-        diffBetweenFeet = [0, 0]
+        footWidth = 53.6
+        footLength = 146.6
+        diffBetweenFeet = [1, 1]
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
@@ -334,8 +334,10 @@ class Robot():
         leftRight = (data[4] + data[6]) / 2 #left foot
         leftCoPX = (leftRight - leftLeft) / footWidth #left foot
         leftCoPY = (leftTop - leftBottom) / footLength #left foot
+        
         self.feetCoP[0] = (rightCoPX + leftCoPX) / diffBetweenFeet[0]
         self.feetCoP[1] = (rightCoPY + leftCoPY) / diffBetweenFeet[1]
+        print("feetCoP", self.feetCoP)
         return self.feetCoP # first term is x, second term is y
 
 
