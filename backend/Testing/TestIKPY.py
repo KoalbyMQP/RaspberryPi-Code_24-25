@@ -316,6 +316,8 @@ right_leg_chain = Chain.from_urdf_file(
     base_elements=['Pelvis', 'RightLegAbductor']
 )
 
+
+
 # for link in enumerate(left_leg_chain.links):
 #     print(link)
 
@@ -381,9 +383,13 @@ rightPose1 = poses['rightEEpose_Even2Right']
 # leftPose2 = poses['leftEEpose_Right2Left']
 # leftPose3 = poses['leftEEpose_Left2Right']
 
-print(via.rf_Even2Right[1], sep='\n\n')
-print(rightPose1, sep='\n\n')
-print(right_leg_chain.inverse_kinematics(rightPose1[0]), right_leg_chain.inverse_kinematics(rightPose1[1]), right_leg_chain.inverse_kinematics(rightPose1[2]), right_leg_chain.inverse_kinematics(rightPose1[3]), sep='\n\n')
+# print(via.rf_Even2Right[1], sep='\n\n')
+# print(rightPose1, sep='\n\n')
+
+kitten = np.array([1.80111086e-14 ,-1.49795680e-01 ,-2.51464650e-01 , 5.95714182e-01 ,-1.50951099e-02,  0.00000000e+00])
+# print(via.rf_Even2Right[1][0])
+print(rightPose1[0])
+# print(right_leg_chain.inverse_kinematics(rightPose1[0], initial_position=via.rf_Even2Right[1][0]), right_leg_chain.inverse_kinematics(rightPose1[1]), right_leg_chain.inverse_kinematics(rightPose1[2]), right_leg_chain.inverse_kinematics(rightPose1[3]), sep='\n\n')
 
 
 # # Define initial and final positions

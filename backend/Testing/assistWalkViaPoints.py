@@ -94,7 +94,7 @@ rf_Left2Right = [
     [[math.radians(rightAbd), -0.000000,0.337710, 0.415672, -0.427027 + math.radians(rAnkleOffset)], # 0 0 -60
                [math.radians(rightAbd), -0.000000, 0.636551, 1.286623, -0.650072+ math.radians(rAnkleOffset)], # 0 80 -80
                [math.radians(rightAbd), -0.000000, 0.936060, 1.312802, -0.725808 + math.radians(rAnkleOffset)], # 0 80 0
-               [math.radians(rightAbd), -0.000000, 0.349066, 0.349066, -0.349066 + math.radians(rAnkleOffset)]], # 0 0 -0
+               [math.radians(rightAbd), -0.000000, 0.349066, 0.349066, -0.349066 + math.radians(rAnkleOffset)]], # 00 -0
     [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
     [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 ]
