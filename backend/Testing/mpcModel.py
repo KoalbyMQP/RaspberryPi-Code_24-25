@@ -20,7 +20,7 @@ def template_model(symvar_type='SX'):
 
     #system constants 
     g = 9.8 #gravity 
-    z_c = robot.CoM[3] #Height of COM of the Robot
+    z_c = robot.updateRobotCoMCoM[3] #Height of COM of the Robot
     ts = .5 # time step 
     x = 10 #this is the position of the xCOM
     px = 5 #I think this is the wanted position of xCOM
@@ -43,7 +43,6 @@ def template_model(symvar_type='SX'):
     xdd = model.set_variable(var_type='_x', var_name='xdd', shape=(1,1))
 
     y = model.set_variable(var_type='_x', var_name='y', shape=(1,1))
-    #yd = model.set_variable(var_type='_x', var_name='yd', shape=(1,1))
     ydd = model.set_variable(var_type='_x', var_name='ydd', shape=(1,1))
 
     #inputs 
@@ -59,6 +58,8 @@ def template_model(symvar_type='SX'):
     
     model.set_rhs('xddd', nextStepx)
     model.set_rhs('yddd', nextStepy)
+    
+    #need to track position 
     model.setup()
 
     return model
