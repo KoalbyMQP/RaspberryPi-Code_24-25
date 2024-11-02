@@ -54,8 +54,8 @@ def template_model(symvar_type='SX'):
     B = np.array([[ts**3/6], [ts**2/2], [ts]])
     C = np.array([1, 0, -z_c/g])
 
-    nextStepx = A*x+B*xdd
-    nextStepy = A*y+B*ydd
+    nextStepx = A*x+B*lip_x
+    nextStepy = A*y+B*lip_y
     
     model.set_rhs('xddd', nextStepx)
     model.set_rhs('yddd', nextStepy)
