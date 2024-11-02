@@ -23,11 +23,10 @@ def main():
     print("Initial Pose Done")
 
     # Initial IMU data
-    imu_data_initial = robot.imu_manager.getAllIMUData()
-    print("Initial IMU Readings:", imu_data_initial)
-    prevIMU = imu_data_initial
+    prevIMU = robot.imu_manager.getAllIMUData()
+
     prevCoP = robot.updateCoP()
-    print("CoP", CoP)
+    print("CoP", prevCoP)
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()

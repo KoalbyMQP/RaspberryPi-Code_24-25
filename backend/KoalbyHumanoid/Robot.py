@@ -313,12 +313,8 @@ class Robot():
     
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
-        footWidth = 53.6
-        footLength = 146.6
-        imu_data = self.imu_manager.getAllIMUData()
-        xDiff = imu_data["RightFoot"][0] - imu_data["LeftFoot"][0]
-        yDiff = imu_data["RightFoot"][1] - imu_data["LeftFoot"][1]
-        diffBetweenFeet = [xDiff, yDiff]
+        footWidth = 5.36 # in cm
+        footLength = 14.66 # in cm
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
@@ -328,19 +324,19 @@ class Robot():
         rightBottom = (data[2] + data[3]) / 2 #right foot
         rightLeft = (data[1] + data[3]) / 2 #right foot
         rightRight = (data[0] + data[2]) / 2 #right foot
-        rightCoPX = (rightRight - rightLeft) / footWidth #right foot
-        rightCoPY = (rightTop - rightBottom) / footLength #right foot
+        rightCoPX = (rightRight*footWidth) / (rightRight + rightLeft) #right foot CoP x location WRT right edge of foot
+        rightCoPY = (rightTop*footLength) / (rightTop + rightBottom) #right foot CoP y location WRT top edge of foot
 
         leftTop= (data[4] + data[5]) / 2 #left foot
         leftBottom = (data[6] + data[7]) / 2 #left foot
         leftLeft = (data[5] + data[7]) / 2 #leftt foot
         leftRight = (data[4] + data[6]) / 2 #left foot
-        leftCoPX = (leftRight - leftLeft) / footWidth #left foot
-        leftCoPY = (leftTop - leftBottom) / footLength #left foot
-
-        self.feetCoP[0] = (rightCoPX + leftCoPX) / diffBetweenFeet[0]
-        self.feetCoP[1] = (rightCoPY + leftCoPY) / diffBetweenFeet[1]
-        return self.feetCoP # first term is x, second term is y
+        leftCoPX = (leftLeft*footWidth) / (leftLeft + leftRight) #left foot CoP x location WRT left edge of foot
+        leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
+        print("CoPs", rightCoPX, rightCoPY, leftCoPX, leftCoPY)
+        self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
+        self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
+        return self.feetCoP #values should be around half of footWidth and footLength
 
 
     def CoPBalance(self, CoPs):
