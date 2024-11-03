@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 from sys import stdout
-from daqhats import hat_list, mcc128, OptionFlags, HatIDs, TriggerModes, \
+from daqhats import hat_list, mcc118, mcc128, OptionFlags, HatIDs, TriggerModes, \
     HatError, AnalogInputMode, AnalogInputRange
 from daqhats_utils import enum_mask_to_string, chan_list_to_mask, \
     validate_channels, input_mode_to_string, input_range_to_string
