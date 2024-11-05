@@ -53,8 +53,8 @@ class Robot():
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
         self.feetCoP = [0, 0]
-        self.CoPPIDX = PID(0, 0, 0)
-        self.CoPPIDZ = PID(0, 0, 0)
+        self.CoPPIDX = PID(0.01, 0, 0)
+        self.CoPPIDZ = PID(0.01, 0, 0)
 
         self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
@@ -318,7 +318,6 @@ class Robot():
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
-        print("data ", data)
 
         rightTop= (data[0] + data[1]) / 2 #right foot
         rightBottom = (data[2] + data[3]) / 2 #right foot
@@ -331,11 +330,11 @@ class Robot():
         leftBottom = (data[6] + data[7]) / 2 #left foot
         leftLeft = (data[5] + data[7]) / 2 #leftt foot
         leftRight = (data[4] + data[6]) / 2 #left foot
-        leftCoPX = (leftLeft*footWidth) / (leftLeft + leftRight) #left foot CoP x location WRT left edge of foot
+        leftCoPX = (leftRight*footWidth) / (leftLeft + leftRight) #left foot CoP x location WRT right edge of foot
         leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
-        print("CoPs", rightCoPX, rightCoPY, leftCoPX, leftCoPY)
         self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
         self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
+        print ("CoP", self.feetCoP)
         return self.feetCoP #values should be around half of footWidth and footLength
 
 

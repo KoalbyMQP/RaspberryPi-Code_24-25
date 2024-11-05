@@ -22,9 +22,6 @@ def main():
     robot.moveAllToTarget()
     print("Initial Pose Done")
 
-    # Initial IMU data
-    prevIMU = robot.imu_manager.getAllIMUData()
-
     prevCoP = robot.updateCoP()
     print("CoP", prevCoP)
 
@@ -40,9 +37,7 @@ def main():
     #stabilizes itself before starting test
     while time.time() - simStartTime < 10:
         time.sleep(0.01)
-        #robot.updateRobotCoM()
-        prevIMU = robot.imu_manager.getAllIMUData()
-        prevCoP = robot.forceManager.getAllForces()
+        prevCoP = robot.updateCoP()
     print("Initialized")
 
     while notFalling:
@@ -56,17 +51,9 @@ def main():
             # robot.IMUBalance(prevIMU) #where PID is used
             robot.CoPBalance(prevCoP)
             
-            IMU = robot.imu_manager.getAllIMUData()
-            pressureSensors = robot.forceManager.getAllForces()
-            robot.CoPBalance(prevCoP)
-            robot.IMUBalance(prevIMU)
-            # print("IMU Readings at step {}: {}".format(count, imu_data))
-            print("Force Readings at step {}: {}".format(count, pressureSensors))
-
-            # robot.IMUBalance(prevIMU[0], prevIMU[2])
+            pressureSensors = robot.updateCoP()
             
             prevCoP = pressureSensors
-            prevIMU = IMU
             count = count + 1 # keeps track of how many trajectory points it has reached
             print("Count: ", count)
     print("Dead")
