@@ -54,7 +54,7 @@ class Robot():
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
         self.feetCoP = [0, 0]
         self.CoPPIDX = PID(0.01, 0, 0)
-        self.CoPPIDZ = PID(0.01, 0, 0)
+        self.CoPPIDZ = PID(0.5, 0, 0)
 
         self.CoM = np.array([0, 0, 0])
         self.ang_vel = [0, 0, 0]
@@ -313,17 +313,18 @@ class Robot():
     
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
-        footWidth = 5.36 # in cm
-        footLength = 14.66 # in cm
+        footWidth = 0.03 #5.36 # in cm - will change depending on actual locations on foot
+        footLength = 0.11 #14.66 # in cm - will change depending on actual locations on foot
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
+        print("data", data)
 
         rightTop= (data[0] + data[1]) / 2 #right foot
         rightBottom = (data[2] + data[3]) / 2 #right foot
         rightLeft = (data[1] + data[3]) / 2 #right foot
         rightRight = (data[0] + data[2]) / 2 #right foot
-        rightCoPX = (rightRight*footWidth) / (rightRight + rightLeft) #right foot CoP x location WRT right edge of foot
+        rightCoPX = (rightRight*footWidth) / (rightRight + rightLeft)  #right foot CoP x location WRT right edge of foot
         rightCoPY = (rightTop*footLength) / (rightTop + rightBottom) #right foot CoP y location WRT top edge of foot
 
         leftTop= (data[4] + data[5]) / 2 #left foot
@@ -334,12 +335,11 @@ class Robot():
         leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
         self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
         self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
-        print ("CoP", self.feetCoP)
+        # print ("CoP", self.feetCoP)
         return self.feetCoP #values should be around half of footWidth and footLength
 
 
     def CoPBalance(self, CoPs):
-        self.updateCoP()
         ErrorX = CoPs[0] - self.feetCoP[0]
         ErrorY = CoPs[1] - self.feetCoP[1]
         self.CoPPIDX.setError(ErrorX)
