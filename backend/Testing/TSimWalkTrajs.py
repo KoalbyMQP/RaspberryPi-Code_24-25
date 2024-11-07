@@ -21,14 +21,14 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
     currentTime = time.time() - start_time
 
     # Right Leg
-    robot.motors[15].target = (0, 'P')
+    robot.motors[15].target = (right_points[0], 'P')
     robot.motors[16].target = (right_points[1], 'P')
     robot.motors[17].target = (right_points[2], 'P')
     robot.motors[18].target = (right_points[3], 'P')
     robot.motors[19].target = (right_points[4], 'P')
 
     # Left Leg
-    robot.motors[20].target = (0, 'P')
+    robot.motors[20].target = (left_points[1], 'P')
     robot.motors[21].target = (left_points[1], 'P')
     robot.motors[22].target = (left_points[2], 'P')
     robot.motors[23].target = (left_points[3], 'P')
@@ -50,7 +50,7 @@ def main():
         base_elements=['RightHip', 'RightLegRotator']
     )
     
-    x_base = 0.04
+    x_base = 0.004
     y_base = -0.385
     z_base = 0.0
 
@@ -68,8 +68,8 @@ def main():
     right_forward_top = [x_base, y_base + 0.1, z_base + 0.2]
     right_almost_center_top = [x_base, y_base + 0.085, z_base]
 
-    target_orientation_left = [0, 1, 0]
-    target_orientation_right = [0, 1, 0]
+    target_orientation_left = [0, 0, 1]
+    target_orientation_right = [0, 0, 1]
 
     initial_position_left = [0, 0, 0, 0, 0]
     initial_position_right = [0, 0, 0, 0, 0]
@@ -78,19 +78,17 @@ def main():
 
     #RLF = Right Leg First 
     #LLF = Left Leg First
-    
     #RLP = Right Leg Positions
     #LLP = Left Leg Positions
     RLF_RLP = [right_base, right_center_top, right_forward_top, right_almost_center_top, right_base, right_base, right_base]
     RLF_LLP = [left_base, left_base, left_base, left_back_flat, left_back_not_flat, left_center_top, left_base]
-
     LLF_RLP = [right_base, right_base, right_base, right_back_flat, right_back_not_flat, right_center_top, right_base]
     LLF_LLP = [left_base, left_center_top, left_forward_top, left_almost_center_top, left_base, left_base, left_base]
 
     total_time = []
     total_vel = []
     total_acc = []
-    step_time = 2.5
+    step_time = 1
     for i in range(len(RLF_LLP)):
         total_time.append([i * step_time, i * step_time, i * step_time])
         total_vel.append([0, 0, 0])
@@ -122,7 +120,6 @@ def main():
                     orientation_mode='Z' 
                 )
                 initial_position_left = ik_solution_left
-                # print(ik_solution_left)
                    
                 target_position_right = right_quintic
                 ik_solution_right = right_leg_chain.inverse_kinematics(
@@ -132,17 +129,12 @@ def main():
                     orientation_mode='Z'
                 )
                 initial_position_right = ik_solution_right
-                # print(left_quintic)
-                # print(ik_solution_left)
                 
                 update_trajectory_and_control(robot, ik_solution_right, ik_solution_left, start_time)
         if(traj_number < (len(all_trajectories)-1)):
-            print("Hello")
             traj_number = traj_number + 1
         else:
-            print("Hi")
             traj_number = 0
-        print(traj_number)
 
 if __name__ == "__main__":
     main()
