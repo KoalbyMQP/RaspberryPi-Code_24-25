@@ -18,7 +18,7 @@ def template_mpc(model, silence_solver = False):
 
     mpc.settings.n_robust = 0 #optimization problem grow exponentially with this setting
     mpc.settings.n_horizon = 2 #number of future estimations
-    mpc.settings.t_step = 0.5 #how long it takes to make a step 
+    mpc.settings.t_step = 5 #how long it takes to make a step in seconds
     mpc.settings.store_full_solution =True  #stores solution 
 
     if silence_solver:
