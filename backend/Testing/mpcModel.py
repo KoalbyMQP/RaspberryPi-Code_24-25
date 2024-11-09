@@ -2,7 +2,7 @@ import numpy as np
 import scipy as scipy
 from scipy import signal
 from casadi import SX
-from backend.KoalbyHumanoid.Robot import Robot
+#from backend.KoalbyHumanoid.Robot import Robot
 
 # Add do_mpc to path. This is not necessary if it was installed via pip.
 import sys
@@ -13,14 +13,14 @@ sys.path.append(rel_do_mpc_path)
 # Import do_mpc package:
 import do_mpc
 
-def template_model(symvar_type='SX'):
-    robot = Robot
+def mpc_model(symvar_type='SX'):
+    # robot = Robot
     model_type = 'continuous' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type)
 
     #system constants 
     g = 9.8 #gravity 
-    z_c = robot.updateRobotCoMCoM[3] #Height of COM of the Robot
+    z_c = 15 #robot.updateRobotCoMCoM[3] #Height of COM of the Robot
     ts = .5 # time step 
     x = 10 #this is the position of the xCOM
     px = 5 #I think this is the wanted position of xCOM
@@ -51,6 +51,7 @@ def template_model(symvar_type='SX'):
 
     A = np.array([[1, ts, ts**2/2], [0, 1, ts], [0, 0, 1]])
     B = np.array([[ts**3/6], [ts**2/2], [ts]])
+    # B = np.array([ts**3/6, ts**2/2, ts])
     C = np.array([1, 0, -z_c/g])
 
     nextStepx = A*x+B*lip_x

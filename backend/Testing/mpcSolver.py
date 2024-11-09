@@ -8,7 +8,7 @@ import os
 rel_do_mpc_path = os.path.join('..','..')
 sys.path.append(rel_do_mpc_path)
 
-def template_mpc(model, silence_solver = False):
+def solve_mpc(model, silence_solver = False):
     """
     --------------------------------------------------------------------------
     template_mpc: tuning parameters
