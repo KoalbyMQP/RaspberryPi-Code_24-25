@@ -20,12 +20,12 @@ LEFT_ABD_OFFSET = -3
 RIGHT_ABD_OFFSET = 3
 
 left_leg_chain = Chain.from_urdf_file(
-    "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
+    "backend/Testing/robotChain.urdf",
     base_elements=['LeftHip', 'LeftLegRotator']
 )
 
 right_leg_chain = Chain.from_urdf_file(
-    "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
+    "backend/Testing/robotChain.urdf",
     base_elements=['RightHip', 'RightLegRotator']
 )
 

@@ -23,13 +23,13 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
     # Right arm
     robot.motors[0].target = (math.radians(-20), 'P')
     robot.motors[1].target = (math.radians(-90), 'P') 
-    robot.motors[3].target = (math.radians(90), 'P') 
+    robot.motors[3].target = (math.radians(100), 'P') #pos
     robot.motors[4].target = (math.radians(-15), 'P')
 
     # Left Arm
     robot.motors[5].target = (math.radians(20), 'P')
     robot.motors[6].target = (math.radians(90), 'P')
-    robot.motors[8].target = (math.radians(-90), 'P')
+    robot.motors[8].target = (math.radians(-100), 'P')#neg
     robot.motors[9].target = (math.radians(15), 'P') 
 
     # Right Leg
@@ -63,22 +63,22 @@ def main():
     )
     
     x_base = 0.004
-    y_base = -0.385
-    z_base = -0.5
+    y_base = -0.4
+    z_base = -0.05
 
     left_base = [x_base, y_base, z_base]
-    left_back_flat = [x_base, y_base + 0.085, z_base - 0.241]
-    left_back_not_flat = [x_base, y_base, z_base - 0.241]
-    left_center_top = [x_base, y_base + 0.1, z_base]
-    left_forward_top = [x_base, y_base + 0.1, z_base + 0.2]
-    left_almost_center_top = [x_base, y_base + 0.085, z_base]
+    left_back_flat = [x_base, y_base + 0.025, z_base - 0.12]
+    left_back_not_flat = [x_base, y_base, z_base - 0.12]
+    left_center_top = [x_base, y_base + 0.05, z_base]
+    left_forward_top = [x_base, y_base + 0.05, z_base + 0.1]
+    left_almost_center_top = [x_base, y_base + 0.025, z_base]
 
     right_base = [x_base, y_base, z_base]
-    right_back_flat = [x_base, y_base + 0.085, z_base - 0.241]
-    right_back_not_flat = [x_base, y_base, z_base - 0.241]
-    right_center_top = [x_base, y_base + 0.1, z_base]
-    right_forward_top = [x_base, y_base + 0.1, z_base + 0.2]
-    right_almost_center_top = [x_base, y_base + 0.085, z_base]
+    right_back_flat = [x_base, y_base + 0.025, z_base - 0.125]
+    right_back_not_flat = [x_base, y_base, z_base - 0.125]
+    right_center_top = [x_base, y_base + 0.05, z_base]
+    right_forward_top = [x_base, y_base + 0.05, z_base + 0.1]
+    right_almost_center_top = [x_base, y_base + 0.025, z_base]
 
     target_orientation_left = [0, 0, 1]
     target_orientation_right = [0, 0, 1]

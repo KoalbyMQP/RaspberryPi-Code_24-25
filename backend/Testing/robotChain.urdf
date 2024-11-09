@@ -96,11 +96,11 @@
       link="Neck" />
     <axis
       xyz="0 1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="Head">
@@ -154,11 +154,11 @@
       link="Head" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftShoulder1">
@@ -212,11 +212,11 @@
       link="LeftShoulder1" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftShoulder2">
@@ -270,11 +270,11 @@
       link="LeftShoulder2" />
     <axis
       xyz="0 0 1" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftBicep">
@@ -328,11 +328,11 @@
       link="LeftBicep" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftForearm">
@@ -386,11 +386,11 @@
       link="LeftForearm" />
     <axis
       xyz="0 1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftHand">
@@ -444,11 +444,11 @@
       link="LeftHand" />
     <axis
       xyz="0 -1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightShoulder1">
@@ -502,11 +502,11 @@
       link="RightShoulder1" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightShoulder2">
@@ -560,11 +560,11 @@
       link="RightShoulder2" />
     <axis
       xyz="0 0 1" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightBicep">
@@ -618,11 +618,11 @@
       link="RightBicep" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightForearm">
@@ -676,11 +676,11 @@
       link="RightForearm" />
     <axis
       xyz="0 1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="RightHand">
@@ -734,11 +734,11 @@
       link="RightHand" />
     <axis
       xyz="0 -1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="ChestMotors">
@@ -792,11 +792,11 @@
       link="ChestMotors" />
     <axis
       xyz="0 0 -1" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="Torso">
@@ -850,11 +850,11 @@
       link="Torso" />
     <axis
       xyz="-1 0 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="Belly">
@@ -908,11 +908,11 @@
       link="Belly" />
     <axis
       xyz="0 -1 0" />
-    <limit
+    <!-- <limit
       lower="0"
       upper="0"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="BellyMotors">
@@ -1255,10 +1255,10 @@
     <child
       link="RightShin" />
     <axis
-      xyz="-1 0 0" />
+      xyz="1 0 0" />
     <limit
-      lower="-6"
-      upper="0"
+      lower="0"
+      upper="6"
       effort="0"
       velocity="0" />
   </joint>
@@ -1488,11 +1488,11 @@
       link="LeftThigh" />
     <axis
       xyz="1 0 0" />
-    <limit
+    <!-- <limit
       lower="-4"
       upper="4"
       effort="0"
-      velocity="0" />
+      velocity="0" /> -->
   </joint>
   <link
     name="LeftShin">
@@ -1545,10 +1545,10 @@
     <child
       link="LeftShin" />
     <axis
-      xyz="1 0 0" />
+      xyz="-1 0 0" />
     <limit
-      lower="0"
-      upper="6"
+      lower="-6"
+      upper="0"
       effort="0"
       velocity="0" />
   </joint>

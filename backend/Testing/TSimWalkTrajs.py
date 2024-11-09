@@ -20,6 +20,18 @@ def setup_robot(is_real):
 def update_trajectory_and_control(robot, right_points, left_points, start_time):
     currentTime = time.time() - start_time
 
+        # Right arm
+    robot.motors[0].target = (math.radians(-20), 'P')
+    robot.motors[1].target = (math.radians(90), 'P') 
+    robot.motors[3].target = (math.radians(90), 'P') 
+    robot.motors[4].target = (math.radians(-15), 'P')
+
+    # Left Arm
+    robot.motors[5].target = (math.radians(20), 'P')
+    robot.motors[6].target = (math.radians(-90), 'P')
+    robot.motors[8].target = (math.radians(-90), 'P')
+    robot.motors[9].target = (math.radians(15), 'P') 
+
     # Right Leg
     robot.motors[15].target = (right_points[0], 'P')
     robot.motors[16].target = (right_points[1], 'P')
