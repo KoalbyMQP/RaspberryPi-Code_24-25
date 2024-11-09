@@ -35,7 +35,8 @@ def mpc_model(symvar_type='SX'):
     c = np.array([[1, 0, (-z_c/g)], [1, 0, 0], [0, 1, 0]])
     d = np.array([[0], [0], [0]])
 
-    lip_x = signal.StateSpace(a, b, c, d)
+    # lip_x = signal.StateSpace(a, b, c, d)
+    lip_x = signal.ss2tf(a, b, c, d)
     lip_y = signal.StateSpace(a, b, c, d)
 
     #setting up states
@@ -53,7 +54,9 @@ def mpc_model(symvar_type='SX'):
     B = np.array([[ts**3/6], [ts**2/2], [ts]])
     # B = np.array([ts**3/6, ts**2/2, ts])
     C = np.array([1, 0, -z_c/g])
-
+    b2 = np.transpose(B)
+    # print(B)
+    print("lip_x", lip_x)
     nextStepx = A*x+B*lip_x
     nextStepy = A*y+B*lip_y
     

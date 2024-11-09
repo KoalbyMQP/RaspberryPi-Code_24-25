@@ -10,18 +10,18 @@ sys.path.append(rel_do_mpc_path)
 import do_mpc
 
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.patches import Circle
-from matplotlib import rcParams
-from matplotlib.animation import FuncAnimation, FFMpegWriter, ImageMagickWriter
+# import matplotlib.gridspec as gridspec
+# from matplotlib.patches import Circle
+# from matplotlib import rcParams
+# from matplotlib.animation import FuncAnimation, FFMpegWriter, ImageMagickWriter
 
 # Plot settings
-rcParams['text.usetex'] = False
-rcParams['axes.grid'] = True
-rcParams['lines.linewidth'] = 2.0
-rcParams['axes.labelsize'] = 'xx-large'
-rcParams['xtick.labelsize'] = 'xx-large'
-rcParams['ytick.labelsize'] = 'xx-large'
+# rcParams['text.usetex'] = False
+# rcParams['axes.grid'] = True
+# rcParams['lines.linewidth'] = 2.0
+# rcParams['axes.labelsize'] = 'xx-large'
+# rcParams['xtick.labelsize'] = 'xx-large'
+# rcParams['ytick.labelsize'] = 'xx-large'
 
 from mpcModel import mpc_model
 from mpcSolver import solve_mpc
@@ -57,3 +57,5 @@ def pendulum(x):
     return line
 
 mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
+
+
