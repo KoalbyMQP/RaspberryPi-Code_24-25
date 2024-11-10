@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as scipy
 from scipy import signal
-from casadi import SX
+from casadi import *
 #from backend.KoalbyHumanoid.Robot import Robot
 
 # Add do_mpc to path. This is not necessary if it was installed via pip.
@@ -36,7 +36,7 @@ def mpc_model(symvar_type='SX'):
     d = np.array([[0], [0], [0]])
 
     # lip_x = signal.StateSpace(a, b, c, d)
-    lip_x = signal.ss2tf(a, b, c, d)
+    lip_x = signal.StateSpace(a, b, c, d)
     lip_y = signal.StateSpace(a, b, c, d)
 
     #setting up states
@@ -52,13 +52,14 @@ def mpc_model(symvar_type='SX'):
 
     A = np.array([[1, ts, ts**2/2], [0, 1, ts], [0, 0, 1]])
     B = np.array([[ts**3/6], [ts**2/2], [ts]])
-    # B = np.array([ts**3/6, ts**2/2, ts])
+    #B = MX(ts**3/6, ts**2/2, ts)
     C = np.array([1, 0, -z_c/g])
     b2 = np.transpose(B)
     # print(B)
     print("lip_x", lip_x)
-    nextStepx = A*x+B*lip_x
-    nextStepy = A*y+B*lip_y
+    
+    nextStepx = A*x + B*lip_x
+    nextStepy = A*y + B*lip_y
     
     model.set_rhs('xddd', nextStepx)
     model.set_rhs('yddd', nextStepy)
