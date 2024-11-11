@@ -23,40 +23,40 @@ import matplotlib.pyplot as plt
 # rcParams['xtick.labelsize'] = 'xx-large'
 # rcParams['ytick.labelsize'] = 'xx-large'
 
-from mpcModel import mpc_model
-from mpcSolver import solve_mpc
-import time
+# from mpcModel import mpc_model
+# from mpcSolver import solve_mpc
+# import time
 
-#settings
-show_animation = True
-store_animation = False
-store_results = False
-model = mpc_model()
-mpc = solve_mpc(model)
-estimator = do_mpc.estimator.StateFeedback(model)
+# #settings
+# show_animation = True
+# store_animation = False
+# store_results = False
+# model = mpc_model()
+# mpc = solve_mpc(model)
+# estimator = do_mpc.estimator.StateFeedback(model)
 
-# set initial state 
-# this is where it will connect to the walking file 
-# need to set x0 -> initial iteration 
-mpc.set_initial_guess()
+# # set initial state 
+# # this is where it will connect to the walking file 
+# # need to set x0 -> initial iteration 
+# mpc.set_initial_guess()
 
-# set up graphs 
-L1 = 12 #cm, height of CoM
-def pendulum(x):
-    line_x = np.array([
-        x[0],
-        x[0]+l1*np.sin(x[1])
-    ])
-    line_y = np.array([
-        0, 
-        l1*np.cos(x[1])
-    ])
+# # set up graphs 
+# L1 = 12 #cm, height of CoM
+# def pendulum(x):
+#     line_x = np.array([
+#         x[0],
+#         x[0]+l1*np.sin(x[1])
+#     ])
+#     line_y = np.array([
+#         0, 
+#         l1*np.cos(x[1])
+#     ])
     
-    line = np.stack((line_x, line_y))
+#     line = np.stack((line_x, line_y))
     
-    return line
+#     return line
 
-mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
+# mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
 
 
 """
@@ -66,7 +66,14 @@ Creating 3d plot of the motion
 ax = plt.figure().add_subplot(projection='3d')
 
 #defining IP
-x = z
+x = np.linspace(0, 1, 100)
+y = 10*x
+ax.plot(x, y, zs=10, zdir='y', label='curve in (x, y)')
+
+#creating ball at the top of the line
+top_x = x[-1]
+top_y = y[-1]
+ax.scatter(top_x, top_y, zs=10, zdir='y', color='blue', label='Top Point')
 
 
 # Make legend, set axes limits and labels
@@ -78,4 +85,4 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 
-# plt.show()
+plt.show()
