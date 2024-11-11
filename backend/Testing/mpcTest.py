@@ -59,3 +59,23 @@ def pendulum(x):
 mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
 
 
+"""
+Creating 3d plot of the motion
+"""
+# creating 2d plot in 3d 
+ax = plt.figure().add_subplot(projection='3d')
+
+#defining IP
+x = z
+
+
+# Make legend, set axes limits and labels
+ax.legend()
+ax.set_xlim(0, 20)
+ax.set_ylim(0, 20)
+ax.set_zlim(0, 20)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+
+# plt.show()

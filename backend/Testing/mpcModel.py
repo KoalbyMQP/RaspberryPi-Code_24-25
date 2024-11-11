@@ -38,6 +38,11 @@ def mpc_model(symvar_type='SX'):
     # lip_x = signal.StateSpace(a, b, c, d)
     lip_x = signal.StateSpace(a, b, c, d)
     lip_y = signal.StateSpace(a, b, c, d)
+    
+    A_sx = SX(a)
+    B_sx = SX(b)
+    C_sx = SX(c)
+    D_sx = SX(d)
 
     #setting up states
     x = model.set_variable(var_type='_x', var_name='x', shape=(3,1))
@@ -58,8 +63,8 @@ def mpc_model(symvar_type='SX'):
     # print(B)
     print("lip_x", lip_x)
     
-    nextStepx = A*x + B*lip_x
-    nextStepy = A*y + B*lip_y
+    nextStepx = A*x + B.T*lip_x
+    nextStepy = A*y + B.T*lip_y
     
     model.set_rhs('xddd', nextStepx)
     model.set_rhs('yddd', nextStepy)
