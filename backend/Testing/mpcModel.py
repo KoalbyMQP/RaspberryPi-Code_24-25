@@ -1,7 +1,8 @@
 import numpy as np
 import scipy as scipy
+import casadi as ca
 from scipy import signal
-from casadi import *
+
 #from backend.KoalbyHumanoid.Robot import Robot
 
 # Add do_mpc to path. This is not necessary if it was installed via pip.
@@ -35,44 +36,48 @@ def mpc_model(symvar_type='SX'):
     c = np.array([[1, 0, (-z_c/g)], [1, 0, 0], [0, 1, 0]])
     d = np.array([[0], [0], [0]])
 
-    # lip_x = signal.StateSpace(a, b, c, d)
+    # these are the continuous state space models 
     lip_x = signal.StateSpace(a, b, c, d)
     lip_y = signal.StateSpace(a, b, c, d)
     
-    A_sx = SX(a)
-    B_sx = SX(b)
-    C_sx = SX(c)
-    D_sx = SX(d)
+    #making matrixes into casadi SX type
+    A_sx = ca.SX(a)
+    B_sx = ca.SX(b)
+    C_sx = ca.SX(c)
+    D_sx = ca.SX(d)
 
     #setting up states
     x = model.set_variable(var_type='_x', var_name='x', shape=(3,1))
-    xdd = model.set_variable(var_type='_x', var_name='xdd', shape=(1,1))
-
-    y = model.set_variable(var_type='_x', var_name='y', shape=(1,1))
-    ydd = model.set_variable(var_type='_x', var_name='ydd', shape=(1,1))
-
+    y = model.set_variable(var_type='_x', var_name='y', shape=(3,1))
+    x_dot = model.set_variable(var_type='_x', var_name='x_dot', shape =(1,1))
+    y_dot = model.set_variable(var_type='_x', var_name='y_dot', shape=(1, 1))
+    
     #inputs 
-    xddd = model.set_variable(var_type='_u', var_name='xddd', shape=(1,1))
-    yddd = model.set_variable(var_type= '_u', var_name='yddd', shape=(1,1))
-
-    A = np.array([[1, ts, ts**2/2], [0, 1, ts], [0, 0, 1]])
-    B = np.array([[ts**3/6], [ts**2/2], [ts]])
-    #B = MX(ts**3/6, ts**2/2, ts)
-    C = np.array([1, 0, -z_c/g])
-    b2 = np.transpose(B)
-    # print(B)
-    print("lip_x", lip_x)
+    xdd = model.set_variable(var_type='_u', var_name='xddd', shape=(3,1))
+    ydd = model.set_variable(var_type= '_u', var_name='yddd', shape=(3,1))
     
-    nextStepx = A*x + B.T*lip_x
-    nextStepy = A*y + B.T*lip_y
+    """
+    the following comment out code is to try something new, and I dont think it works. 
+    the goal was that it would make the state space system discrete for the next iteration
+    """
+    # A = np.array([[1, ts, ts**2/2], [0, 1, ts], [0, 0, 1]])
+    # B = np.array([[ts**3/6], [ts**2/2], [ts]])
+    # #B = MX(ts**3/6, ts**2/2, ts)
+    # C = np.array([1, 0, -z_c/g])
+    # b2 = np.transpose(B)
+    # # print(B)
+    # print("lip_x", lip_x)
     
-    model.set_rhs('xddd', nextStepx)
-    model.set_rhs('yddd', nextStepy)
+    #making a discrete system 
+    nextStepx = ca.mtimes(A_sx, x) + ca.mtimes(B_sx.T, xdd)
+    nextStepy = ca.mtimes(A_sx, y) + ca.mtimes(B_sx.T, ydd)
+    
+    model.set_rhs('x_dot', nextStepx)
+    model.set_rhs('y_dot', nextStepy)
     
     #need to track position 
     model.setup()
 
     return model
-
 
 
