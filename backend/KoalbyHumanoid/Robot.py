@@ -318,7 +318,6 @@ class Robot():
 
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
-        print("data", data)
 
         rightTop= (data[0] + data[1]) / 2 #right foot
         rightBottom = (data[2] + data[3]) / 2 #right foot
@@ -335,7 +334,6 @@ class Robot():
         leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
         self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
         self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
-        # print ("CoP", self.feetCoP)
         return self.feetCoP #values should be around half of footWidth and footLength
 
 
