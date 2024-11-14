@@ -1,61 +1,63 @@
 import sys, time, math
-
-import numpy as np 
+import numpy as np
+# sys.path.append("D:/Documents/College/Humanoid MQP Project/RaspberryPi-Code_23-24")
+# sys.path.append("C:/Users/Gabriel/AppData/Local/Programs/Python/Python312/Lib/site-packages")
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid import trajPlannerPose
-from backend.KoalbyHumanoid.Config import Joints
 import matplotlib.pyplot as plt
-from backend.KoalbyHumanoid.Plotter import Plotter
 
-# Edit to declare if you are testing the sim or the real robot
 is_real = False
 robot = Robot(is_real)
 print("Setup Complete")
 
-
 def main():
-
-    # moves arms down from T-pose
-    robot.motors[1].target = (math.radians(80), 'P') # for RightShoulderAbductor
-    robot.motors[6].target = (math.radians(-80), 'P') # for LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
     robot.moveAllToTarget()
     print("Initial Pose Done")
 
-    prevCoP = robot.updateCoP()
-    print("CoP", prevCoP)
-
-    # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
-    setPoints = [[0,  0], [math.radians(90), math.radians(-90)], [math.radians(0), math.radians(0)]]
+    setPoints = [[0, 0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
-    count = 0  # Initialize outside of the stabilization loop for consistent counting
+    notFalling = True
+    count = 0
 
-
-    #stabilizes itself before starting test
-    while time.time() - simStartTime < 10:
+    # Stabilize for 10 seconds
+    while time.time() - simStartTime < 5:
         time.sleep(0.01)
-        prevCoP = robot.updateCoP()
     print("Initialized")
 
-    for point in traj:
-        #tells robot trajectory is specifically for arms
-        robot.motors[23].target = (point[1], 'P') # for right arm
-        robot.motors[18].target = (point[2], 'P') # for left arm
-        robot.moveAllToTarget()
+    # Set initial balance targets
+    imu_data = robot.imu_manager.getAllIMUData()
+    right_chest_imu = imu_data["RightChest"]
+    left_chest_imu = imu_data["LeftChest"]
+    torso_imu = imu_data["Torso"]
+    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
+    prevX = initial[0]
+    prevZ = initial[2]
 
-        time.sleep(0.01) 
-        # robot.IMUBalance(prevIMU) #where PID is used
-        robot.CoPBalance(prevCoP)
-        
-        pressureSensors = robot.updateCoP()
-        
-        prevCoP = pressureSensors
-        count = count + 1 # keeps track of how many trajectory points it has reached
-        print("Count: ", count)
-    print(count, " / ", len(traj)) # prints percentage of completion of balance test if falling was detected
+    while notFalling:
+        for point in traj:
+            # Move to trajectory points
+            robot.motors[18].target = (point[1], 'P')  # right knee
+            robot.motors[23].target = (point[2], 'P')  # left knee
+            robot.moveAllToTarget()
+            time.sleep(0.01)
 
+            robot.IMUBalance(prevX, prevZ)
+            print(robot.fused_imu)
+            # if robot.fused_imu[0] > 15 or robot.fused_imu[1] > 15 or robot.fused_imu[2] > 15:  
+            #     print("FALLING")
+            #     notFalling = False
+            #     break
+            count += 1
+            print(count, "/", len(traj))
+            
+    
+    print("Dead")
+    print(count, "/", len(traj))
 
-if(__name__ == "__main__"):
+if __name__ == "__main__":
     main()

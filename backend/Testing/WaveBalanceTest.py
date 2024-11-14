@@ -15,9 +15,10 @@ print("Setup Complete")
 
 
 def main():
-
-    prevCoP = robot.updateCoP()
-    print("CoP", prevCoP)
+    robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
+    robot.moveAllToTarget()
+    print("Initial Pose Done")
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
@@ -28,10 +29,18 @@ def main():
 
 
     #stabilizes itself before starting test
-    while time.time() - simStartTime < 10:
+    while time.time() - simStartTime < 5:
         time.sleep(0.01)
-        prevCoP = robot.updateCoP()
     print("Initialized")
+
+    # Set initial balance targets
+    imu_data = robot.imu_manager.getAllIMUData()
+    right_chest_imu = imu_data["RightChest"]
+    left_chest_imu = imu_data["LeftChest"]
+    torso_imu = imu_data["Torso"]
+    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
+    prevX = initial[0]
+    prevZ = initial[2]
 
     for point in setUp:
         #tells robot trajectory is specifically for arms
@@ -41,15 +50,14 @@ def main():
         robot.moveAllToTarget()
 
         time.sleep(0.01) 
-        # robot.IMUBalance(prevIMU) #where PID is used
-        robot.CoPBalance(prevCoP)
+
+        robot.IMUBalance(prevX, prevZ)
+        print(robot.fused_imu)
         
-        pressureSensors = robot.updateCoP()
         
-        prevCoP = pressureSensors
         count = count + 1 # keeps track of how many trajectory points it has reached
-        print("Count: ", count)
-    print(count, " / ", len(setUp)) # prints percentage of completion of balance test if falling was detected
+        print(count, " / ", len(setUp))
+
 
     createWavePoints = [[math.radians(-45)], [math.radians(-70)], [math.radians(-45)]]
     wavePoints = trajPlannerPose.TrajPlannerPose(createWavePoints)
@@ -62,15 +70,11 @@ def main():
             robot.moveAllToTarget()
 
             time.sleep(0.01) 
-            # robot.IMUBalance(prevIMU) #where PID is used
-            robot.CoPBalance(prevCoP)
-            
-            pressureSensors = robot.updateCoP()
-            
-            prevCoP = pressureSensors
+            robot.IMUBalance(prevX, prevZ)
+            print(robot.fused_imu)
+
             count = count + 1 # keeps track of how many trajectory points it has reached
-            print("Count: ", count)
-        print(count, " / ", len(setUp))
+            print(count, " / ", len(setUp))
 
 
 
