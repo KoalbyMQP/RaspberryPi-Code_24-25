@@ -31,13 +31,13 @@ def solve_mpc(model, silence_solver = False):
     mpc.set_objective(mterm=mterm, lterm=lterm)
     mpc.set_rterm(u=1e-4)
 
-    max_x = np.array([[4.0], [10.0], [4.0], [10.0]])
+    max_x = np.array([[4.0], [10.0], [4.0], [10.0]]) #needs to be replaced with size of feet 
 
     mpc.bounds['lower','_x','x'] = -max_x
     mpc.bounds['upper','_x','x'] =  max_x
 
-    mpc.bounds['lower','_u','u'] = -0.5
-    mpc.bounds['upper','_u','u'] =  0.5
+    mpc.bounds['lower','_u','u'] = -0.5 #not too sure what this value will be yet 
+    mpc.bounds['upper','_u','u'] =  0.5 
 
 
     mpc.setup()
