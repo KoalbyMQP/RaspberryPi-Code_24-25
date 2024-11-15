@@ -48,20 +48,26 @@ def mpc_model(symvar_type='SX'):
     # # D_sx = ca.SX(d)
 
     # #setting up states
-    # x = model.set_variable(var_type='_x', var_name='x', shape=(1,1))
-    # y = model.set_variable(var_type='_x', var_name='y', shape=(1,1))
-    # xd = model.set_variable(var_type='_x', var_name='xd', shape =(1,1))
-    # yd = model.set_variable(var_type='_x', var_name='yd', shape=(1, 1))
-    xdd = model.set_variable(var_type='_x', var_name='xdd', shape =(1,1))
-    ydd = model.set_variable(var_type='_x', var_name='ydd', shape =(1,1))
-
-    
+    x = model.set_variable(var_type='_x', var_name='x')
+    y = model.set_variable(var_type='_x', var_name='y')
+    xd = model.set_variable(var_type='_x', var_name='xd')
+    yd = model.set_variable(var_type='_x', var_name='yd')
+    # Algebraic states 
+    xdd = model.set_variable(var_type='_z', var_name='xdd')
+    ydd = model.set_variable(var_type='_z', var_name='ydd')
     #inputs 
-    ur = model.set_variable(var_type='_u', var_name='xddd', shape=(1,1))
-    up = model.set_variable(var_type= '_u', var_name='yddd', shape=(1,1))
+    ur = model.set_variable(var_type='_u', var_name='xddd')
+    up = model.set_variable(var_type= '_u', var_name='yddd')
     
-    model.set_rhs('xdd', (g/z_c)*x - (1/mass)*ur)
-    model.set_rhs('ydd', (g/z_c)*y - (1/mass)*up)
+    # Differential Equations 
+    model.set_rhs('x', xd)
+    model.set_rhs('xd', xdd)
+    model.set_rhs('y', yd)
+    model.set_rhs('yd', ydd)
+    
+    
+    # model.set_rhs('xdd', (g/z_c)*x - (1/mass)*ur)
+    # model.set_rhs('ydd', (g/z_c)*y - (1/mass)*up)
     
     # """
     # the following comment out code is to try something new, and I dont think it works. 
