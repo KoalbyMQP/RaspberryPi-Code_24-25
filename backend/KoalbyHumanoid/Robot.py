@@ -42,8 +42,8 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.0005, 0.0, 0.)
-            self.imuPIDZ = PID(1, 0.0, 0.0)
+            self.imuPIDX = PID(0.007, 0.0, 0.)
+            self.imuPIDZ = PID(0.18, 0.0, 0.005)
 
         self.lastMotorCheck = time.time()
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)

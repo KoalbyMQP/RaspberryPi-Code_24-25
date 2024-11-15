@@ -44,7 +44,7 @@ def main():
             robot.motors[18].target = (point[1], 'P')  # right knee
             robot.motors[23].target = (point[2], 'P')  # left knee
             robot.moveAllToTarget()
-            time.sleep(0.01)
+            time.sleep(0.005)
 
             robot.IMUBalance(prevX, prevZ)
             print(robot.fused_imu)

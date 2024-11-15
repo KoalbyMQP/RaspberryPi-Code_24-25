@@ -49,11 +49,9 @@ def main():
         robot.motors[2].target = (point[3], 'P')
         robot.moveAllToTarget()
 
-        time.sleep(0.01) 
+        time.sleep(0.001) 
 
-        robot.IMUBalance(prevX, prevZ)
-        print(robot.fused_imu)
-        
+        robot.IMUBalance(prevX, prevZ)        
         
         count = count + 1 # keeps track of how many trajectory points it has reached
         print(count, " / ", len(setUp))
@@ -69,12 +67,13 @@ def main():
             robot.motors[1].target = (point[1], 'P') # for right arm
             robot.moveAllToTarget()
 
-            time.sleep(0.01) 
+            time.sleep(0.0005) 
             robot.IMUBalance(prevX, prevZ)
-            print(robot.fused_imu)
 
             count = count + 1 # keeps track of how many trajectory points it has reached
-            print(count, " / ", len(setUp))
+            print(count, " / ", len(wave))
+        count = 0  # Initialize outside of the stabilization loop for consistent counting
+
 
 
 
