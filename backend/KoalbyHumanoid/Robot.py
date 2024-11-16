@@ -43,7 +43,7 @@ class Robot():
             self.motors = self.sim_motors_init()
             
             self.imuPIDX = PID(0.007, 0.0, 0.)
-            self.imuPIDZ = PID(0.18, 0.0, 0.005)
+            self.imuPIDZ = PID(0.11, 0.1, 0.0)
 
         self.lastMotorCheck = time.time()
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
