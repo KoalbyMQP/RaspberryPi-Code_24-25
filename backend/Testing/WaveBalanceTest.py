@@ -40,6 +40,7 @@ def main():
     torso_imu = imu_data["Torso"]
     initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
     prevX = initial[0]
+    prevY = initial[1]
     prevZ = initial[2]
 
     for point in setUp:
@@ -49,10 +50,10 @@ def main():
         robot.motors[2].target = (point[3], 'P')
         robot.moveAllToTarget()
 
-        robot.IMUBalance(prevX, prevZ)        
+        # robot.IMUBalance(prevX, prevZ)    
         
         count = count + 1 # keeps track of how many trajectory points it has reached
-        print(count, " / ", len(setUp))
+        # print(count, " / ", len(setUp))
 
 
     createWavePoints = [[math.radians(-45)], [math.radians(-70)], [math.radians(-45)]]
@@ -65,7 +66,7 @@ def main():
             robot.motors[1].target = (point[1], 'P') # for right arm
             robot.moveAllToTarget()
 
-            robot.IMUBalance(prevX, prevZ)
+            robot.IMUBalance(prevX, prevY, prevZ)
 
             count = count + 1 # keeps track of how many trajectory points it has reached
             print(count, " / ", len(wave))
