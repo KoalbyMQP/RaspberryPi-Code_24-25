@@ -43,8 +43,8 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.1, 0.0, 0.0)
-            self.imuPIDY = PID(0.1, 0.0, 0.0)
+            self.imuPIDX = PID(0.11, 0.0, 0.0)
+            self.imuPIDY = PID(0.15, 0.02, 0.0)
             self.imuPIDZ = PID(0.1, 0.0, 0.0)
 
         self.lastMotorCheck = time.time()
@@ -84,6 +84,7 @@ class Robot():
             np.array: Fused [pitch, roll, yaw] data for PID controller input.
         """
         self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
+        print(self.fused_imu)
         return self.fused_imu
     
     def IMUBalance(self, Xtarget, Ytarget, Ztarget):
@@ -113,7 +114,7 @@ class Robot():
         newTargetZ = self.imuPIDZ.calculate()
 
         # Apply corrections
-        self.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
+        self.motors[12].target = (-newTargetZ, 'P')  # Adjust yaw
         self.motors[13].target = (-newTargetY, 'P')  # Adjust pitch
         self.motors[10].target = (newTargetX, 'P')  # Adjust pitch
 

@@ -48,12 +48,8 @@ def main():
         robot.motors[1].target = (point[1], 'P') # for right arm
         robot.motors[6].target = (point[2], 'P') # for left arm
         robot.motors[2].target = (point[3], 'P')
-        robot.moveAllToTarget()
-
-        # robot.IMUBalance(prevX, prevZ)    
+        robot.moveAllToTarget()        
         
-        count = count + 1 # keeps track of how many trajectory points it has reached
-        # print(count, " / ", len(setUp))
 
 
     createWavePoints = [[math.radians(-45)], [math.radians(-70)], [math.radians(-45)]]
