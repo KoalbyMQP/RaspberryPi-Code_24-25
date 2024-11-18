@@ -293,32 +293,13 @@ if __name__ == '__main__':
 
 
 
-
+# Yes, this is modeled after how Adafruit APIs are written
 #class MCC_DAQ_API:
-#    def __init__(self):
-#        self.board_list = hat_list(filter_by_id = HatIDs.ANY)
-#        if not self.board_list:
-#            print("No boards found")
-#
-## get hat list of MCC daqhat boards
-#board_list = hat_list(filter_by_id = HatIDs.ANY)
-#if not board_list:
-#    print("No boards found")
-#    sys.exit()
-#
-## Read and display every channel
-#for entry in board_list:
-#    if entry.id == HatIDs.MCC_118:
-#        print("Board {}: MCC 118".format(entry.address))
-#        board = mcc118(entry.address)
-#        for channel in range(board.info().NUM_AI_CHANNELS):
-#            value = board.a_in_read(channel)
-#            print("Ch {0}: {1:.3f}".format(channel, value))
-#    elif entry.id == HatIDs.MCC_128:
-#        print("Board {}: MCC 128".format(entry.address))
-#        board = mcc128(entry.address)
-#        for channel in range(board.info().NUM_AI_CHANNELS):
-#            value = board.a_in_read(channel)
-#            print("Ch {0}: {1:.3f}".format(channel, value))
+#    def __init__(
+#        self,
+#        input_ranges_128
+#    ) -> None :
+#        self.input_ranges_128 = input_ranges_128
+#    def read_data(self, boardModel: int, copyOfModel: int) -> (int, int,  int, int,  int, int,  int, int):
 
-class
+
