@@ -43,8 +43,8 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.1, 0.0, 0.0)
-            self.imuPIDY = PID(0.1, 0.0, 0.0)
+            self.imuPIDX = PID(0.15, 0.0, 0.0)
+            self.imuPIDY = PID(0.275, 0.0, 0.0)
             self.imuPIDZ = PID(0.1, 0.0, 0.0)
 
         self.lastMotorCheck = time.time()
@@ -112,12 +112,8 @@ class Robot():
         newTargetY = self.imuPIDY.calculate()
         newTargetZ = self.imuPIDZ.calculate()
 
-        # Apply corrections
-        self.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
-        self.motors[13].target = (-newTargetY, 'P')  # Adjust pitch
-        self.motors[10].target = (newTargetX, 'P')  # Adjust pitch
-
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+        # self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+        return [newTargetX, newTargetY, newTargetZ]
 
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
@@ -247,7 +243,7 @@ class Robot():
     def moveAllToTarget(self):
         if self.is_real:
             for motor in self.motors:
-                time.sleep(0.01)
+                # time.sleep(0.01)
                 if not isinstance(motor.target, tuple) or len(motor.target) != 2:
                     # Set a default target if the motor target is not set correctly
                     motor.target = (motor.theta, 'P')  # Use the current position as a default target

@@ -14,11 +14,32 @@ robot = Robot(is_real)
 print("Setup Complete")
 
 
-def main():
+
+def initialize():
     robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
     robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
+    robot.motors[10].target = (math.radians(2.5), 'P')
+    robot.motors[11].target = (math.radians(0), 'P')
+    robot.motors[12].target = (math.radians(0), 'P')
+    robot.motors[13].target = (math.radians(0), 'P')
+    robot.motors[14].target = (math.radians(0), 'P')
     robot.moveAllToTarget()
     print("Initial Pose Done")
+    
+
+
+def main():
+    initialize()
+
+    # Set initial balance targets
+    imu_data = robot.imu_manager.getAllIMUData()
+    right_chest_imu = imu_data["RightChest"]
+    left_chest_imu = imu_data["LeftChest"]
+    torso_imu = imu_data["Torso"]
+    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
+    prevX = initial[0]
+    prevY = initial[1]
+    prevZ = initial[2]
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
@@ -33,26 +54,16 @@ def main():
         time.sleep(0.01)
     print("Initialized")
 
-    # Set initial balance targets
-    imu_data = robot.imu_manager.getAllIMUData()
-    right_chest_imu = imu_data["RightChest"]
-    left_chest_imu = imu_data["LeftChest"]
-    torso_imu = imu_data["Torso"]
-    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
-    prevX = initial[0]
-    prevY = initial[1]
-    prevZ = initial[2]
 
     for point in setUp:
+
         #tells robot trajectory is specifically for arms
         robot.motors[1].target = (point[1], 'P') # for right arm
         robot.motors[6].target = (point[2], 'P') # for left arm
         robot.motors[2].target = (point[3], 'P')
-        robot.moveAllToTarget()
-
-        # robot.IMUBalance(prevX, prevZ)    
+        robot.moveAllToTarget()  
         
-        count = count + 1 # keeps track of how many trajectory points it has reached
+        # count = count + 1 # keeps track of how many trajectory points it has reached
         # print(count, " / ", len(setUp))
 
 
@@ -62,14 +73,29 @@ def main():
     count = 0  # Initialize outside of the stabilization loop for consistent counting
     while True:
         for point in wave:
+
+            print("Iteration number: ", count)
+
+            newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
+            newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
+            newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
+
+            print("PID complete")
+
+            robot.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
+            robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
+            robot.motors[10].target = (-newTargetX, 'P')  # Adjust pitch
+
             #tells robot trajectory is specifically for arms
             robot.motors[1].target = (point[1], 'P') # for right arm
             robot.moveAllToTarget()
 
-            robot.IMUBalance(prevX, prevY, prevZ)
+            print("Hand Motion")
+
 
             count = count + 1 # keeps track of how many trajectory points it has reached
-            print(count, " / ", len(wave))
+            # print(count, " / ", len(wave))
+
         count = 0  # Initialize outside of the stabilization loop for consistent counting
 
 
