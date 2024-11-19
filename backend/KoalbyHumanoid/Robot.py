@@ -43,9 +43,9 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.11, 0.0, 0.0)
-            self.imuPIDY = PID(0.15, 0.02, 0.0)
-            self.imuPIDZ = PID(0.1, 0.0, 0.0)
+            self.imuPIDX = PID(0.2, 0.0, 0.0) #0.15
+            self.imuPIDY = PID(0.27, 0.1, 0.05) #0.275
+            self.imuPIDZ = PID(0.07, 0.0, 0.0) #0.1
 
         self.lastMotorCheck = time.time()
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
@@ -71,7 +71,7 @@ class Robot():
         print("Robot Created and Initialized")
 
     # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
-    def fuse_imu_data(self, right_chest_imu, left_chest_imu, torso_imu):
+    def fuse_imu_data(self):
         """
         Fuses the IMU data from right chest, left chest, and torso.
 
@@ -83,27 +83,21 @@ class Robot():
         Returns:
             np.array: Fused [pitch, roll, yaw] data for PID controller input.
         """
+        imu_data = self.imu_manager.getAllIMUData()
+        right_chest_imu = imu_data["RightChest"]
+        left_chest_imu = imu_data["LeftChest"]
+        torso_imu = imu_data["Torso"]
         self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
         print(self.fused_imu)
         return self.fused_imu
     
     def IMUBalance(self, Xtarget, Ytarget, Ztarget):
-        imu_data = self.imu_manager.getAllIMUData()
-        right_chest_imu = imu_data["RightChest"]
-        left_chest_imu = imu_data["LeftChest"]
-        torso_imu = imu_data["Torso"]
-
         # Fuse IMU data
-        fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
-
+        fused_data = self.fuse_imu_data()
         # Use the fused data for balance calculations
-        xRot = fused_data[0]
-        yRot = fused_data[1]
-        zRot = fused_data[2]  
-
-        Xerror = Xtarget - xRot
-        Yerror = Ytarget - yRot
-        Zerror = Ztarget - zRot
+        Xerror = Xtarget - fused_data[0]
+        Yerror = Ytarget - fused_data[1]
+        Zerror = Ztarget - fused_data[2]  
 
         self.imuPIDX.setError(Xerror)
         self.imuPIDY.setError(Yerror)
@@ -114,11 +108,10 @@ class Robot():
         newTargetZ = self.imuPIDZ.calculate()
 
         # Apply corrections
-        self.motors[12].target = (-newTargetZ, 'P')  # Adjust yaw
-        self.motors[13].target = (-newTargetY, 'P')  # Adjust pitch
-        self.motors[10].target = (newTargetX, 'P')  # Adjust pitch
+        self.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
+        self.motors[11].target = (-newTargetY, 'P')  # Adjust pitch
+        self.motors[14].target = (-newTargetX, 'P')  # Adjust pitch
 
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
