@@ -1,9 +1,7 @@
 import sys, time, math
 import numpy as np 
-import matplotlib.pyplot as plt
 from ikpy.chain import Chain
 from ikpy.utils import plot as plot_utils
-from matplotlib.animation import FuncAnimation
 from scipy.interpolate import CubicSpline
 
 sys.path.append("./")
@@ -20,17 +18,20 @@ def setup_robot(is_real):
 def update_trajectory_and_control(robot, right_points, left_points, start_time):
     currentTime = time.time() - start_time
 
+    # Torso
+    robot.motors[10].target = (math.radians(-30), 'P')
+
     # Right arm
-    robot.motors[0].target = (math.radians(-20), 'P')
+    robot.motors[0].target = (math.radians(10), 'P')
     robot.motors[1].target = (math.radians(-90), 'P') 
     robot.motors[3].target = (math.radians(100), 'P') #pos
-    robot.motors[4].target = (math.radians(-15), 'P')
+    robot.motors[4].target = (math.radians(0), 'P')
 
     # Left Arm
-    robot.motors[5].target = (math.radians(20), 'P')
+    robot.motors[5].target = (math.radians(-10), 'P')
     robot.motors[6].target = (math.radians(90), 'P')
     robot.motors[8].target = (math.radians(-100), 'P')#neg
-    robot.motors[9].target = (math.radians(15), 'P') 
+    robot.motors[9].target = (math.radians(0), 'P') 
 
     # Right Leg
     robot.motors[15].target = (right_points[0], 'P')
@@ -48,9 +49,45 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
 
     robot.moveAllToTarget()
 
+def initSimWalk(robot):
+
+    # Right arm
+    robot.motors[0].target = (math.radians(10), 'P')
+    robot.motors[1].target = (math.radians(-90), 'P') 
+    robot.motors[3].target = (math.radians(100), 'P') #pos
+    robot.motors[4].target = (math.radians(5), 'P')
+
+    # Left Arm
+    robot.motors[5].target = (math.radians(-10), 'P')
+    robot.motors[6].target = (math.radians(90), 'P')
+    robot.motors[8].target = (math.radians(-100), 'P')#neg
+    robot.motors[9].target = (math.radians(40), 'P') 
+
+    # Right Leg
+    robot.motors[15].target = (math.radians(0), 'P')
+    robot.motors[16].target = (math.radians(0), 'P')
+    robot.motors[17].target = (math.radians(0), 'P')
+    robot.motors[18].target = (math.radians(0), 'P')
+    robot.motors[19].target = (math.radians(0), 'P')
+
+    # Left Leg
+    robot.motors[20].target = (math.radians(0), 'P')
+    robot.motors[21].target = (math.radians(0), 'P')
+    robot.motors[22].target = (math.radians(0), 'P')
+    robot.motors[23].target = (math.radians(0), 'P')
+    robot.motors[24].target = (math.radians(0), 'P')
+
+    robot.moveAllToTarget()
+
+
 def main():
     is_real = False
     robot = setup_robot(is_real)
+
+    # initSimWalk(robot)
+
+    # time.sleep(30)
+
 
     left_leg_chain = Chain.from_urdf_file(
         "backend/Testing/robotChain.urdf",
@@ -67,18 +104,18 @@ def main():
     z_base = -0.05
 
     left_base = [x_base, y_base, z_base]
-    left_back_flat = [x_base, y_base + 0.025, z_base - 0.12]
-    left_back_not_flat = [x_base, y_base, z_base - 0.12]
-    left_center_top = [x_base, y_base + 0.05, z_base]
-    left_forward_top = [x_base, y_base + 0.05, z_base + 0.1]
-    left_almost_center_top = [x_base, y_base + 0.025, z_base]
+    left_back_flat = [x_base, y_base, z_base - 0.1]
+    left_back_not_flat = [x_base, y_base, z_base - 0.1]
+    left_center_top = [x_base, y_base + 0.1, z_base]
+    left_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
+    left_almost_center_top = [x_base, y_base, z_base]
 
     right_base = [x_base, y_base, z_base]
-    right_back_flat = [x_base, y_base + 0.025, z_base - 0.125]
-    right_back_not_flat = [x_base, y_base, z_base - 0.125]
-    right_center_top = [x_base, y_base + 0.05, z_base]
-    right_forward_top = [x_base, y_base + 0.05, z_base + 0.1]
-    right_almost_center_top = [x_base, y_base + 0.025, z_base]
+    right_back_flat = [x_base, y_base, z_base - 0.1]
+    right_back_not_flat = [x_base, y_base, z_base - 0.1]
+    right_center_top = [x_base, y_base + 0.1, z_base]
+    right_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
+    right_almost_center_top = [x_base, y_base, z_base]
 
     target_orientation_left = [0, 0, 1]
     target_orientation_right = [0, 0, 1]
@@ -92,21 +129,19 @@ def main():
     #LLF = Left Leg First
     #RLP = Right Leg Positions
     #LLP = Left Leg Positions
-    RLF_RLP = [right_base, right_center_top, right_forward_top, right_almost_center_top, right_base, right_base, right_base]
-    RLF_LLP = [left_base, left_base, left_base, left_back_flat, left_back_not_flat, left_center_top, left_base]
-    LLF_RLP = [right_base, right_base, right_base, right_back_flat, right_back_not_flat, right_center_top, right_base]
-    LLF_LLP = [left_base, left_center_top, left_forward_top, left_almost_center_top, left_base, left_base, left_base]
+    RLF_RLP = [right_center_top, right_forward_top, right_almost_center_top, right_base, right_base]
+    RLF_LLP = [left_base, left_base, left_back_flat, left_back_not_flat, left_center_top]
+    LLF_RLP = [right_base, right_base, right_back_flat, right_back_not_flat, right_center_top]
+    LLF_LLP = [left_center_top, left_forward_top, left_almost_center_top, left_base, left_base]
 
     total_time = []
     total_vel = []
     total_acc = []
-    step_time = 1
+    step_time = 2
     for i in range(len(RLF_LLP)):
         total_time.append([i * step_time, i * step_time, i * step_time])
         total_vel.append([0, 0, 0])
         total_acc.append([0, 0, 0])
-
-    print(total_time, RLF_LLP, total_vel, total_acc)
 
     RLF_LLP_traj = TrajPlannerTime(total_time, RLF_LLP, total_vel, total_acc)
     RLF_RLP_traj = TrajPlannerTime(total_time, RLF_RLP, total_vel, total_acc)
@@ -122,7 +157,6 @@ def main():
         while time.time() - start_time < step_time*(len(total_time)-1):
                 left_quintic = all_trajectories[traj_number][0].getQuinticPositions(time.time() - start_time)
                 right_quintic = all_trajectories[traj_number][1].getQuinticPositions(time.time() - start_time)
-                print(left_quintic)
 
                 target_position_left = left_quintic
                 ik_solution_left = left_leg_chain.inverse_kinematics(
