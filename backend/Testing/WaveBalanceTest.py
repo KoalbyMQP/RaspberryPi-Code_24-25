@@ -18,7 +18,7 @@ print("Setup Complete")
 def initialize():
     robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
     robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
-    robot.motors[10].target = (math.radians(2.5), 'P')
+    robot.motors[10].target = (math.radians(5), 'P')
     robot.motors[11].target = (math.radians(0), 'P')
     robot.motors[12].target = (math.radians(0), 'P')
     robot.motors[13].target = (math.radians(0), 'P')
@@ -71,16 +71,13 @@ def main():
     wavePoints = trajPlannerPose.TrajPlannerPose(createWavePoints)
     wave = wavePoints.getCubicTraj(0.05, 100)
     count = 0  # Initialize outside of the stabilization loop for consistent counting
+
     while True:
         for point in wave:
-
-            print("Iteration number: ", count)
 
             newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
             newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
             newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
-
-            print("PID complete")
 
             robot.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
             robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
@@ -88,9 +85,9 @@ def main():
 
             #tells robot trajectory is specifically for arms
             robot.motors[1].target = (point[1], 'P') # for right arm
-            robot.moveAllToTarget()
 
-            print("Hand Motion")
+
+            robot.moveAllToTarget()
 
 
             count = count + 1 # keeps track of how many trajectory points it has reached
