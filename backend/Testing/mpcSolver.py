@@ -12,6 +12,7 @@ def solve_mpc(model, silence_solver = False):
     """
     --------------------------------------------------------------------------
     template_mpc: tuning parameters
+    I honestly havent touched this. Not sure how much needs to be added or adjusted 
     --------------------------------------------------------------------------
     """
     mpc = do_mpc.controller.MPC(model)

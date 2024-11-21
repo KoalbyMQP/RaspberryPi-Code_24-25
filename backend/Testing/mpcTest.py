@@ -10,6 +10,7 @@ sys.path.append(rel_do_mpc_path)
 import do_mpc
 
 import matplotlib.pyplot as plt
+# the following commented out stuff is graph functions from do_mpc
 # import matplotlib.gridspec as gridspec
 # from matplotlib.patches import Circle
 # from matplotlib import rcParams
@@ -36,11 +37,11 @@ mpc = solve_mpc(model)
 estimator = do_mpc.estimator.StateFeedback(model)
 
 # set initial state 
-# this is where it will connect to the walking file 
+# this is where it will connect to the walking file i think  
 # need to set x0 -> initial iteration 
 mpc.set_initial_guess()
 
-# set up graphs 
+# set up graphs (this is from do_mpc files of their LIPM model)
 L1 = 12 #cm, height of CoM
 def pendulum(x):
     line_x = np.array([
@@ -60,7 +61,7 @@ mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
 
 
 """
-Creating 3d plot of the motion
+Creating 3d plot of the motion. At this moment it just is a static plot of the line with the point
 """
 # creating 2d plot in 3d 
 ax = plt.figure().add_subplot(projection='3d')

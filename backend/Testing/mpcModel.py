@@ -47,6 +47,14 @@ def mpc_model(symvar_type='SX'):
     # # C_sx = ca.SX(c)
     # # D_sx = ca.SX(d)
 
+
+# """
+#  the idea of this current model is the each .rhs needs to have a state.
+#  for algebraic motion equations us the .set_alg function, and that will then use 
+#  the states that have not been used yet. You can also use .set_expression and 
+#  the model wont be using it per say but will be tracking the value of the variables.
+#  finally look into other type of variables that can be used _z, _tvp, _p
+# """
     # #setting up states
     x = model.set_variable(var_type='_x', var_name='x')
     y = model.set_variable(var_type='_x', var_name='y')
@@ -65,7 +73,7 @@ def mpc_model(symvar_type='SX'):
     model.set_rhs('y', yd)
     model.set_rhs('yd', ydd)
     
-    
+    # Code below this is the x and y 2nd order diff eq for 3d LIPM
     # model.set_rhs('xdd', (g/z_c)*x - (1/mass)*ur)
     # model.set_rhs('ydd', (g/z_c)*y - (1/mass)*up)
     
