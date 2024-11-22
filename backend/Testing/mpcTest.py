@@ -46,11 +46,11 @@ L1 = 12 #cm, height of CoM
 def pendulum(x):
     line_x = np.array([
         x[0],
-        x[0]+l1*np.sin(x[1])
+        x[0]+L1*np.sin(x[1])
     ])
     line_y = np.array([
         0, 
-        l1*np.cos(x[1])
+        L1*np.cos(x[1])
     ])
     
     line = np.stack((line_x, line_y))
