@@ -31,9 +31,9 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.5, 0.0, 0.2)
-            self.imuPIDY = PID(0.5, 0.0, 0.2)
-            self.imuPIDZ = PID(0.5, 0.0, 0.2)
+            self.imuPIDX = PID(0.175, 0.05, 5)
+            self.imuPIDY = PID(0.275, 0.05, 5)
+            self.imuPIDZ = PID(0.25, 0.05, 5)
             self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
@@ -43,9 +43,9 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.2, 0.0, 0.0) #0.15
-            self.imuPIDY = PID(0.27, 0.1, 0.05) #0.275
-            self.imuPIDZ = PID(0.07, 0.0, 0.0) #0.1
+            self.imuPIDX = PID(0.175, 0.05, 5)
+            self.imuPIDY = PID(0.275, 0.05, 5)
+            self.imuPIDZ = PID(0.25, 0.05, 5)
 
         self.lastMotorCheck = time.time()
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
