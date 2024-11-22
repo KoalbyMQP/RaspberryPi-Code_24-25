@@ -7,6 +7,22 @@ from daqhats import hat_list, mcc118, mcc128, OptionFlags, HatIDs, TriggerModes,
     HatError, AnalogInputMode, AnalogInputRange
 from daqhats_utils import enum_mask_to_string, chan_list_to_mask, \
     validate_channels, input_mode_to_string, input_range_to_string
+from coppeliasim_zmqremoteapi_client import RemoteAPIClient
+
+
+class MCC():
+    def __init__(self):
+
+    def get_hats_available(self):
+
+
+
+
+
+
+
+
+
 
 
 # Constants
