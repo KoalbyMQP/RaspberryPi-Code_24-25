@@ -11,10 +11,107 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
 
 class MCC():
-    def __init__(self):
+    def __init__(self, device_count_128=1, device_count_118=1, master_128=0, chans_128 = [
+        {0, 1, 2, 3, 4, 5, 6, 7}
+    ], chans_118 = [
+        {0, 1, 2, 3, 4, 5, 6, 7}
+    ], input_modes_128 = [
+        AnalogInputMode.SE
+    ], input_ranges_128 = [
+        AnalogInputRange.BIP_10V
+    ], options_128 = [
+        OptionFlags.EXTTRIGGER
+    ], options_118 = [
+        OptionFlags.OptionFlags.EXTCLOCK
+    ], samples_per_channel = 10000, sample_rate = 1000.0, trigger_mode = TriggerModes.RISING_EDGE):
+        # Constants
+        self.device_count_128 = device_count_128
+        self.device_count_118 = device_count_118
+        self.master_128 = master_128
+        self.chans_128 = chans_128
+        self.chans_118 = chans_118
+        self.input_modes_128 = input_modes_128
+        self.input_ranges_128 = input_ranges_128
+        self.options_128 = options_128
+        self.options_118 = options_118
+        self.samples_per_channel = samples_per_channel
+        self.sample_rate = sample_rate # samples per second
+        self.trigger_mode = trigger_mode
 
+
+        self.hats_128 = []
+        self.hats_118 = []
     def get_hats_available(self):
 
+def select_hat_devices(filter_by_id, number_of_devices):
+    """
+    This function performs a query of available DAQ HAT devices and determines
+    the addresses of the DAQ HAT devices to be used in the example.  If the
+    number of HAT devices present matches the requested number of devices,
+    a list of all mcc128 objects is returned in order of address, otherwise the
+    user is prompted to select addresses from a list of displayed devices.
+
+    Args:
+        filter_by_id (int): If this is :py:const:`HatIDs.ANY` return all DAQ
+            HATs found.  Otherwise, return only DAQ HATs with ID matching this
+            value.
+        number_of_devices (int): The number of devices to be selected.
+
+    Returns:
+        list[mcc128]: A list of mcc128 objects for the selected devices
+        (Note: The object at index 0 will be used as the master).
+
+    Raises:
+        HatError: Not enough HAT devices are present.
+
+    """
+    selected_hats = []
+
+    # Get descriptors for all of the available HAT devices.
+    hats = hat_list(filter_by_id=filter_by_id)
+    number_of_hats = len(hats)
+
+    # Verify at least one HAT device is detected.
+    if number_of_hats < number_of_devices:
+        error_string = ('Error: This example requires {0} MCC 1x8 HATs - '
+                        'found {1}'.format(number_of_devices, number_of_hats))
+        raise HatError(0, error_string)
+    elif number_of_hats == number_of_devices:
+        for i in range(number_of_devices):
+            if filter_by_id == 128:
+                selected_hats.append(mcc128(hats[i].address))
+            if filter_by_id == 118:
+                selected_hats.append(mcc118(hats[i].address))
+    else:
+        # Display available HAT devices for selection.
+        for hat in hats:
+            print('Address ', hat.address, ': ', hat.product_name, sep='')
+        print('')
+
+        for device in range(number_of_devices):
+            valid = False
+            while not valid:
+                input_str = 'Enter address for HAT device {}: '.format(device)
+                address = int(input(input_str))
+
+                # Verify the selected address exists.
+                if any(hat.address == address for hat in hats):
+                    valid = True
+                else:
+                    print('Invalid address - try again')
+
+                # Verify the address was not previously selected
+                if any(hat.address() == address for hat in selected_hats):
+                    print('Address already selected - try again')
+                    valid = False
+
+                if valid:
+                    if filter_by_id == 128:
+                        selected_hats.append(mcc128(hats[i].address))
+                    if filter_by_id == 118:
+                        selected_hats.append(mcc118(hats[i].address))
+
+    return selected_hats
 
 
 
