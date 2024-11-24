@@ -30,15 +30,28 @@ def solve_mpc(model, silence_solver = False):
     lterm = model.aux['cost'] #stage cost
     
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(u=1e-4)
+    mpc.set_rterm(xddd=1e-4, yddd=1e-4)
 
-    max_x = np.array([[4.0], [10.0], [4.0], [10.0]]) #needs to be replaced with size of feet 
+    # max_x = np.array([[4.0], [10.0], [4.0], [10.0]]) #needs to be replaced with size of feet 
 
-    mpc.bounds['lower','_x','x'] = -max_x
-    mpc.bounds['upper','_x','x'] =  max_x
+    # # Set lower and upper bounds for each state variable
+    # for i, bound in enumerate(max_x.flatten()):
+    #     mpc.bounds['lower', '_x', i] = -bound
+    #     mpc.bounds['upper', '_x', i] = bound
+    # Define bounds for each state variable explicitly based on their names
+    state_bounds = {'x': 4.0, 'y': 10.0, 'xd': 4.0, 'yd': 10.0}
 
-    mpc.bounds['lower','_u','u'] = -0.5 #not too sure what this value will be yet 
-    mpc.bounds['upper','_u','u'] =  0.5 
+    for state_name, bound in state_bounds.items():
+        mpc.bounds['lower', '_x', state_name] = -bound
+        mpc.bounds['upper', '_x', state_name] = bound
+
+
+    mpc.bounds['lower', '_u', 'xddd'] = -0.5
+    mpc.bounds['upper', '_u', 'xddd'] = 0.5
+
+    mpc.bounds['lower', '_u', 'yddd'] = -0.5
+    mpc.bounds['upper', '_u', 'yddd'] = 0.5
+
 
 
     mpc.setup()

@@ -64,8 +64,8 @@ def mpc_model(symvar_type='SX'):
     xdd = model.set_variable(var_type='_z', var_name='xdd')
     ydd = model.set_variable(var_type='_z', var_name='ydd')
     #inputs 
-    ur = model.set_variable(var_type='_u', var_name='xddd')
-    up = model.set_variable(var_type= '_u', var_name='yddd')
+    ur = model.set_variable(var_type='_u', var_name='xddd', shape=(1,1))
+    up = model.set_variable(var_type= '_u', var_name='yddd', shape=(1,1))
     
     # Differential Equations 
     model.set_rhs('x', xd)
@@ -98,11 +98,22 @@ def mpc_model(symvar_type='SX'):
     # model.set_rhs('y', lip_y)
     # model.set_rhs('x_dot', nextStepx)
     # model.set_rhs('y_dot', nextStepy)
-    
-    
-    
-    #need to track position 
+
+    # Algebraic equations for xdd and ydd
+    model.set_alg('xdd', (g / z_c) * x - (1 / mass) * ur)
+    model.set_alg('ydd', (g / z_c) * y - (1 / mass) * up)
+
+    # Define cost function (example for tracking a desired state)
+    cost_x = (x - px)**2
+    cost_y = (y - py)**2
+    total_cost = cost_x + cost_y
+
+    # Set the cost expression in the model
+    model.set_expression(expr_name='cost', expr=total_cost)
+
+    # Final setup call
     model.setup()
+
 
     return model
 
