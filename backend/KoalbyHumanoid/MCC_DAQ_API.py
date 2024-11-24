@@ -11,19 +11,49 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
 
 class MCC():
-    def __init__(self, device_count_128=1, device_count_118=1, master_128=0, chans_128 = [
-        {0, 1, 2, 3, 4, 5, 6, 7}
-    ], chans_118 = [
-        {0, 1, 2, 3, 4, 5, 6, 7}
-    ], input_modes_128 = [
-        AnalogInputMode.SE
-    ], input_ranges_128 = [
-        AnalogInputRange.BIP_10V
-    ], options_128 = [
-        OptionFlags.EXTTRIGGER
-    ], options_118 = [
-        OptionFlags.OptionFlags.EXTCLOCK
-    ], samples_per_channel = 10000, sample_rate = 1000.0, trigger_mode = TriggerModes.RISING_EDGE):
+    def __init__(self, device_count_128=1, device_count_118=1, master_128=0, 
+                 chans_128 = [ {0, 1, 2, 3, 4, 5, 6, 7} ],
+                 chans_118 = [ {0, 1, 2, 3, 4, 5, 6, 7} ],
+                 input_modes_128 = [ AnalogInputMode.SE ],
+                 input_ranges_128 = [ AnalogInputRange.BIP_10V ],
+                 options_128 = [ OptionFlags.EXTTRIGGER ],
+                 options_118 = [ OptionFlags.EXTCLOCK ],
+                 samples_per_channel = 10000, sample_rate = 1000.0,
+                 trigger_mode = TriggerModes.RISING_EDGE
+                 ):
+        """
+        This function initializes the MCC HATs in software.
+
+        Args:
+            device_count_128 (int): Number of MCC128 boards. Defaults to 1.
+            device_count_118 (int): Number of MCC118 boards. Defaults to 1.
+            master_128 (int): Zero index of which MCC128 board provides the master
+                clock. Defaults to 0. Assumes MCC128 board controls clock.
+            chans_128: List of list of channels for MCC128 boards. Defaults to
+                [ {0, 1, 2, 3, 4, 5, 6, 7} ]
+                but can be expanded to
+                [ {0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 6} ]
+                or any other combination.
+            chans_118: List of list of channels for MCC128 boards. Defaults to
+                [ {0, 1, 2, 3, 4, 5, 6, 7} ]
+                but can be expanded to
+                [ {0, 1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 6} ]
+                or any other combination.
+            input_modes_128: FOR 128 BOARDS ONLY! List of input modes for MCC128
+                boards. Defaults to [ AnalogInputMode.SE ].
+            input_ranges_128: FOR 128 BOARDS ONLY! List of input ranges for MCC128
+                boards. Defaults to [ AnalogInputRange.BIP_10V ].
+            options_128: List of option flags for MCC128 boards. Defaults to
+                [ OptionFlags.EXTTRIGGER ].
+            options_118: List of option flags for MCC128 boards. Defaults to
+                [ OptionFlags.EXTCLOCK ].
+            samples_per_channel (int): Number of samples per channel. Defaults to 10000.
+            sample_rate: Number of samples per second. Defaults to 1000.0.
+            trigger_mode: When on the clock signal to trigger. Defaults to
+                TriggerModes.RISING_EDGE. 
+
+        """
+        
         # Constants
         self.device_count_128 = device_count_128
         self.device_count_118 = device_count_118
@@ -41,7 +71,13 @@ class MCC():
 
         self.hats_128 = []
         self.hats_118 = []
+
     def get_hats_available(self):
+        pass
+    
+    def get_data(self):
+        pass
+
 
 def select_hat_devices(filter_by_id, number_of_devices):
     """
