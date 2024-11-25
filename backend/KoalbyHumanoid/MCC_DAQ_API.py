@@ -72,88 +72,192 @@ class MCC():
         self.hats_128 = []
         self.hats_118 = []
 
-    def get_hats_available(self):
-        pass
+    def set_hats_ready(self):
+        selected_hats_128 = []
+        selected_hats_118 = []
+
+        # Get descriptors for all of the available HAT devices.
+        hats_128 = hat_list(filter_by_id_128=DEVICE_COUNT_128)
+        hats_118 = hat_list(filter_by_id_118=DEVICE_COUNT_118)
+        
+        number_of_hats_128 = len(hats_128)
+        number_of_hats_118 = len(hats_118)
+
+        if (number_of_hats_128 != self.device_count_128 or 
+            number_of_hats_118 != self.device_count_118):
+            return [ {number_of_hats_128}, {number_of_hats_118}, {False} ]
+        for i in range(number_of_hats_128):
+            selected_hats_128.append(mcc128(hats_128[i].address))
+        for i in range(number_of_hats_118):
+            selected_hats_118.append(mcc118(hats_118[i].address))
+        
+        try:
+            # Get an instance of the selected hat device object.
+            self.hats_128 = select_hat_devices(HatIDs.MCC_128, DEVICE_COUNT_128)
+            self.hats_118 = select_hat_devices(HatIDs.MCC_118, DEVICE_COUNT_118)
+
+            # Validate the selected channels, set the modes and ranges.
+            for i, hat in enumerate(hats_128):
+                validate_channels(self.chans_128[i], hat.info().NUM_AI_CHANNELS[self.input_modes_128[i]])
+                hat.a_in_mode_write(self.input_modes_128[i])
+                hat.a_in_range_write(self.input_ranges_128[i])
+            for i, hat in enumerate(hats_118):
+                validate_channels(self.chans_118[i], hat.info().NUM_AI_CHANNELS)
+            
+            # Set the trigger mode for the master device.
+            hats_128[MASTER_128].trigger_mode(self.trigger_mode)
+
+        except:
+            return [ {selected_hats_128}, {selected_hats_118}, {False} ]
+            
+        return [ {selected_hats_128}, {selected_hats_118}, {True} ]
+
+    def get_actual_sample_rate(self):
+        #actual_rate_118 = self.hats_118[MASTER_128].a_in_scan_actual_rate(len(chans_118[MASTER_128]),
+        #                                                 sample_rate)
+        actual_rate_128 = self.hats_128[self.master_128].a_in_scan_actual_rate(len(self.chans_128[MASTER_128]),
+                                                         self.sample_rate)
     
-    def get_data(self):
-        pass
+    def get_data(self, samples_to_read = 1, timeout = 5):
+        samples_per_chan_read_128 = [0] * self.device_count_128
+        samples_per_chan_read_118 = [0] * self.device_count_118
+        total_samples_per_chan_128 = [0] * self.device_count_128
+        total_samples_per_chan_118 = [0] * self.device_count_118
+        is_running_triggerwait = True
+        is_triggered = False
+        is_running_sample = True
+        
+        for i, hat in enumerate(self.hats_128):
+            chan_mask = chan_list_to_mask(self.hans_128[i])
+            hat.a_in_scan_start(chan_mask, self.samples_per_channel, self.sample_rate,
+                                self.options_128[i])
+        for i, hat in enumerate(self.hats_118):
+            chan_mask = chan_list_to_mask(self.chans_118[i])
+            hat.a_in_scan_start(chan_mask, self.samples_per_channel, self.sample_rate,
+                                self.options_118[i])
+
+        # Monitor the trigger status on the master device.
+        # Read the status only to determine when the trigger occurs.
+        while is_running_triggerwait and not is_triggered:
+            status = self.hats_128[self.master_128].a_in_scan_status()
+            is_running_triggerwait = status.running
+            is_triggered = status.triggered
+        # Read and display data for all devices until scan completes
+        # or overrun is detected.
+        
+        #read_data(hats_118, hats_128, chans_118, chans_128)
 
 
-def select_hat_devices(filter_by_id, number_of_devices):
+def read_data(hats_118, hats_128, chans_118, chans_128):
     """
-    This function performs a query of available DAQ HAT devices and determines
-    the addresses of the DAQ HAT devices to be used in the example.  If the
-    number of HAT devices present matches the requested number of devices,
-    a list of all mcc128 objects is returned in order of address, otherwise the
-    user is prompted to select addresses from a list of displayed devices.
+    Reads data from the specified channels on the specified DAQ HAT devices
+    and updates the data on the terminal display.  The reads are executed in a
+    loop that continues until either the scan completes or an overrun error
+    is detected.
 
     Args:
-        filter_by_id (int): If this is :py:const:`HatIDs.ANY` return all DAQ
-            HATs found.  Otherwise, return only DAQ HATs with ID matching this
-            value.
-        number_of_devices (int): The number of devices to be selected.
+        hats (list[mcc128]): A list of mcc128 HAT device objects.
+        chans (list[int][int]): A 2D list to specify the channel list for each
+            mcc128 HAT device.
 
     Returns:
-        list[mcc128]: A list of mcc128 objects for the selected devices
-        (Note: The object at index 0 will be used as the master).
-
-    Raises:
-        HatError: Not enough HAT devices are present.
+        None
 
     """
-    selected_hats = []
+    samples_to_read = 500
+    timeout = 5  # Seconds
+    samples_per_chan_read_118 = [0] * DEVICE_COUNT_118
+    samples_per_chan_read_128 = [0] * DEVICE_COUNT_128
+    total_samples_per_chan_118 = [0] * DEVICE_COUNT_118
+    total_samples_per_chan_128 = [0] * DEVICE_COUNT_128
+    is_running = True
 
-    # Get descriptors for all of the available HAT devices.
-    hats = hat_list(filter_by_id=filter_by_id)
-    number_of_hats = len(hats)
+    # Create blank lines where the data will be displayed
+    #for _ in range(DEVICE_COUNT * 4 + 1):
+    #    print('')
+    # Move the cursor up to the start of the data display.
+    #print('\x1b[{0}A'.format(DEVICE_COUNT * 4 + 1), end='')
+    #print(CURSOR_SAVE, end='')
 
-    # Verify at least one HAT device is detected.
-    if number_of_hats < number_of_devices:
-        error_string = ('Error: This example requires {0} MCC 1x8 HATs - '
-                        'found {1}'.format(number_of_devices, number_of_hats))
-        raise HatError(0, error_string)
-    elif number_of_hats == number_of_devices:
-        for i in range(number_of_devices):
-            if filter_by_id == 128:
-                selected_hats.append(mcc128(hats[i].address))
-            if filter_by_id == 118:
-                selected_hats.append(mcc118(hats[i].address))
-    else:
-        # Display available HAT devices for selection.
-        for hat in hats:
-            print('Address ', hat.address, ': ', hat.product_name, sep='')
-        print('')
+    while True:
+        data_128 = [None] * DEVICE_COUNT_128
+        data_118 = [None] * DEVICE_COUNT_118
+        # Read the data from each HAT device.
+        for i, hat in enumerate(hats_128):
+            read_result = hat.a_in_scan_read(samples_to_read, timeout)
+            data_128[i] = read_result.data
+            is_running &= read_result.running
+            samples_per_chan_read_128[i] = int(len(data_128[i]) / len(chans_128[i]))
+            total_samples_per_chan_128[i] += samples_per_chan_read_128[i]
 
-        for device in range(number_of_devices):
-            valid = False
-            while not valid:
-                input_str = 'Enter address for HAT device {}: '.format(device)
-                address = int(input(input_str))
+            if read_result.buffer_overrun:
+                print('\nError: Buffer overrun')
+                break
+            if read_result.hardware_overrun:
+                print('\nError: Hardware overrun')
+                break
+        for i, hat in enumerate(hats_118):
+            read_result = hat.a_in_scan_read(samples_to_read, timeout)
+            data_118[i] = read_result.data
+            is_running &= read_result.running
+            samples_per_chan_read_118[i] = int(len(data_118[i]) / len(chans_118[i]))
+            total_samples_per_chan_118[i] += samples_per_chan_read_118[i]
 
-                # Verify the selected address exists.
-                if any(hat.address == address for hat in hats):
-                    valid = True
-                else:
-                    print('Invalid address - try again')
+            if read_result.buffer_overrun:
+                print('\nError: Buffer overrun')
+                break
+            if read_result.hardware_overrun:
+                print('\nError: Hardware overrun')
+                break
 
-                # Verify the address was not previously selected
-                if any(hat.address() == address for hat in selected_hats):
-                    print('Address already selected - try again')
-                    valid = False
+        #print(CURSOR_RESTORE, end='')
 
-                if valid:
-                    if filter_by_id == 128:
-                        selected_hats.append(mcc128(hats[i].address))
-                    if filter_by_id == 118:
-                        selected_hats.append(mcc118(hats[i].address))
+        # Display the data for each HAT device
+        for i, hat in enumerate(hats_128):
+            print('HAT 128 {0}:'.format(i))
 
-    return selected_hats
+            # Print the header row for the data table.
+            print('  Samples Read    Scan Count', end='')
+            for chan in chans_128[i]:
+                print('     Channel', chan, end='')
+            print('')
 
+            # Display the sample count information.
+            print('{0:>14}{1:>14}'.format(samples_per_chan_read_128[i],
+                                          total_samples_per_chan_128[i]), end='')
 
+            # Display the data for all selected channels
+            for chan_idx in range(len(chans_128[i])):
+                if samples_per_chan_read_128[i] > 0:
+                    sample_idx = ((samples_per_chan_read_128[i] * len(chans_128[i]))
+                                  - len(chans_128[i]) + chan_idx)
+                    print(' {:>12.5f} V'.format(data_128[i][sample_idx]), end='')
+            print('\n')
+        for i, hat in enumerate(hats_118):
+            print('HAT 118 {0}:'.format(i))
 
+            # Print the header row for the data table.
+            print('  Samples Read    Scan Count', end='')
+            for chan in chans_118[i]:
+                print('     Channel', chan, end='')
+            print('')
 
+            # Display the sample count information.
+            print('{0:>14}{1:>14}'.format(samples_per_chan_read_118[i],
+                                          total_samples_per_chan_118[i]), end='')
 
+            # Display the data for all selected channels
+            for chan_idx in range(len(chans_118[i])):
+                if samples_per_chan_read_118[i] > 0:
+                    sample_idx = ((samples_per_chan_read_118[i] * len(chans_118[i]))
+                                  - len(chans_118[i]) + chan_idx)
+                    print(' {:>12.5f} V'.format(data_118[i][sample_idx]), end='')
+            print('\n')
 
+        stdout.flush()
+
+        if not is_running:
+            break
 
 
 
