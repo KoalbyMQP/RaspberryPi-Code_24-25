@@ -117,6 +117,7 @@ class MCC():
         #                                                 sample_rate)
         actual_rate_128 = self.hats_128[self.master_128].a_in_scan_actual_rate(len(self.chans_128[MASTER_128]),
                                                          self.sample_rate)
+        return actual_rate_128
     
     def get_data(self, samples_to_read = 1, timeout = 5):
         samples_per_chan_read_128 = [0] * self.device_count_128
