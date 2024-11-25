@@ -144,8 +144,6 @@ class MCC():
             is_running_triggerwait = status.running
             is_triggered = status.triggered
 
-###WIP###
-        
         # Read and output data for all devices until scan completes
         # or overrun is detected.
         data_128 = [None] * self.device_count_128
@@ -159,11 +157,11 @@ class MCC():
             total_samples_per_chan_128[i] += samples_per_chan_read_128[i]
 
             if read_result.buffer_overrun:
-                print('\nError: Buffer overrun')
-                break
+                print('\nMCC HAT Error: Buffer overrun')
+                return None
             if read_result.hardware_overrun:
-                print('\nError: Hardware overrun')
-                break
+                print('\nMCC HAT Error: Hardware overrun')
+                return None
         for i, hat in enumerate(self.hats_118):
             read_result = hat.a_in_scan_read(samples_to_read, timeout)
             data_118[i] = read_result.data
@@ -172,173 +170,61 @@ class MCC():
             total_samples_per_chan_118[i] += samples_per_chan_read_118[i]
 
             if read_result.buffer_overrun:
-                print('\nError: Buffer overrun')
-                break
+                print('\nMCC HAT Error: Buffer overrun')
+                return None
             if read_result.hardware_overrun:
-                print('\nError: Hardware overrun')
-                break
-
-        #print(CURSOR_RESTORE, end='')
-
-        # Display the data for each HAT device
-        for i, hat in enumerate(self.hats_128):
-            print('HAT 128 {0}:'.format(i))
-
-            # Print the header row for the data table.
-            print('  Samples Read    Scan Count', end='')
-            for chan in chans_128[i]:
-                print('     Channel', chan, end='')
-            print('')
-
-            # Display the sample count information.
-            print('{0:>14}{1:>14}'.format(samples_per_chan_read_128[i],
-                                          total_samples_per_chan_128[i]), end='')
-
-            # Display the data for all selected channels
-            for chan_idx in range(len(self.chans_128[i])):
-                if samples_per_chan_read_128[i] > 0:
-                    sample_idx = ((samples_per_chan_read_128[i] * len(self.chans_128[i]))
-                                  - len(self.chans_128[i]) + chan_idx)
-                    print(' {:>12.5f} V'.format(data_128[i][sample_idx]), end='')
-            print('\n')
-        for i, hat in enumerate(self.hats_118):
-            print('HAT 118 {0}:'.format(i))
-
-            # Print the header row for the data table.
-            print('  Samples Read    Scan Count', end='')
-            for chan in chans_118[i]:
-                print('     Channel', chan, end='')
-            print('')
-
-            # Display the sample count information.
-            print('{0:>14}{1:>14}'.format(samples_per_chan_read_118[i],
-                                          total_samples_per_chan_118[i]), end='')
-
-            # Display the data for all selected channels
-            for chan_idx in range(len(self.chans_118[i])):
-                if samples_per_chan_read_118[i] > 0:
-                    sample_idx = ((samples_per_chan_read_118[i] * len(self.chans_118[i]))
-                                  - len(self.chans_118[i]) + chan_idx)
-                    print(' {:>12.5f} V'.format(data_118[i][sample_idx]), end='')
-            print('\n')
-
+                print('\nMCC HAT Error: Hardware overrun')
+                return None
+        
         stdout.flush()
 
         if not is_running:
-            break
-        #read_data(hats_118, hats_128, chans_118, chans_128)
-
-
-def read_data(hats_118, hats_128, chans_118, chans_128):
-    """
-    Reads data from the specified channels on the specified DAQ HAT devices
-    and updates the data on the terminal display.  The reads are executed in a
-    loop that continues until either the scan completes or an overrun error
-    is detected.
-
-    Args:
-        hats (list[mcc128]): A list of mcc128 HAT device objects.
-        chans (list[int][int]): A 2D list to specify the channel list for each
-            mcc128 HAT device.
-
-    Returns:
-        None
-
-    """
-    samples_to_read = 500
-    timeout = 5  # Seconds
-    samples_per_chan_read_118 = [0] * DEVICE_COUNT_118
-    samples_per_chan_read_128 = [0] * DEVICE_COUNT_128
-    total_samples_per_chan_118 = [0] * DEVICE_COUNT_118
-    total_samples_per_chan_128 = [0] * DEVICE_COUNT_128
-    is_running = True
-
-    # Create blank lines where the data will be displayed
-    #for _ in range(DEVICE_COUNT * 4 + 1):
-    #    print('')
-    # Move the cursor up to the start of the data display.
-    #print('\x1b[{0}A'.format(DEVICE_COUNT * 4 + 1), end='')
-    #print(CURSOR_SAVE, end='')
-
-    while True:
-        data_128 = [None] * DEVICE_COUNT_128
-        data_118 = [None] * DEVICE_COUNT_118
-        # Read the data from each HAT device.
-        for i, hat in enumerate(self.hats_128):
-            read_result = hat.a_in_scan_read(samples_to_read, timeout)
-            data_128[i] = read_result.data
-            is_running &= read_result.running
-            samples_per_chan_read_128[i] = int(len(self.data_128[i]) / len(self.chans_128[i]))
-            total_samples_per_chan_128[i] += samples_per_chan_read_128[i]
-
-            if read_result.buffer_overrun:
-                print('\nError: Buffer overrun')
-                break
-            if read_result.hardware_overrun:
-                print('\nError: Hardware overrun')
-                break
-        for i, hat in enumerate(self.hats_118):
-            read_result = hat.a_in_scan_read(samples_to_read, timeout)
-            data_118[i] = read_result.data
-            is_running &= read_result.running
-            samples_per_chan_read_118[i] = int(len(data_118[i]) / len(chans_118[i]))
-            total_samples_per_chan_118[i] += samples_per_chan_read_118[i]
-
-            if read_result.buffer_overrun:
-                print('\nError: Buffer overrun')
-                break
-            if read_result.hardware_overrun:
-                print('\nError: Hardware overrun')
-                break
-
-        #print(CURSOR_RESTORE, end='')
-
+            print('\nMCC HAT get_data told it is not running for some reason. Weird...')
+            return None
+            
+        return [self.chans_128, {-1}, samples_per_chan_read_128, {-1}, total_samples_per_chan_128, {-1}, data_128, {-1}, self.chans_118, {-1}, samples_per_chan_read_118, {-1}, total_samples_per_chan_118, {-1}, data_118]
+        
         # Display the data for each HAT device
-        for i, hat in enumerate(hats_128):
-            print('HAT 128 {0}:'.format(i))
+        #for i, hat in enumerate(self.hats_128):
+        #    print('HAT 128 {0}:'.format(i))
 
             # Print the header row for the data table.
-            print('  Samples Read    Scan Count', end='')
-            for chan in chans_128[i]:
-                print('     Channel', chan, end='')
-            print('')
+        #    print('  Samples Read    Scan Count', end='')
+        #    for chan in chans_128[i]:
+        #        print('     Channel', chan, end='')
+        #    print('')
 
             # Display the sample count information.
-            print('{0:>14}{1:>14}'.format(samples_per_chan_read_128[i],
-                                          total_samples_per_chan_128[i]), end='')
+        #    print('{0:>14}{1:>14}'.format(samples_per_chan_read_128[i],
+        #                                  total_samples_per_chan_128[i]), end='')
 
             # Display the data for all selected channels
-            for chan_idx in range(len(chans_128[i])):
-                if samples_per_chan_read_128[i] > 0:
-                    sample_idx = ((samples_per_chan_read_128[i] * len(chans_128[i]))
-                                  - len(chans_128[i]) + chan_idx)
-                    print(' {:>12.5f} V'.format(data_128[i][sample_idx]), end='')
-            print('\n')
-        for i, hat in enumerate(hats_118):
-            print('HAT 118 {0}:'.format(i))
+        #    for chan_idx in range(len(self.chans_128[i])):
+        #        if samples_per_chan_read_128[i] > 0:
+        #            sample_idx = ((samples_per_chan_read_128[i] * len(self.chans_128[i]))
+        #                          - len(self.chans_128[i]) + chan_idx)
+        #            print(' {:>12.5f} V'.format(data_128[i][sample_idx]), end='')
+        #    print('\n')
+        #for i, hat in enumerate(self.hats_118):
+        #    print('HAT 118 {0}:'.format(i))
 
             # Print the header row for the data table.
-            print('  Samples Read    Scan Count', end='')
-            for chan in chans_118[i]:
-                print('     Channel', chan, end='')
-            print('')
+        #    print('  Samples Read    Scan Count', end='')
+        #    for chan in chans_118[i]:
+        #        print('     Channel', chan, end='')
+        #    print('')
 
             # Display the sample count information.
-            print('{0:>14}{1:>14}'.format(samples_per_chan_read_118[i],
-                                          total_samples_per_chan_118[i]), end='')
+        #    print('{0:>14}{1:>14}'.format(samples_per_chan_read_118[i],
+        #                                  total_samples_per_chan_118[i]), end='')
 
             # Display the data for all selected channels
-            for chan_idx in range(len(chans_118[i])):
-                if samples_per_chan_read_118[i] > 0:
-                    sample_idx = ((samples_per_chan_read_118[i] * len(chans_118[i]))
-                                  - len(chans_118[i]) + chan_idx)
-                    print(' {:>12.5f} V'.format(data_118[i][sample_idx]), end='')
-            print('\n')
-
-        stdout.flush()
-
-        if not is_running:
-            break
+        #    for chan_idx in range(len(self.chans_118[i])):
+        #        if samples_per_chan_read_118[i] > 0:
+        #            sample_idx = ((samples_per_chan_read_118[i] * len(self.chans_118[i]))
+        #                          - len(self.chans_118[i]) + chan_idx)
+        #            print(' {:>12.5f} V'.format(data_118[i][sample_idx]), end='')
+        #    print('\n')
 
 
 
