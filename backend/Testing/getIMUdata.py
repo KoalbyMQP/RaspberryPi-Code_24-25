@@ -14,11 +14,17 @@ tca = adafruit_tca9548a.TCA9548A(i2c)
 # Initialize the IMU sensors
 imu1 = adafruit_bno055.BNO055_I2C(tca[6])
 imu2 = adafruit_bno055.BNO055_I2C(tca[7])
+imu3 = adafruit_bno055.BNO055_I2C(tca[3])
+imu4 = adafruit_bno055.BNO055_I2C(tca[4])
+imu5 = adafruit_bno055.BNO055_I2C(tca[5])
 
 # Data storage
 time_data = []
 imu1_data = {"yaw": [], "roll": [], "pitch": []}
 imu2_data = {"yaw": [], "roll": [], "pitch": []}
+imu3_data = {"yaw": [], "roll": [], "pitch": []}
+imu4_data = {"yaw": [], "roll": [], "pitch": []}
+imu5_data = {"yaw": [], "roll": [], "pitch": []}
 
 # Start time for timestamps
 start_time = time.time()
@@ -47,11 +53,37 @@ for i in range(100):
         imu2_data["roll"].append(euler2[1])
         imu2_data["pitch"].append(euler2[2])
         
+    euler3 = imu3.euler
+    if euler3:
+        if(euler3[0]>180):
+            imu3_data["yaw"].append(euler3[0] - 360)
+        else:
+            imu3_data["yaw"].append(euler3[0])
+        imu3_data["roll"].append(euler3[1])
+        imu3_data["pitch"].append(euler3[2])
+    
+    euler4 = imu4.euler
+    if euler4:
+        if(euler4[0]>180):
+            imu4_data["yaw"].append(euler4[0] - 360)
+        else:
+            imu4_data["yaw"].append(euler4[0])
+        imu4_data["roll"].append(euler4[1])
+        imu4_data["pitch"].append(euler4[2])
+    
+    euler5 = imu5.euler
+    if euler5:
+        if(euler5[0]>180):
+            imu5_data["yaw"].append(euler5[0] - 360)
+        else:
+            imu5_data["yaw"].append(euler5[0])
+        imu5_data["roll"].append(euler5[1])
+        imu5_data["pitch"].append(euler5[2])
     # Record time
     time_data.append(current_time)
     
     # Print to console (optional)
-    print(f"Time: {current_time:.2f}s | IMU1 - Yaw: {euler1[0]:.2f}, Roll: {euler1[1]:.2f}, Pitch: {euler1[2]:.2f} | IMU2 - Yaw: {euler2[0]:.2f}, Roll: {euler2[1]:.2f}, Pitch: {euler2[2]:.2f}")
+    print(f"Time: {current_time:.2f}s | IMU1 - Yaw: {euler1[0]:.2f}, Roll: {euler1[1]:.2f}, Pitch: {euler1[2]:.2f} | IMU2 - Yaw: {euler2[0]:.2f}, Roll: {euler2[1]:.2f}, Pitch: {euler2[2]:.2f} | IMU3 - Yaw: {euler3[0]:.2f}, Roll: {euler3[1]:.2f}, Pitch: {euler3[2]:.2f} | IMU4 - Yaw: {euler4[0]:.2f}, Roll: {euler4[1]:.2f}, Pitch: {euler4[2]:.2f} | IMU5 - Yaw: {euler5[0]:.2f}, Roll: {euler5[1]:.2f}, Pitch: {euler5[2]:.2f}")
 
     time.sleep(0.05)  # 50ms delay
 
@@ -73,3 +105,6 @@ def plot_data(time_data, data, imu_name):
 # Plot and save data for each IMU
 plot_data(time_data, imu1_data, "IMU1")
 plot_data(time_data, imu2_data, "IMU2")
+plot_data(time_data, imu3_data, "IMU3")
+plot_data(time_data, imu4_data, "IMU4")
+plot_data(time_data, imu5_data, "IMU5")
