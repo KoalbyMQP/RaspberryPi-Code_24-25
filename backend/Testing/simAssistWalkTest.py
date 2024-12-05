@@ -4,7 +4,7 @@ import numpy as np
 sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid.trajPlannerTime import TrajPlannerTime
-from backend.Testing import assistWalkViaPoints as via
+from backend.DemoScripts import assistWalkViaPoints as via
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 from backend.KoalbyHumanoid.Config import Joints
 import copy

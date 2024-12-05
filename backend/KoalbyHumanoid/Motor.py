@@ -18,7 +18,7 @@ class Motor():
         if is_real:
             self.angle_limit = angle_limit
             self.arduino_serial = serial
-        else:
+        else: 
             self.pidGains = pidGains
             self.sim = sim
             self.handle = handle
