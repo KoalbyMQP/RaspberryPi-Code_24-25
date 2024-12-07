@@ -18,11 +18,29 @@ print("Setup Complete")
 def initialize():
     robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
     robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
-    robot.motors[10].target = (math.radians(5), 'P')
+
+    # Torso
+    robot.motors[10].target = (math.radians(4), 'P')
     robot.motors[11].target = (math.radians(0), 'P')
     robot.motors[12].target = (math.radians(0), 'P')
     robot.motors[13].target = (math.radians(0), 'P')
     robot.motors[14].target = (math.radians(0), 'P')
+
+    # Right Leg
+    robot.motors[15].target = (0, 'P')
+    robot.motors[16].target = (0, 'P')
+    robot.motors[17].target = (0, 'P')
+    robot.motors[18].target = (0, 'P')
+    robot.motors[19].target = (0, 'P')
+
+    # Left Leg
+    robot.motors[20].target = (0, 'P')
+    robot.motors[21].target = (0, 'P')
+    robot.motors[22].target = (0, 'P')
+    robot.motors[23].target = (0, 'P')
+    robot.motors[24].target = (0, 'P')
+
+
     robot.moveAllToTarget()
     print("Initial Pose Done")
     
@@ -57,14 +75,15 @@ def main():
 
     for point in setUp:
 
-        #tells robot trajectory is specifically for arms
+        # tells robot trajectory is specifically for arms
+
         robot.motors[1].target = (point[1], 'P') # for right arm
         robot.motors[6].target = (point[2], 'P') # for left arm
         robot.motors[2].target = (point[3], 'P')
         robot.moveAllToTarget()  
         
-        # count = count + 1 # keeps track of how many trajectory points it has reached
-        # print(count, " / ", len(setUp))
+        count = count + 1 # keeps track of how many trajectory points it has reached
+        print(count, " / ", len(setUp))
 
 
     createWavePoints = [[math.radians(-45)], [math.radians(-70)], [math.radians(-45)]]
@@ -86,6 +105,20 @@ def main():
             #tells robot trajectory is specifically for arms
             robot.motors[1].target = (point[1], 'P') # for right arm
 
+            # Right Leg
+            robot.motors[15].target = (0, 'P')
+            robot.motors[16].target = (0, 'P')
+            robot.motors[17].target = (0, 'P')
+            robot.motors[18].target = (0, 'P')
+            robot.motors[19].target = (0, 'P')
+
+            # Left Leg
+            robot.motors[20].target = (0, 'P')
+            robot.motors[21].target = (0, 'P')
+            robot.motors[22].target = (0, 'P') 
+            robot.motors[23].target = (0, 'P') 
+            robot.motors[24].target = (0, 'P')
+
 
             robot.moveAllToTarget()
 
@@ -94,11 +127,6 @@ def main():
             # print(count, " / ", len(wave))
 
         count = 0  # Initialize outside of the stabilization loop for consistent counting
-
-
-
-
-
 
 if(__name__ == "__main__"):
     main()
