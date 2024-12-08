@@ -1,98 +1,4 @@
-# import numpy as np
-# import matplotlib.pyplot as plt
-# from casadi import *
-# from casadi.tools import *
-# import pdb
-# import sys
-# import os
-# rel_do_mpc_path = os.path.join('..','..')
-# sys.path.append(rel_do_mpc_path)
-# import do_mpc
 
-# import matplotlib.pyplot as plt
-# # the following commented out stuff is graph functions from do_mpc
-# # import matplotlib.gridspec as gridspec
-# # from matplotlib.patches import Circle
-# # from matplotlib import rcParams
-# # from matplotlib.animation import FuncAnimation, FFMpegWriter, ImageMagickWriter
-
-# # Plot settings
-# # rcParams['text.usetex'] = False
-# # rcParams['axes.grid'] = True
-# # rcParams['lines.linewidth'] = 2.0
-# # rcParams['axes.labelsize'] = 'xx-large'
-# # rcParams['xtick.labelsize'] = 'xx-large'
-# # rcParams['ytick.labelsize'] = 'xx-large'
-
-# from mpcModel import mpc_model
-# from mpcSolver import solve_mpc
-# import time
-
-# #settings
-# show_animation = True
-# store_animation = False
-# store_results = False
-# model = mpc_model()
-# mpc = solve_mpc(model)
-# estimator = do_mpc.estimator.StateFeedback(model)
-
-# # set initial state 
-# # this is where it will connect to the walking file i think  
-# # need to set x0 -> initial iteration 
-# mpc.set_initial_guess()
-
-# # set up graphs (this is from do_mpc files of their LIPM model)
-# L1 = 12 #cm, height of CoM
-# def pendulum(x):
-#     line_x = np.array([
-#         x[0],
-#         x[0]+L1*np.sin(x[1])
-#     ])
-#     line_y = np.array([
-#         0, 
-#         L1*np.cos(x[1])
-#     ])
-    
-#     line = np.stack((line_x, line_y))
-    
-#     return line
-
-# mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
-
-
-# """
-# Creating 3d plot of the motion. At this moment it just is a static plot of the line with the point
-# """
-# # creating 2d plot in 3d 
-# ax = plt.figure().add_subplot(projection='3d')
-
-# #defining IP
-# x = np.linspace(0, 1, 100)
-# y = 10*x
-# ax.plot(x, y, zs=10, zdir='y', label='curve in (x, y)')
-
-# #creating ball at the top of the line
-# top_x = x[-1]
-# top_y = y[-1]
-# ax.scatter(top_x, top_y, zs=10, zdir='y', color='blue', label='Top Point')
-
-
-# # Make legend, set axes limits and labels
-# ax.legend()
-# ax.set_xlim(0, 20)
-# ax.set_ylim(0, 20)
-# ax.set_zlim(0, 20)
-# ax.set_xlabel('X')
-# ax.set_ylabel('Y')
-# ax.set_zlabel('Z')
-
-# plt.show()
-
-
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -106,98 +12,71 @@ sys.path.append(rel_do_mpc_path)
 import do_mpc
 
 import matplotlib.pyplot as plt
-# the following commented out stuff is graph functions from do_mpc
-# import matplotlib.gridspec as gridspec
-# from matplotlib.patches import Circle
-# from matplotlib import rcParams
-# from matplotlib.animation import FuncAnimation, FFMpegWriter, ImageMagickWriter
 
-# Plot settings
-# rcParams['text.usetex'] = False
-# rcParams['axes.grid'] = True
-# rcParams['lines.linewidth'] = 2.0
-# rcParams['axes.labelsize'] = 'xx-large'
-# rcParams['xtick.labelsize'] = 'xx-large'
-# rcParams['ytick.labelsize'] = 'xx-large'
 
 from mpcModel import mpc_model
 from mpcSolver import solve_mpc
 import time
 
-# settings
-show_animation = True
-store_animation = False
-store_results = False
+# RK4 Integration Function
+def rk4_step(f, x, u, dt):
+    k1 = f(x, u)
+    k2 = f(x + 0.5 * dt * k1, u)
+    k3 = f(x + 0.5 * dt * k2, u)
+    k4 = f(x + dt * k3, u)
+    return x + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+
+# Dynamics for integration
+def dynamics(x, u):
+    # Ensure u is a flat 1D array (extracting values if u is a 2D array)
+    u = u.flatten() if len(u.shape) > 1 else u
+    return np.array([
+        x[2],  # xd
+        x[3],  # yd
+        (9.8 / 15) * x[0] - (5 / 3.5) * u[0],  # xdd
+        (9.8 / 15) * x[1] - (5 / 3.5) * u[1]   # ydd
+    ])
+
+# Initialize Model and MPC
 model = mpc_model()
 mpc = solve_mpc(model)
-estimator = do_mpc.estimator.StateFeedback(model)
-
-# Check MPC setup
-print("Initial MPC Model Data:")
-print(mpc.data)  # This prints out the MPC setup details, including variables, constraints, etc.
-
-# set initial state 
-# this is where it will connect to the walking file i think  
-# need to set x0 -> initial iteration 
 mpc.set_initial_guess()
+x0 = np.array([2, 2, 0, 0])  # Start closer to the desired position
+trajectory = [x0]
 
-# Check the initial guess
-print("Initial guess (x0):")
-print(mpc.x0)  # This prints the initial state guess for debugging
+# Simulation Loop
+for i in range(200):
+    u0 = mpc.make_step(x0)
+    x0 = rk4_step(dynamics, x0, u0, mpc.settings.t_step)
+    trajectory.append(x0)
 
-# Simulate the system for 50 steps and print control inputs
-for i in range(50):  # You can change 50 to a larger or smaller number based on your needs
-    u0 = mpc.make_step(mpc.x0)  # Solve for the optimal control input at the current state
-    print(f"Step {i}: Control input: {u0}")  # Print the control input at each step
-    
-    # You can implement logic to update the state of your system here
-    # For example, if you have a pendulum or cart-pole system, update the state:
-    # state = pendulum_step(state, u0)
+trajectory = np.array(trajectory)
 
-# set up graphs (this is from do_mpc files of their LIPM model)
-L1 = 12 #cm, height of CoM
-def pendulum(x):
-    line_x = np.array([
-        x[0],
-        x[0]+L1*np.sin(x[1])
-    ])
-    line_y = np.array([
-        0, 
-        L1*np.cos(x[1])
-    ])
-    
-    line = np.stack((line_x, line_y))
-    
-    return line
+# Pendulum Visualization
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+origin = 0
 
-mpc_graphics = do_mpc.graphics.Graphics(mpc.data)
+def pendulum(x, origin):
+    line_x = np.array([origin, x[0]])
+    line_y = np.array([origin, x[1]])
+    line_z = np.array([0, 15])  # z_c remains constant
+    return line_x, line_y, line_z
 
+for state in trajectory:
+    if(state[1] >= 4.9):
+        origin = 5
+    x, y, z = pendulum(state, origin)
+    ax.plot(x, y, z, color='blue')
+    ax.scatter(x[1], y[1], z[1], color='red')
 
-"""
-Creating 3d plot of the motion. At this moment it just is a static plot of the line with the point
-"""
-# creating 2d plot in 3d 
-ax = plt.figure().add_subplot(projection='3d')
-
-# defining IP
-x = np.linspace(0, 1, 100)
-y = 10*x
-ax.plot(x, y, zs=10, zdir='y', label='curve in (x, y)')
-
-# creating ball at the top of the line
-top_x = x[-1]
-top_y = y[-1]
-ax.scatter(top_x, top_y, zs=10, zdir='y', color='blue', label='Top Point')
-
-
-# Make legend, set axes limits and labels
-ax.legend()
-ax.set_xlim(0, 20)
-ax.set_ylim(0, 20)
+# Configure the plot
+ax.set_xlim(-10, 10)
+ax.set_ylim(-10, 10)
 ax.set_zlim(0, 20)
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
+ax.set_title("Pendulum Motion with LIPM Dynamics")
 
-# Show the plot
 plt.show()
