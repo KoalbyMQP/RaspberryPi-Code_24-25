@@ -41,11 +41,11 @@ def dynamics(x, u):
 model = mpc_model()
 mpc = solve_mpc(model)
 mpc.set_initial_guess()
-x0 = np.array([2, 2, 0, 0])  # Start closer to the desired position
+x0 = np.array([0, 0, 0, 0])  # Start closer to the desired position
 trajectory = [x0]
 
 # Simulation Loop
-for i in range(200):
+for i in range(75):
     u0 = mpc.make_step(x0)
     x0 = rk4_step(dynamics, x0, u0, mpc.settings.t_step)
     trajectory.append(x0)

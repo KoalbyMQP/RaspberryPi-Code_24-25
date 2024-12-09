@@ -26,6 +26,8 @@ def mpc_model(symvar_type='SX'):
     xdd = (g / z_c) * x - (5 / mass) * ur - damping * xd
     ydd = (g / z_c) * y - (5 / mass) * up - damping * yd
 
+
+    # set_alg for xdd and ydd
     model.set_rhs('x', xd)
     model.set_rhs('xd', xdd)
     model.set_rhs('y', yd)
@@ -33,11 +35,11 @@ def mpc_model(symvar_type='SX'):
 
     # Cost function
     px, py = 5, 5  # Desired positions
-    cost_x = 10 * (x - px) ** 2
-    cost_y = 10 * (y - py) ** 2
+    cost_x = 1 * (x - px) ** 2
+    cost_y = 1 * (y - py) ** 2
     cost_x_vel = 1 * xd ** 2
     cost_y_vel = 1 * yd ** 2
-    total_cost = cost_x + cost_y + cost_x_vel + cost_y_vel
+    total_cost = cost_x + cost_y #+ cost_x_vel + cost_y_vel
     model.set_expression(expr_name='cost', expr=total_cost)
 
     # Final setup
