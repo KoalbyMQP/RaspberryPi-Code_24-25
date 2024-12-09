@@ -15,8 +15,8 @@ print("Setup Complete")
 
 
 def main():
-    robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
     robot.motors[10].target = (math.radians(2.5), 'P') # HipsFront2Back
     robot.motors[11].target = (math.radians(0), 'P') # TorsoSide2Side
     robot.motors[12].target = (math.radians(0), 'P') # HipsRotate
@@ -40,10 +40,6 @@ def main():
 
     while True:
         robot.IMUBalance(prevX, prevY, prevZ)
-
-
-
-
 
 
 
