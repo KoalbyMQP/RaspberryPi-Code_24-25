@@ -1,6 +1,8 @@
 #import adafruit_bno055
 import numpy as np
 import math
+import adafruit_bno055
+import adafruit_tca9548a
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 
 try:
@@ -25,15 +27,18 @@ class IMU():
 
         if isReal:
             try:
-                i2c = board.I2C()  # uses board.SCL and board.SDA
-                self.sensor = adafruit_bno055.BNO055_I2C(i2c)
+                i2c = board.I2C()
+                tca = adafruit_tca9548a.TCA9548A(i2c)
+
+                self.imu1 = adafruit_bno055.BNO055_I2C(tca[6])
+                self.imu5 = adafruit_bno055.BNO055_I2C(tca[5])
             except:
                 print("No IMU detected, disabling IMU")
                 self.isConnected = False
 
     def zero(self):
         if self.isReal:
-            self.zeroAngles = self.getDataRaw()
+            self.zeroAngles = [0, 0, 0, 0, 0, 0]
         else:
             raise NotImplementedError("IMU zero not implemented for simulation IMU")
 
@@ -97,5 +102,26 @@ class IMUManager():
         Returns:
         - A dictionary where keys are IMU names and values are the IMU data.
         """
-        imu_data = {name: self.imus[name].getData() for name in self.imu_names}
+        imu_data = []
+        euler1 = self.imu1.euler
+        imu1_data = []
+        if euler1:  # Ensure data is valid
+            if(euler1[0]>180):
+                imu1_data[0].append(euler1[0] - 360)
+            else:
+                imu1_data[0].append(euler1[0])
+                imu1_data[1].append(euler1[1])
+                imu1_data[2].append(euler1[2])
+        imu_data.append(imu1_data)
+        
+        euler2 = self.imu2.euler
+        imu2_data = []
+        if euler2:  # Ensure data is valid
+            if(euler2[0]>180):
+                imu2_data[0].append(euler1[0] - 360)
+            else:
+                imu2_data[0].append(euler1[0])
+                imu2_data[1].append(euler1[1])
+                imu2_data[2].append(euler1[2])
+        imu_data.append(imu2_data)
         return imu_data

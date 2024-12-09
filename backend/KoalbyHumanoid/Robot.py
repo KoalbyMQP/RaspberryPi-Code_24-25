@@ -84,10 +84,10 @@ class Robot():
             np.array: Fused [pitch, roll, yaw] data for PID controller input.
         """
         imu_data = self.imu_manager.getAllIMUData()
-        right_chest_imu = imu_data["RightChest"]
-        left_chest_imu = imu_data["LeftChest"]
-        torso_imu = imu_data["Torso"]
-        self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
+        right_chest_imu = imu_data[0]
+        left_chest_imu = imu_data[1]
+        #torso_imu = imu_data["Torso"]
+        self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
         print(self.fused_imu)
         return self.fused_imu
     

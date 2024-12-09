@@ -6,6 +6,7 @@ import board
 import adafruit_bno055
 import adafruit_tca9548a
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Create I2C bus and TCA9548A object
 i2c = board.I2C()
@@ -20,11 +21,11 @@ imu5 = adafruit_bno055.BNO055_I2C(tca[5])
 
 # Data storage
 time_data = []
-imu1_data = {"yaw": [], "roll": [], "pitch": []}
+imu1_data = [[],[],[]]
 imu2_data = {"yaw": [], "roll": [], "pitch": []}
 imu3_data = {"yaw": [], "roll": [], "pitch": []}
 imu4_data = {"yaw": [], "roll": [], "pitch": []}
-imu5_data = {"yaw": [], "roll": [], "pitch": []}
+imu5_data = [[],[],[]]
 
 # Start time for timestamps
 start_time = time.time()
@@ -37,11 +38,11 @@ for i in range(100):
     euler1 = imu1.euler
     if euler1:  # Ensure data is valid
         if(euler1[0]>180):
-            imu1_data["yaw"].append(euler1[0] - 360)
+            imu1_data[0].append(euler1[0] - 360)
         else:
-            imu1_data["yaw"].append(euler1[0])
-        imu1_data["roll"].append(euler1[1])
-        imu1_data["pitch"].append(euler1[2])
+            imu1_data[0].append(euler1[0])
+        imu1_data[1].append(euler1[1])
+        imu1_data[2].append(euler1[2])
 
     # Get IMU2 data
     euler2 = imu2.euler
@@ -74,25 +75,25 @@ for i in range(100):
     euler5 = imu5.euler
     if euler5:
         if(euler5[0]>180):
-            imu5_data["yaw"].append(euler5[0] - 360)
+            imu5_data[0].append(euler5[0] - 360)
         else:
-            imu5_data["yaw"].append(euler5[0])
-        imu5_data["roll"].append(euler5[1])
-        imu5_data["pitch"].append(euler5[2])
+            imu5_data[0].append(euler5[0])
+        imu5_data[1].append(euler5[1])
+        imu5_data[2].append(euler5[2])
     # Record time
     time_data.append(current_time)
     
     # Print to console (optional)
-    print(f"Time: {current_time:.2f}s | IMU1 - Yaw: {euler1[0]:.2f}, Roll: {euler1[1]:.2f}, Pitch: {euler1[2]:.2f} | IMU2 - Yaw: {euler2[0]:.2f}, Roll: {euler2[1]:.2f}, Pitch: {euler2[2]:.2f} | IMU3 - Yaw: {euler3[0]:.2f}, Roll: {euler3[1]:.2f}, Pitch: {euler3[2]:.2f} | IMU4 - Yaw: {euler4[0]:.2f}, Roll: {euler4[1]:.2f}, Pitch: {euler4[2]:.2f} | IMU5 - Yaw: {euler5[0]:.2f}, Roll: {euler5[1]:.2f}, Pitch: {euler5[2]:.2f}")
-
+    #print(f"Time: {current_time:.2f}s | IMU1 - Yaw: {euler1[0]:.2f}, Roll: {euler1[1]:.2f}, Pitch: {euler1[2]:.2f} | IMU2 - Yaw: {euler2[0]:.2f}, Roll: {euler2[1]:.2f}, Pitch: {euler2[2]:.2f} | IMU3 - Yaw: {euler3[0]:.2f}, Roll: {euler3[1]:.2f}, Pitch: {euler3[2]:.2f} | IMU4 - Yaw: {euler4[0]:.2f}, Roll: {euler4[1]:.2f}, Pitch: {euler4[2]:.2f} | IMU5 - Yaw: {euler5[0]:.2f}, Roll: {euler5[1]:.2f}, Pitch: {euler5[2]:.2f}")
+    print("measuring")
     time.sleep(0.05)  # 50ms delay
 
 # Plot function
 def plot_data(time_data, data, imu_name):
     plt.figure(figsize=(8, 5))
-    plt.plot(time_data, data["yaw"], label="Yaw", color='r')
-    plt.plot(time_data, data["roll"], label="Roll", color='g')
-    plt.plot(time_data, data["pitch"], label="Pitch", color='b')
+    plt.plot(time_data, data[0], label="Yaw", color='r')
+    plt.plot(time_data, data[1], label="Roll", color='g')
+    plt.plot(time_data, data[2], label="Pitch", color='b')
     plt.xlabel("Time (s)")
     plt.ylabel("Angle (Degrees)")
     plt.title(f"{imu_name} Yaw, Roll, Pitch vs Time")
@@ -103,8 +104,11 @@ def plot_data(time_data, data, imu_name):
     print(f"Plot saved as '{imu_name.lower()}_data.png'")
 
 # Plot and save data for each IMU
-plot_data(time_data, imu1_data, "IMU1")
-plot_data(time_data, imu2_data, "IMU2")
-plot_data(time_data, imu3_data, "IMU3")
-plot_data(time_data, imu4_data, "IMU4")
-plot_data(time_data, imu5_data, "IMU5")
+#plot_data(time_data, imu1_data, "IMU1")
+# plot_data(time_data, imu2_data, "IMU2")
+# plot_data(time_data, imu3_data, "IMU3")
+# plot_data(time_data, imu4_data, "IMU4")
+#plot_data(time_data, imu5_data, "IMU5")
+
+fused_imu = np.mean([imu1_data, imu1_data], axis=0)
+plot_data(time_data, fused_imu, "IMU 1 + IMU 5")
