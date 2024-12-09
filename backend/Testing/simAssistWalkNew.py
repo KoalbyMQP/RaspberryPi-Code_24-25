@@ -24,6 +24,7 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
     # Right arm
     robot.motors[0].target = (math.radians(10), 'P')
     robot.motors[1].target = (math.radians(-90), 'P') 
+    # robot.motors[2].target = (math.radians())
     robot.motors[3].target = (math.radians(100), 'P') #pos
     robot.motors[4].target = (math.radians(0), 'P')
 
@@ -61,7 +62,7 @@ def initSimWalk(robot):
     robot.motors[5].target = (math.radians(-10), 'P')
     robot.motors[6].target = (math.radians(90), 'P')
     robot.motors[8].target = (math.radians(-100), 'P')#neg
-    robot.motors[9].target = (math.radians(40), 'P') 
+    robot.motors[9].target = (math.radians(0), 'P') 
 
     # Right Leg
     robot.motors[15].target = (math.radians(0), 'P')
@@ -81,12 +82,12 @@ def initSimWalk(robot):
 
 
 def main():
-    is_real = False
+    is_real = True
     robot = setup_robot(is_real)
 
-    # initSimWalk(robot)
+    initSimWalk(robot)
 
-    # time.sleep(30)
+    time.sleep(30)
 
 
     left_leg_chain = Chain.from_urdf_file(
