@@ -18,7 +18,6 @@ from mpcModel import mpc_model
 from mpcSolver import solve_mpc
 import time
 
-# RK4 Integration Function
 def rk4_step(f, x, u, dt):
     k1 = f(x, u)
     k2 = f(x + 0.5 * dt * k1, u)
@@ -26,9 +25,7 @@ def rk4_step(f, x, u, dt):
     k4 = f(x + dt * k3, u)
     return x + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
-# Dynamics for integration
 def dynamics(x, u):
-    # Ensure u is a flat 1D array (extracting values if u is a 2D array)
     u = u.flatten() if len(u.shape) > 1 else u
     return np.array([
         x[2],  # xd
@@ -37,14 +34,12 @@ def dynamics(x, u):
         (9.8 / 15) * x[1] - (5 / 3.5) * u[1]   # ydd
     ])
 
-# Initialize Model and MPC
 model = mpc_model()
 mpc = solve_mpc(model)
 mpc.set_initial_guess()
-x0 = np.array([0, 0, 0, 0])  # Start closer to the desired position
+x0 = np.array([0, 0, 0, 0]) 
 trajectory = [x0]
 
-# Simulation Loop
 for i in range(40):
     u0 = mpc.make_step(x0)
     x0 = rk4_step(dynamics, x0, u0, mpc.settings.t_step)
@@ -52,7 +47,6 @@ for i in range(40):
 
 trajectory = np.array(trajectory)
 
-# Pendulum Visualization
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 origin = 0
@@ -66,7 +60,7 @@ def pendulum(x, origin):
         line_x = np.array([0, x[0]])
     if(x[1]>15):
         line_x = np.array([5, x[0]])
-    line_z = np.array([0, 15])  # z_c remains constant
+    line_z = np.array([0, 15])  
     return line_x, line_y, line_z
 
 step = 5;

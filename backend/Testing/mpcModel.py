@@ -17,15 +17,12 @@ def mpc_model(symvar_type='SX'):
     xd = model.set_variable(var_type='_x', var_name='xd')
     yd = model.set_variable(var_type='_x', var_name='yd')
 
-    # Inputs
     ur = model.set_variable(var_type='_u', var_name='xddd')
     up = model.set_variable(var_type='_u', var_name='yddd')
 
-    # Introduce reference parameters as time-varying parameters (TVP)
     px = model.set_variable(var_type='_tvp', var_name='px')
     py = model.set_variable(var_type='_tvp', var_name='py')
 
-    # Dynamics
     xdd = (g / z_c) * x - (5 / mass) * ur
     ydd = (g / z_c) * y - (5 / mass) * up
 
@@ -34,7 +31,6 @@ def mpc_model(symvar_type='SX'):
     model.set_rhs('y', yd)
     model.set_rhs('yd', ydd)
 
-    # Cost function now depends on px, py
     cost_x = 1 * (x - px) ** 2
     cost_y = 1 * (y - py) ** 2
     total_cost = cost_x + cost_y
