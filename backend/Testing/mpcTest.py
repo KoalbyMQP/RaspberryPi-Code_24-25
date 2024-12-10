@@ -45,7 +45,7 @@ x0 = np.array([0, 0, 0, 0])  # Start closer to the desired position
 trajectory = [x0]
 
 # Simulation Loop
-for i in range(75):
+for i in range(40):
     u0 = mpc.make_step(x0)
     x0 = rk4_step(dynamics, x0, u0, mpc.settings.t_step)
     trajectory.append(x0)
@@ -58,21 +58,29 @@ ax = fig.add_subplot(111, projection='3d')
 origin = 0
 
 def pendulum(x, origin):
-    line_x = np.array([origin, x[0]])
     line_y = np.array([origin, x[1]])
+    line_x = np.array([0, x[0]])
+    if(x[1]>5):
+        line_x = np.array([5, x[0]])
+    if(x[1]>10):
+        line_x = np.array([0, x[0]])
+    if(x[1]>15):
+        line_x = np.array([5, x[0]])
     line_z = np.array([0, 15])  # z_c remains constant
     return line_x, line_y, line_z
 
+step = 5;
 for state in trajectory:
-    if(state[1] >= 4.9):
-        origin = 5
+    if(state[1] >= step):
+        origin = step
+        step = step + 5;
     x, y, z = pendulum(state, origin)
     ax.plot(x, y, z, color='blue')
     ax.scatter(x[1], y[1], z[1], color='red')
 
 # Configure the plot
 ax.set_xlim(-10, 10)
-ax.set_ylim(-10, 10)
+ax.set_ylim(0, 20)
 ax.set_zlim(0, 20)
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
