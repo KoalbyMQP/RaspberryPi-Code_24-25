@@ -1,4 +1,3 @@
-
 from max30102 import MAX30102
 import hrcalc
 import threading
@@ -15,6 +14,7 @@ class HeartRateMonitor(object):
 
     def __init__(self, print_raw=False, print_result=False):
         self.bpm = 0
+        self.spo2 = 0  # Initialize SpO2
         if print_raw is True:
             print('IR, Red')
         self.print_raw = print_raw
@@ -51,12 +51,14 @@ class HeartRateMonitor(object):
                         while len(bpms) > 4:
                             bpms.pop(0)
                         self.bpm = np.mean(bpms)
+                        self.spo2 = spo2  # Update SpO2 value
                         if (np.mean(ir_data) < 50000 and np.mean(red_data) < 50000):
                             self.bpm = 0
+                            self.spo2 = 0  # Reset SpO2 if no finger detected
                             if self.print_result:
                                 print("Finger not detected")
                         if self.print_result:
-                            print("BPM: {0}, SpO2: {1}".format(self.bpm, spo2))
+                            print("BPM: {0}, SpO2: {1}".format(self.bpm, self.spo2))
 
             time.sleep(self.LOOP_TIME)
 
@@ -70,4 +72,5 @@ class HeartRateMonitor(object):
     def stop_sensor(self, timeout=2.0):
         self._thread.stopped = True
         self.bpm = 0
+        self.spo2 = 0  # Reset SpO2
         self._thread.join(timeout)

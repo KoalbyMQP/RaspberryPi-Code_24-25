@@ -1,25 +1,14 @@
 import smbus
 import time
+import tkinter as tk
+from tkinter import StringVar
 
 class MLX90614():
-
-    MLX90614_RAWIR1=0x04
-    MLX90614_RAWIR2=0x05
-    MLX90614_TA=0x06
-    MLX90614_TOBJ1=0x07
-    MLX90614_TOBJ2=0x08
-
-    MLX90614_TOMAX=0x20
-    MLX90614_TOMIN=0x21
-    MLX90614_PWMCTRL=0x22
-    MLX90614_TARANGE=0x23
-    MLX90614_EMISS=0x24
-    MLX90614_CONFIG=0x25
-    MLX90614_ADDR=0x0E
-    MLX90614_ID1=0x3C
-    MLX90614_ID2=0x3D
-    MLX90614_ID3=0x3E
-    MLX90614_ID4=0x3F
+    MLX90614_RAWIR1 = 0x04
+    MLX90614_RAWIR2 = 0x05
+    MLX90614_TA = 0x06
+    MLX90614_TOBJ1 = 0x07
+    MLX90614_TOBJ2 = 0x08
 
     comm_retries = 5
     comm_sleep_amount = 0.1
@@ -36,18 +25,12 @@ class MLX90614():
                 return self.bus.read_word_data(self.address, reg_addr)
             except IOError as e:
                 err = e
-                #"Rate limiting" - sleeping to prevent problems with sensor
-                #when requesting data too quickly
-                time(self.comm_sleep_amount)
-        #By this time, we made a couple requests and the sensor didn't respond
-        #(judging by the fact we haven't returned from this function yet)
-        #So let's just re-raise the last IOError we got
+                time.sleep(self.comm_sleep_amount)
         raise err
 
     def data_to_temp(self, data):
-        temp = (data*0.02) - 273.15
-        temp = ((.986*(temp)) + .507)
-        return temp
+        temp = (data * 0.02) - 273.15
+        return ((0.986 * temp) + 0.507)
 
     def get_amb_temp(self):
         data = self.read_reg(self.MLX90614_TA)
@@ -56,18 +39,42 @@ class MLX90614():
     def get_obj_temp(self):
         data = self.read_reg(self.MLX90614_TOBJ1)
         return self.data_to_temp(data)
-    
+
+# GUI Setup
+def update_temp():
+    try:
+        obj_temp_c = round(sensor.get_obj_temp(), 1)
+        obj_temp_f = round((obj_temp_c * 9 / 5 + 32), 2)
+
+        obj_temp_c_label.set(f"{obj_temp_c} °C")
+        obj_temp_f_label.set(f"{obj_temp_f} °F")
+    except Exception as e:
+        obj_temp_c_label.set("Error")
+        obj_temp_f_label.set("Error")
+        print(f"Error reading sensor: {e}")
+
+    root.after(500, update_temp)  # Update temperature every 500ms
+
 if __name__ == "__main__":
     sensor = MLX90614()
-    while True:
-        ambTempC = (round(sensor.get_amb_temp(),1));
-        objTempC = round(sensor.get_obj_temp(),1)*(1.2);
-        
-        ambTempF = (round((ambTempC*9/5+32),2));
-        objTempF = (round((objTempC*9/5+32),2));
-        
-        #print("Ambient Temp:", tempC "C", " )
-        print("Object Temp:",objTempC,"C");
-        print("Object Temp:",objTempF,"F\n");
-        time.sleep(0.5)
-        
+
+    # Create the Tkinter window
+    root = tk.Tk()
+    root.title("Temperature Display")
+    root.geometry("800x400")
+    root.configure(bg="black")
+
+    # Object Temp Labels
+    tk.Label(root, text="Object Temperature", font=("Helvetica", 24), bg="black", fg="white").pack(pady=20)
+    
+    obj_temp_c_label = StringVar()
+    obj_temp_f_label = StringVar()
+
+    tk.Label(root, textvariable=obj_temp_c_label, font=("Helvetica", 48), bg="black", fg="white").pack(pady=10)
+    tk.Label(root, textvariable=obj_temp_f_label, font=("Helvetica", 48), bg="black", fg="white").pack(pady=10)
+
+    # Start updating temperatures
+    update_temp()
+
+    # Start the Tkinter event loop
+    root.mainloop()
