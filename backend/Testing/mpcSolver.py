@@ -1,6 +1,8 @@
 import do_mpc
 import numpy as np
 
+iterationCount = 52
+
 def solve_mpc(model, silence_solver=False):
     mpc = do_mpc.controller.MPC(model)
 
@@ -40,17 +42,17 @@ def solve_mpc(model, silence_solver=False):
         py_ref = 5
 
         # After 50 steps (5.0 s)
-        if step > 10:
+        if step > iterationCount/4:
             px_ref = 0
             py_ref = 10
 
         # After 75 steps (7.5 s)
-        if step > 20:
+        if step > iterationCount/2:
             px_ref = 5
             py_ref = 15
 
         # After 100 steps (10 s)
-        if step > 30:
+        if step > 3*iterationCount/4:
             px_ref = 0
             py_ref = 20
 

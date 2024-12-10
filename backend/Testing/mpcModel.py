@@ -31,8 +31,8 @@ def mpc_model(symvar_type='SX'):
     model.set_rhs('y', yd)
     model.set_rhs('yd', ydd)
 
-    cost_x = 1 * (x - px) ** 2
-    cost_y = 1 * (y - py) ** 2
+    cost_x = 0.05 * (x - px) ** 2
+    cost_y = 0.05 * (y - py) ** 2
     total_cost = cost_x + cost_y
     model.set_expression(expr_name='cost', expr=total_cost)
 

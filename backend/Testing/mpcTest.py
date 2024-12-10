@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 from mpcModel import mpc_model
 from mpcSolver import solve_mpc
+import mpcSolver
 import time
 
 def rk4_step(f, x, u, dt):
@@ -40,7 +41,9 @@ mpc.set_initial_guess()
 x0 = np.array([0, 0, 0, 0]) 
 trajectory = [x0]
 
-for i in range(40):
+iterations = mpcSolver.iterationCount
+
+for i in range(iterations):
     u0 = mpc.make_step(x0)
     x0 = rk4_step(dynamics, x0, u0, mpc.settings.t_step)
     trajectory.append(x0)
