@@ -16,8 +16,8 @@ print("Setup Complete")
 
 
 def initialize():
-    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(70), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-70), 'P') # LeftShoulderAbductor
 
     # Torso
     robot.motors[10].target = (math.radians(3), 'P')
@@ -79,9 +79,9 @@ def main():
         newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
         newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
 
-        robot.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
-        robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
-        robot.motors[10].target = (-newTargetX, 'P')  # Adjust roll
+        robot.motors[12].target = (math.radians(newTargetZ), 'P')  # Adjust yaw
+        robot.motors[13].target = (math.radians(newTargetY), 'P')  # Adjust pitch
+        robot.motors[10].target = (math.radians(-newTargetX), 'P')  # Adjust pitch
 
         # Right Leg
         robot.motors[15].target = (0, 'P')

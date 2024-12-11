@@ -61,7 +61,7 @@ def main():
 
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
-    createSetUpPoints = [[0, 0, 0], [math.radians(-45), math.radians(-80), math.radians(180)]]
+    createSetUpPoints = [[0, 0, 0], [math.radians(-60), math.radians(-80), math.radians(180)]]
     setUpPoints = trajPlannerPose.TrajPlannerPose(createSetUpPoints)
     setUp = setUpPoints.getCubicTraj(1, 100)
     count = 0  # Initialize outside of the stabilization loop for consistent counting
@@ -80,15 +80,21 @@ def main():
         robot.motors[1].target = (point[1], 'P') # for right arm
         robot.motors[6].target = (point[2], 'P') # for left arm
         robot.motors[2].target = (point[3], 'P')
+        robot.motors[10].target = (math.radians(4), 'P')
+        robot.motors[11].target = (math.radians(0), 'P')
+        robot.motors[12].target = (math.radians(0), 'P')
+        robot.motors[13].target = (math.radians(0), 'P')
+        robot.motors[14].target = (math.radians(0), 'P')
+
         robot.moveAllToTarget()  
         
         count = count + 1 # keeps track of how many trajectory points it has reached
         print(count, " / ", len(setUp))
 
 
-    createWavePoints = [[math.radians(-45)], [math.radians(-70)], [math.radians(-45)]]
+    createWavePoints = [[math.radians(-60)], [math.radians(-80)], [math.radians(-60)]]
     wavePoints = trajPlannerPose.TrajPlannerPose(createWavePoints)
-    wave = wavePoints.getCubicTraj(0.05, 100)
+    wave = wavePoints.getCubicTraj(1, 100)
     count = 0  # Initialize outside of the stabilization loop for consistent counting
 
     while True:
@@ -98,9 +104,9 @@ def main():
             newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
             newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
 
-            robot.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
-            robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
-            robot.motors[10].target = (-newTargetX, 'P')  # Adjust pitch
+            robot.motors[12].target = (math.radians(newTargetZ), 'P')  # Adjust yaw
+            robot.motors[13].target = (math.radians(newTargetY), 'P')  # Adjust pitch
+            robot.motors[10].target = (math.radians(-newTargetX), 'P')  # Adjust pitch
 
             #tells robot trajectory is specifically for arms
             robot.motors[1].target = (point[1], 'P') # for right arm
@@ -121,12 +127,5 @@ def main():
 
 
             robot.moveAllToTarget()
-
-
-            count = count + 1 # keeps track of how many trajectory points it has reached
-            # print(count, " / ", len(wave))
-
-        count = 0  # Initialize outside of the stabilization loop for consistent counting
-
 if(__name__ == "__main__"):
     main()
