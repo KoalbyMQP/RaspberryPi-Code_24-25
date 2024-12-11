@@ -31,9 +31,9 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.01, 0.01, 0.01)
-            self.imuPIDY = PID(0.01, 0.01, 0.01)
-            self.imuPIDZ = PID(0.01, 0.01, 0.01)
+            self.imuPIDX = PID(0.005, 0.05, 0.03)
+            self.imuPIDY = PID(0.005, 0.05, 0.03)
+            self.imuPIDZ = PID(0.005, 0.05, 0.03)
             self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()

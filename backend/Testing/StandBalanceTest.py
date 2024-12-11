@@ -37,7 +37,7 @@ def main():
     robot = Robot(is_real)
     print("Setup Complete")
     initialize(robot)
-
+    scale_factor_front_to_back = 2
     imu_data = robot.imu_manager.getAllIMUData()
     right_chest_imu = imu_data[0]
     left_chest_imu = imu_data[1]
@@ -60,9 +60,9 @@ def main():
 
         print("X value: ", newTargetX, "    Y value: ", newTargetY, "   Z value:", newTargetZ)
 
-        robot.motors[10].target = (-newTargetZ, 'P')  # Adjust yaw
-        robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
-        robot.motors[12].target = (newTargetX, 'P')  # Adjust roll
+        robot.motors[10].target = (-math.radians(newTargetZ), 'P')  # Adjust yaw
+        robot.motors[13].target = ((math.radians(newTargetY) * scale_factor_front_to_back), 'P')  # Adjust pitch
+        robot.motors[12].target = (math.radians(newTargetX), 'P')  # Adjust roll
 
         # robot.motors[10].target = (0, 'P')  # Adjust yaw
         # robot.motors[13].target = (0, 'P')  # Adjust pitch
