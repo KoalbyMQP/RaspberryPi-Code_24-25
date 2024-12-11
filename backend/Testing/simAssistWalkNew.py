@@ -84,10 +84,9 @@ def initSimWalk(robot):
 def main():
     is_real = True
     robot = setup_robot(is_real)
-
-    initSimWalk(robot)
-
-    time.sleep(30)
+    for i in range(15):
+        initSimWalk(robot)
+        time.sleep(1)
 
 
     left_leg_chain = Chain.from_urdf_file(
