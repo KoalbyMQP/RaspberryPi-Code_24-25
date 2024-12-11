@@ -54,15 +54,17 @@ def main():
     print("Initialized")
     count = 0
     while True:
-        newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
-        newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
-        newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
+        balancePoints = robot.IMUBalance(prevX, prevY, prevZ)
+        newTargetX = balancePoints[0]
+        newTargetY = balancePoints[1]
+        newTargetZ = balancePoints[2]
 
         print("X value: ", newTargetX, "    Y value: ", newTargetY, "   Z value:", newTargetZ)
 
         robot.motors[10].target = (-math.radians(newTargetZ), 'P')  # Adjust yaw
         robot.motors[13].target = ((math.radians(newTargetY) * scale_factor_front_to_back), 'P')  # Adjust pitch
         robot.motors[12].target = (math.radians(newTargetX), 'P')  # Adjust roll
+
 
         # robot.motors[10].target = (0, 'P')  # Adjust yaw
         # robot.motors[13].target = (0, 'P')  # Adjust pitch
