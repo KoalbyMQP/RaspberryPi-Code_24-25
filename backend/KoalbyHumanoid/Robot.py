@@ -31,9 +31,9 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.175, 0.05, 5)
-            self.imuPIDY = PID(0.275, 0.05, 5)
-            self.imuPIDZ = PID(0.25, 0.05, 5)
+            self.imuPIDX = PID(0.01, 0.01, 0.01)
+            self.imuPIDY = PID(0.01, 0.01, 0.01)
+            self.imuPIDZ = PID(0.01, 0.01, 0.01)
             self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
@@ -81,9 +81,7 @@ class Robot():
         imu_data = self.imu_manager.getAllIMUData()
         right_chest_imu = imu_data[0]
         left_chest_imu = imu_data[1]
-        #torso_imu = imu_data["Torso"]
 
-        # Fuse IMU data
         fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu)
 
         # Use the fused data for balance calculations

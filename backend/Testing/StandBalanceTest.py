@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
 
 def initialize(robot):
-    robot.motors[1].target = (math.radians(-80), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(80), 'P') # LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(-70), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(70), 'P') # LeftShoulderAbductor
     # Torso
     robot.motors[10].target = (math.radians(3), 'P')
     robot.motors[11].target = (math.radians(0), 'P')
@@ -49,17 +49,24 @@ def main():
     startTime = time.time()
 
     #stabilizes itself before starting test
-    while time.time() - startTime < 7:
-        time.sleep(0.01)
+    while time.time() - startTime < 10:
+        time.sleep(0.1)
     print("Initialized")
     count = 0
     while True:
         newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
         newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
         newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
-        robot.motors[10].target = (newTargetZ, 'P')  # Adjust yaw
-        robot.motors[13].target = (-newTargetY, 'P')  # Adjust pitch
-        robot.motors[12].target = (-newTargetX, 'P')  # Adjust roll
+
+        print("X value: ", newTargetX, "    Y value: ", newTargetY, "   Z value:", newTargetZ)
+
+        robot.motors[10].target = (-newTargetZ, 'P')  # Adjust yaw
+        robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
+        robot.motors[12].target = (newTargetX, 'P')  # Adjust roll
+
+        # robot.motors[10].target = (0, 'P')  # Adjust yaw
+        # robot.motors[13].target = (0, 'P')  # Adjust pitch
+        # robot.motors[12].target = (0, 'P')  # Adjust roll
         # Right Leg
         robot.motors[15].target = (0, 'P')
         robot.motors[16].target = (0, 'P')
