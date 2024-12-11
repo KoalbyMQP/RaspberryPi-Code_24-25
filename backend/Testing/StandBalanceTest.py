@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
 
 def initialize(robot):
-    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(-80), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(80), 'P') # LeftShoulderAbductor
     # Torso
     robot.motors[10].target = (math.radians(3), 'P')
     robot.motors[11].target = (math.radians(0), 'P')
@@ -38,7 +38,10 @@ def main():
     print("Setup Complete")
     initialize(robot)
 
-    initial = robot.fuse_imu_data()
+    imu_data = robot.imu_manager.getAllIMUData()
+    right_chest_imu = imu_data[0]
+    left_chest_imu = imu_data[1]
+    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu)
     prevX = initial[0]
     prevY = initial[1]
     prevZ = initial[2]
@@ -54,9 +57,9 @@ def main():
         newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
         newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
         newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
-        robot.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
-        robot.motors[13].target = (newTargetY, 'P')  # Adjust pitch
-        robot.motors[10].target = (-newTargetX, 'P')  # Adjust roll
+        robot.motors[10].target = (newTargetZ, 'P')  # Adjust yaw
+        robot.motors[13].target = (-newTargetY, 'P')  # Adjust pitch
+        robot.motors[12].target = (-newTargetX, 'P')  # Adjust roll
         # Right Leg
         robot.motors[15].target = (0, 'P')
         robot.motors[16].target = (0, 'P')

@@ -73,6 +73,8 @@ class Robot():
     # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
     def fuse_imu_data(self, right_chest_imu, left_chest_imu):
         self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
+        if (self.fused_imu[0]>180):
+            self.fused_imu[0] = self.fused_imu[0] - 360
         return self.fused_imu
     
     def IMUBalance(self, Xtarget, Ytarget, Ztarget):

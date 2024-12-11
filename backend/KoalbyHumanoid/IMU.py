@@ -106,10 +106,7 @@ class IMUManager():
         euler1 = self.imu1.euler
         imu1_data = []
         if euler1:  # Ensure data is valid
-            if(euler1[0]>180):
-                imu1_data.append(euler1[0] - 360)
-            else:
-                imu1_data.append(euler1[0])
+            imu1_data.append(euler1[0])
             imu1_data.append(euler1[1])
             imu1_data.append(euler1[2])
         imu_data.append(imu1_data)
@@ -117,10 +114,7 @@ class IMUManager():
         euler2 = self.imu2.euler
         imu2_data = []
         if euler2:  # Ensure data is valid
-            if(euler2[0]>180):
-                imu2_data.append(euler1[0] - 360)
-            else:
-                imu2_data.append(euler1[0])
+            imu2_data.append(euler1[0])
             imu2_data.append(euler1[1])
             imu2_data.append(euler1[2])
         imu_data.append(imu2_data)
