@@ -28,10 +28,7 @@ class IMU():
         if isReal:
             try:
                 i2c = board.I2C()
-                tca = adafruit_tca9548a.TCA9548A(i2c)
-
-                self.imu1 = adafruit_bno055.BNO055_I2C(tca[6])
-                self.imu5 = adafruit_bno055.BNO055_I2C(tca[5])
+                IMU.tca = adafruit_tca9548a.TCA9548A(i2c)
             except:
                 print("No IMU detected, disabling IMU")
                 self.isConnected = False
@@ -95,6 +92,9 @@ class IMUManager():
         self.imu_names = ["RightFoot", "LeftFoot", "CenterOfMass", "Torso", "RightChest", "LeftChest"]
         self.imus = {name: IMU(isReal, sim, name) for name in self.imu_names}
 
+        self.imu1 = adafruit_bno055.BNO055_I2C(IMU.tca[6])
+        self.imu2 = adafruit_bno055.BNO055_I2C(IMU.tca[5])
+
     def getAllIMUData(self):
         """
         Retrieve data for all IMUs.
@@ -107,21 +107,21 @@ class IMUManager():
         imu1_data = []
         if euler1:  # Ensure data is valid
             if(euler1[0]>180):
-                imu1_data[0].append(euler1[0] - 360)
+                imu1_data.append(euler1[0] - 360)
             else:
-                imu1_data[0].append(euler1[0])
-                imu1_data[1].append(euler1[1])
-                imu1_data[2].append(euler1[2])
+                imu1_data.append(euler1[0])
+            imu1_data.append(euler1[1])
+            imu1_data.append(euler1[2])
         imu_data.append(imu1_data)
         
         euler2 = self.imu2.euler
         imu2_data = []
         if euler2:  # Ensure data is valid
             if(euler2[0]>180):
-                imu2_data[0].append(euler1[0] - 360)
+                imu2_data.append(euler1[0] - 360)
             else:
-                imu2_data[0].append(euler1[0])
-                imu2_data[1].append(euler1[1])
-                imu2_data[2].append(euler1[2])
+                imu2_data.append(euler1[0])
+            imu2_data.append(euler1[1])
+            imu2_data.append(euler1[2])
         imu_data.append(imu2_data)
         return imu_data

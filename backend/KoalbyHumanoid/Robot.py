@@ -71,33 +71,27 @@ class Robot():
         print("Robot Created and Initialized")
 
     # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
-    def fuse_imu_data(self):
-        """
-        Fuses the IMU data from right chest, left chest, and torso.
-
-        Args:
-            right_chest_imu (array-like): [pitch, roll, yaw] from the right chest IMU.
-            left_chest_imu (array-like): [pitch, roll, yaw] from the left chest IMU.
-            torso_imu (array-like): [pitch, roll, yaw] from the torso IMU.
-
-        Returns:
-            np.array: Fused [pitch, roll, yaw] data for PID controller input.
-        """
+    def fuse_imu_data(self, right_chest_imu, left_chest_imu):
+        self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
+        return self.fused_imu
+    
+    def IMUBalance(self, Xtarget, Ytarget, Ztarget):
         imu_data = self.imu_manager.getAllIMUData()
         right_chest_imu = imu_data[0]
         left_chest_imu = imu_data[1]
         #torso_imu = imu_data["Torso"]
-        self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
-        print(self.fused_imu)
-        return self.fused_imu
-    
-    def IMUBalance(self, Xtarget, Ytarget, Ztarget):
+
         # Fuse IMU data
-        fused_data = self.fuse_imu_data()
+        fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu)
+
         # Use the fused data for balance calculations
-        Xerror = Xtarget - fused_data[0]
-        Yerror = Ytarget - fused_data[1]
-        Zerror = Ztarget - fused_data[2]  
+        xRot = fused_data[0]
+        yRot = fused_data[1]
+        zRot = fused_data[2]  
+
+        Xerror = Xtarget - xRot
+        Yerror = Ytarget - yRot
+        Zerror = Ztarget - zRot
 
         self.imuPIDX.setError(Xerror)
         self.imuPIDY.setError(Yerror)
@@ -107,10 +101,8 @@ class Robot():
         newTargetY = self.imuPIDY.calculate()
         newTargetZ = self.imuPIDZ.calculate()
 
-        # Apply corrections
-        self.motors[12].target = (newTargetZ, 'P')  # Adjust yaw
-        self.motors[11].target = (-newTargetY, 'P')  # Adjust pitch
-        self.motors[14].target = (-newTargetX, 'P')  # Adjust pitch
+        # self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+        return [newTargetX, newTargetY, newTargetZ]
 
 
     def updateCoP(self): #get position of main pressure point on foot
