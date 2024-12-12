@@ -19,7 +19,7 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
     currentTime = time.time() - start_time
 
     # Torso
-    robot.motors[10].target = (math.radians(-30), 'P')
+    robot.motors[10].target = (math.radians(0), 'P')
 
     # Right arm
     robot.motors[0].target = (math.radians(10), 'P')
@@ -51,6 +51,8 @@ def update_trajectory_and_control(robot, right_points, left_points, start_time):
     robot.moveAllToTarget()
 
 def initSimWalk(robot):
+
+    robot.motors[10].target = (math.radians(0), 'P')
 
     # Right arm
     robot.motors[0].target = (math.radians(10), 'P')
@@ -84,7 +86,7 @@ def initSimWalk(robot):
 def main():
     is_real = True
     robot = setup_robot(is_real)
-    for i in range(15):
+    for i in range(60):
         initSimWalk(robot)
         time.sleep(1)
 
@@ -93,6 +95,7 @@ def main():
         "backend/Testing/robotChain.urdf",
         base_elements=['LeftHip', 'LeftLegRotator']
     )
+
 
     right_leg_chain = Chain.from_urdf_file(
         "backend/Testing/robotChain.urdf",
@@ -103,19 +106,31 @@ def main():
     y_base = -0.4
     z_base = -0.05
 
-    left_base = [x_base, y_base, z_base]
-    left_back_flat = [x_base, y_base, z_base - 0.1]
-    left_back_not_flat = [x_base, y_base, z_base - 0.1]
-    left_center_top = [x_base, y_base + 0.1, z_base]
-    left_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
-    left_almost_center_top = [x_base, y_base, z_base]
+    # left_base = [x_base, y_base, z_base]
+    # left_back_flat = [x_base, y_base, z_base - 0.1]
+    # left_back_not_flat = [x_base, y_base - 0.02, z_base - 0.1]
+    # left_center_top = [x_base, y_base + 0.1, z_base]
+    # left_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
+    # left_almost_center_top = [x_base, y_base, z_base]
 
-    right_base = [x_base, y_base, z_base]
-    right_back_flat = [x_base, y_base, z_base - 0.1]
-    right_back_not_flat = [x_base, y_base, z_base - 0.1]
-    right_center_top = [x_base, y_base + 0.1, z_base]
-    right_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
-    right_almost_center_top = [x_base, y_base, z_base]
+    # right_base = [x_base, y_base, z_base]
+    # right_back_flat = [x_base, y_base, z_base - 0.1]
+    # right_back_not_flat = [x_base, y_base - 0.02, z_base - 0.1]
+    # right_center_top = [x_base, y_base + 0.1, z_base]
+    # right_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
+    # right_almost_center_top = [x_base, y_base, z_base]
+
+    left_base = [x_base, y_base - 0.03, z_base]
+    left_center_top = [x_base, y_base + 0.05, z_base - 0.05]
+    left_intermediate_center_top = [x_base, y_base + 0.07, z_base]
+    left_forward_top = [x_base, y_base+0.02, z_base + 0.05]
+    left_base_step = [x_base, y_base-0.01, z_base - 0.1]
+
+    right_base = [x_base, y_base - 0.03, z_base]
+    right_center_top = [x_base, y_base + 0.05, z_base - 0.05]
+    right_intermediate_center_top = [x_base, y_base + 0.07, z_base]
+    right_forward_top = [x_base, y_base + 0.02, z_base + 0.05]
+    right_base_step = [x_base, y_base-0.01, z_base - 0.1]
 
     target_orientation_left = [0, 0, 1]
     target_orientation_right = [0, 0, 1]
@@ -129,15 +144,20 @@ def main():
     #LLF = Left Leg First
     #RLP = Right Leg Positions
     #LLP = Left Leg Positions
-    RLF_RLP = [right_center_top, right_forward_top, right_almost_center_top, right_base, right_base]
-    RLF_LLP = [left_base, left_base, left_back_flat, left_back_not_flat, left_center_top]
-    LLF_RLP = [right_base, right_base, right_back_flat, right_back_not_flat, right_center_top]
-    LLF_LLP = [left_center_top, left_forward_top, left_almost_center_top, left_base, left_base]
+    # RLF_RLP = [right_center_top, right_forward_top, right_almost_center_top, right_base, right_base]
+    # RLF_LLP = [left_base, left_base, left_base, left_back_not_flat, left_center_top]
+    # LLF_RLP = [right_base, right_base, right_base, right_back_not_flat, right_center_top]
+    # LLF_LLP = [left_center_top, left_forward_top, left_almost_center_top, left_base, left_base]
+
+    RLF_RLP = [right_center_top, right_intermediate_center_top, right_forward_top, right_base]
+    RLF_LLP = [left_base, left_base, left_base_step, left_base]
+    LLF_RLP = [right_base, right_base, right_base_step, right_base]
+    LLF_LLP = [left_center_top, left_intermediate_center_top, left_forward_top, left_base]
 
     total_time = []
     total_vel = []
     total_acc = []
-    step_time = 2
+    step_time = 1
     for i in range(len(RLF_LLP)):
         total_time.append([i * step_time, i * step_time, i * step_time])
         total_vel.append([0, 0, 0])
