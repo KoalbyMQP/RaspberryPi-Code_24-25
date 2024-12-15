@@ -3,6 +3,8 @@ import time
 import math
 import numpy as np
 
+sys.path.append("D:/Documents/College/Humanoid MQP Project/RaspberryPi-Code_23-24")
+sys.path.append("C:/Users/Gabriel/AppData/Local/Programs/Python/Python312/Lib/site-packages")
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
 from backend.KoalbyHumanoid.Link import Link
@@ -11,13 +13,13 @@ from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
-from backend.KoalbyHumanoid.IMU import IMU
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
+from backend.KoalbyHumanoid.IMU import IMU, IMUManager
+from backend.KoalbyHumanoid.PressureSensor import PressureSensor, ForceManager
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
 
 class Robot():
-
     # Initialization methods
 
     def __init__(self, is_real):
@@ -29,9 +31,9 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.2,0,0.1) # 1
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
-            
+            self.imuPIDX = PID(0.5, 0.0, 0.2)
+            self.imuPIDY = PID(0.5, 0.0, 0.2)
+            self.imuPIDZ = PID(0.5, 0.0, 0.2)
             self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
@@ -41,13 +43,12 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.3,0.005,0.1)
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
+            self.imuPIDX = PID(5, 2, 5)
+            self.imuPIDY = PID(15, 2, 5)
+            self.imuPIDZ = PID(15, 2, 5)
 
         self.lastMotorCheck = time.time()
-
-        self.imu = IMU(self.is_real, sim=self.sim)
-        self.CoM = np.array([0, 0, 0])
+        self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
         self.ang_accel = [0, 0, 0]
@@ -57,18 +58,98 @@ class Robot():
         self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
-        self.PID = PID(0.25,0.1,0)
-        # self.imuPIDX = PID(0.3,0.005,0.1)
-        # self.imuPIDZ = PID(0.25,0.0,0.0075)
-        self.PIDVel = PID(0.0,0,0)
-        self.VelPIDX = PID(0.002, 0, 0)
-        self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
-        # self.trackSphere = self.sim.getObject("./trackSphere")
-        # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
-        if(not is_real):
+        self.fused_imu = 0
+        # Use IMUManager to manage multiple IMUs
+        self.imu_manager = IMUManager(self.is_real, sim=self.sim)
+        self.forceManager = ForceManager(self.is_real, sim=self.sim)
+        self.feetCoP = [0, 0]
+        self.CoPPIDX = PID(0.01, 0, 0)
+        self.CoPPIDZ = PID(0.5, 0, 0)
+
+        if not is_real:
             self.sim.startSimulation()
-        # self.sim.startSimulation()
         print("Robot Created and Initialized")
+
+    # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
+    def fuse_imu_data(self, right_chest_imu, left_chest_imu, torso_imu):
+        """
+        Fuses the IMU data from right chest, left chest, and torso.
+
+        Args:
+            right_chest_imu (array-like): [pitch, roll, yaw] from the right chest IMU.
+            left_chest_imu (array-like): [pitch, roll, yaw] from the left chest IMU.
+            torso_imu (array-like): [pitch, roll, yaw] from the torso IMU.
+
+        Returns:
+            np.array: Fused [pitch, roll, yaw] data for PID controller input.
+        """
+        self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
+        return self.fused_imu
+    
+    def IMUBalance(self, Xtarget, Ytarget, Ztarget):
+        imu_data = self.imu_manager.getAllIMUData()
+        right_chest_imu = imu_data["RightChest"]
+        left_chest_imu = imu_data["LeftChest"]
+        torso_imu = imu_data["Torso"]
+
+        # Fuse IMU data
+        fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
+
+        # Use the fused data for balance calculations
+        xRot = fused_data[0]
+        yRot = fused_data[1]
+        zRot = fused_data[2]  
+
+        Xerror = Xtarget - xRot
+        Yerror = Ytarget - yRot
+        Zerror = Ztarget - zRot
+
+        self.imuPIDX.setError(Xerror)
+        self.imuPIDY.setError(Yerror)
+        self.imuPIDZ.setError(Zerror)
+
+        newTargetX = self.imuPIDX.calculate()
+        newTargetY = self.imuPIDY.calculate()
+        newTargetZ = self.imuPIDZ.calculate()
+
+        # self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+        return [newTargetX, newTargetY, newTargetZ]
+
+    def updateCoP(self): #get position of main pressure point on foot
+        #foot dimensions are needed to calculate positions
+        footWidth = 0.03 #5.36 # in cm - will change depending on actual locations on foot
+        footLength = 0.11 #14.66 # in cm - will change depending on actual locations on foot
+
+        #get pressure value from each pressure sensor
+        data = self.forceManager.pressurePerSensor()
+
+        rightTop= (data[0] + data[1]) / 2 #right foot
+        rightBottom = (data[2] + data[3]) / 2 #right foot
+        rightLeft = (data[1] + data[3]) / 2 #right foot
+        rightRight = (data[0] + data[2]) / 2 #right foot
+        rightCoPX = (rightRight*footWidth) / (rightRight + rightLeft)  #right foot CoP x location WRT right edge of foot
+        rightCoPY = (rightTop*footLength) / (rightTop + rightBottom) #right foot CoP y location WRT top edge of foot
+
+        leftTop= (data[4] + data[5]) / 2 #left foot
+        leftBottom = (data[6] + data[7]) / 2 #left foot
+        leftLeft = (data[5] + data[7]) / 2 #leftt foot
+        leftRight = (data[4] + data[6]) / 2 #left foot
+        leftCoPX = (leftRight*footWidth) / (leftLeft + leftRight) #left foot CoP x location WRT right edge of foot
+        leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
+        self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
+        self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
+        return self.feetCoP #values should be around half of footWidth and footLength
+
+    def CoPBalance(self, CoPs):
+        ErrorX = CoPs[0] - self.feetCoP[0]
+        ErrorY = CoPs[1] - self.feetCoP[1]
+        self.CoPPIDX.setError(ErrorX)
+        self.CoPPIDZ.setError(ErrorY)
+        targetX = self.CoPPIDX.calculate()
+        targetZ = self.CoPPIDZ.calculate()
+
+        self.motors[13].target = (targetX, 'V') #for hips side2side
+        self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
     def checkCoppeliaSimResponding(self):
         client = RemoteAPIClient()
@@ -128,6 +209,7 @@ class Robot():
         for motorConfig in Config.motors:
             print("Beginning to stream", motorConfig[3])
             handle = self.sim.getObject("/" + motorConfig[3])
+
             motor = Motor(False, motorConfig[0], motorConfig[3], motorConfig[6], motorConfig[7], pidGains=motorConfig[5], sim=self.sim, handle=handle)
             motor.theta = motor.get_position()
             motor.name = motorConfig[3]
@@ -161,14 +243,20 @@ class Robot():
     def moveAllToTarget(self):
         if self.is_real:
             for motor in self.motors:
-                time.sleep(0.01)
+                # time.sleep(0.01)
+                if not isinstance(motor.target, tuple) or len(motor.target) != 2:
+                    # Set a default target if the motor target is not set correctly
+                    motor.target = (motor.theta, 'P')  # Use the current position as a default target
                 motor.move(motor.target)
         else:
-            # joint = self.locate(self.motors[19])
-            # self.sim.setObjectPosition(self.trackSphere,(joint[0][3]/1000,joint[2][3]/-1000,joint[1][3]/1000),self.sim.getObject("./Chest_respondable"))
-            self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,[motor.handle for motor in self.motors], [motor.target[0] for motor in self.motors])
-            # for motor in self.motors:
-            #     motor.move(motor.target)
+            # Check for invalid targets and set a safe default
+            for motor in self.motors:
+                if not isinstance(motor.target, tuple) or len(motor.target) != 2:
+                    motor.target = (motor.theta, 'P')  # Default to the current position if no valid target
+            # Call CoppeliaSim API with valid motor targets
+            self.sim.callScriptFunction('setJointAngles', self.motorMovePositionScriptHandle,
+                                        [motor.handle for motor in self.motors],
+                                        [motor.target[0] for motor in self.motors])  # Only the first element (angle) is needed
 
     def initHomePos(self):
         if self.is_real:
@@ -276,22 +364,6 @@ class Robot():
             locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
         return locations
     
-    def updateBalancePoint(self):
-        rightAnkle = self.locate(self.motors[Config.Joints.Right_Ankle_Joint.value])
-        leftAnkle = self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])
-        rightAnkleToSole = np.array([[1,0,0,-24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        leftAnkleToSole = np.array([[1,0,0,24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        rightSole = np.matmul(rightAnkle,rightAnkleToSole)
-        leftSole = np.matmul(leftAnkle,leftAnkleToSole)
-        rightPolyCoords = rightSole[0:3,3]
-        leftPolyCoords = leftSole[0:3,3]
-        self.rightFootBalancePoint = rightPolyCoords
-        self.leftFootBalancePoint = leftPolyCoords
-        centerPoint = (rightPolyCoords+leftPolyCoords)/2
-        self.balancePoint = centerPoint
-        # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
-        return centerPoint
-    
     def IK(self, motor, T, thetaGuess):
         """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
 
@@ -311,36 +383,10 @@ class Robot():
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
 
-    # methods to balance (unassisted standing)
-
-    def IMUBalance(self, Xtarget, Ztarget):
-        data = self.imu.getData()
-
-        xRot = data[0]
-        zRot = data[2]
-        Xerror = Xtarget - xRot
-        Zerror = Ztarget - zRot
-        self.imuPIDX.setError(Xerror)
-        self.imuPIDZ.setError(Zerror)
-        newTargetX = self.imuPIDX.calculate()
-        newTargetZ = self.imuPIDZ.calculate()
-        # print(math.degrees(newTargetX), math.degrees(newTargetZ))
-        self.motors[13].target = (newTargetZ, 'P')
-        self.motors[10].target = (newTargetX, 'P')
-
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
-
-    def VelBalance(self, balancePoint):
-        balanceError = balancePoint - self.CoM
-        Xerror = balanceError[0]
-        Zerror = balanceError[2]
-        self.VelPIDX.setError(Xerror)
-        self.VelPIDZ.setError(Zerror)
-        newTargetX = self.VelPIDX.calculate()
-        newTargetZ = self.VelPIDZ.calculate()
-        self.motors[13].target = (newTargetX, 'V')
-        self.motors[10].target = (-newTargetZ, 'V')
-        return balanceError
+    # New method to get data from all IMUs
+    def getAllIMUData(self):
+        imu_data = {name: imu.getData() for name, imu in self.imus.items()}
+        return imu_data
 
     def balanceAngle(self):
         balanceError = self.balancePoint - self.CoM

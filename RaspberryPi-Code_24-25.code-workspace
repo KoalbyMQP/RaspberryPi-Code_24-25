@@ -2,6 +2,10 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"name": "GO_HOME_POS_PIO_CONV",
+			"path": "../Arduino-Code_24-25/Go_Home_Pos/GO_HOME_POS_PIO_CONV"
 		}
 	],
 	"settings": {}
