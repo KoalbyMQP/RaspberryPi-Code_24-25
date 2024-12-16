@@ -92,6 +92,10 @@ def update(frame):
         origin = step
         step += 5
 
+    if (state[1] == 0):
+        origin = 0
+        step = 0
+
     x, y, z = pendulum(state, origin)
 
     line.set_data(x, y)
