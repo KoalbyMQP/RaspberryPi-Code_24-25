@@ -302,17 +302,17 @@ sys.path.append("./")
 import copy
 # from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid.trajPlannerTime import TrajPlannerTime
-from backend.Testing import assistWalkViaPoints as via
+from backend.DemoScripts import assistWalkViaPoints as via
 # from coppeliasim_zmqremoteapi_client import RemoteAPIClient as sim
 # from backend.KoalbyHumanoid.Config import Joints
 
 left_leg_chain = Chain.from_urdf_file(
-    "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
+    "backend/Testing/robotChain.urdf",
     base_elements=['Pelvis', 'LeftLegAbductor']
 )
 
 right_leg_chain = Chain.from_urdf_file(
-    "/Users/sahilmirani/MQP/RaspberryPi-Code_24-25/backend/Testing/robotChain.urdf",
+    "backend/Testing/robotChain.urdf",
     base_elements=['Pelvis', 'RightLegAbductor']
 )
 

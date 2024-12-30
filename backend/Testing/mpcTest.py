@@ -22,14 +22,13 @@ def rk4_step(f, x, u, dt):
     k4 = f(x + dt * k3, u)
     return x + (dt / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
-# Dynamics for integration
 def dynamics(x, u):
     u = u.flatten() if len(u.shape) > 1 else u
     return np.array([
         x[2],  # xd
         x[3],  # yd
-        (9.8 / 15) * x[0] - (5 / 3.5) * u[0],  # xdd
-        (9.8 / 15) * x[1] - (5 / 3.5) * u[1]   # ydd
+        (9.8 / 15) * x[0] - (5 / 3.5) * u[0], 
+        (9.8 / 15) * x[1] - (5 / 3.5) * u[1] 
     ])
 
 model = mpc_model()
