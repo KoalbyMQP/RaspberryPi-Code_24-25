@@ -141,6 +141,8 @@ class Robot():
         return self.feetCoP #values should be around half of footWidth and footLength
 
     def CoPBalance(self, CoPs):
+        self.updateCoP()
+        print(str(self.feetCoP))
         ErrorX = CoPs[0] - self.feetCoP[0]
         ErrorY = CoPs[1] - self.feetCoP[1]
         self.CoPPIDX.setError(ErrorX)
@@ -148,8 +150,12 @@ class Robot():
         targetX = self.CoPPIDX.calculate()
         targetZ = self.CoPPIDZ.calculate()
 
-        self.motors[13].target = (targetX, 'V') #for hips side2side
-        self.motors[10].target = (-targetZ, 'V') #for hips front2back
+        #temporary measure: for now to print error values, later for fusing imu and pressure sensor data
+        newTargets = [targetX, targetZ]
+        return newTargets
+
+        # self.motors[13].target = (targetX, 'V') #for hips side2side
+        # self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
     def checkCoppeliaSimResponding(self):
         client = RemoteAPIClient()

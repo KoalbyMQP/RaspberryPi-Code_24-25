@@ -51,10 +51,11 @@ def main():
 
     # Set initial balance targets
     imu_data = robot.imu_manager.getAllIMUData()
-    right_chest_imu = imu_data[0]
-    left_chest_imu = imu_data[1]
+    right_chest_imu = imu_data["RightChest"]
+    left_chest_imu = imu_data["LeftChest"]
+    torso_imu = imu_data["Torso"]
     #torso_imu = imu_data["Torso"]
-    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu)
+    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
     prevX = initial[0]
     prevY = initial[1]
     prevZ = initial[2]

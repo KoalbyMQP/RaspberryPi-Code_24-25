@@ -59,6 +59,10 @@ def main():
     prevY = initial[1]
     prevZ = initial[2]
 
+    #set initial CoP
+    force_data = robot.updateCoP()
+    print(str(force_data))
+
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
     createSetUpPoints = [[0, 0, 0], [math.radians(-60), math.radians(-80), math.radians(180)]]
@@ -100,9 +104,16 @@ def main():
     while True:
         for point in wave:
 
+            # IMU targets
             newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
             newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
             newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
+
+            # CoP Balance
+            newTargetsForce = robot.CoPBalance(force_data)
+            # print("Force error X:" + str(newTargetsForce[0]))
+            # print("Force error Y:" + str(newTargetsForce[1]))
+            
 
             robot.motors[12].target = (math.radians(newTargetZ), 'P')  # Adjust yaw
             robot.motors[13].target = (math.radians(newTargetY), 'P')  # Adjust pitch
