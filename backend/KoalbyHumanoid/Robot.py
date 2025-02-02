@@ -31,9 +31,9 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(1, 0.0, 0.0)
-            self.imuPIDY = PID(1, 0.0, 0.0)
-            self.imuPIDZ = PID(1, 0.0, 0.0)
+            self.imuPIDX = PID(0.5, 0.0, 0.2)
+            self.imuPIDY = PID(0.5, 0.0, 0.2)
+            self.imuPIDZ = PID(0.5, 0.0, 0.2)
             self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
@@ -43,9 +43,9 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./Chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.175, 0.05, 5)
-            self.imuPIDY = PID(0.275, 0.05, 5)
-            self.imuPIDZ = PID(0.25, 0.05, 5)
+            self.imuPIDX = PID(5, 2, 5)
+            self.imuPIDY = PID(15, 2, 5)
+            self.imuPIDZ = PID(15, 2, 5)
 
         self.lastMotorCheck = time.time()
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
@@ -71,19 +71,29 @@ class Robot():
         print("Robot Created and Initialized")
 
     # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
-    def fuse_imu_data(self, right_chest_imu, left_chest_imu):
-        self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
-        if (self.fused_imu[0]>180):
-            self.fused_imu[0] = self.fused_imu[0] - 360
+    def fuse_imu_data(self, right_chest_imu, left_chest_imu, torso_imu):
+        """
+        Fuses the IMU data from right chest, left chest, and torso.
+
+        Args:
+            right_chest_imu (array-like): [pitch, roll, yaw] from the right chest IMU.
+            left_chest_imu (array-like): [pitch, roll, yaw] from the left chest IMU.
+            torso_imu (array-like): [pitch, roll, yaw] from the torso IMU.
+
+        Returns:
+            np.array: Fused [pitch, roll, yaw] data for PID controller input.
+        """
+        self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
         return self.fused_imu
     
     def IMUBalance(self, Xtarget, Ytarget, Ztarget):
         imu_data = self.imu_manager.getAllIMUData()
-        right_chest_imu = imu_data[0]
-        left_chest_imu = imu_data[1]
+        right_chest_imu = imu_data["RightChest"]
+        left_chest_imu = imu_data["LeftChest"]
+        torso_imu = imu_data["Torso"]
 
-        fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu)
-        print("X fused: ", fused_data[0], "    Y fused: ", fused_data[1], "   Z fused:", fused_data[2])
+        # Fuse IMU data
+        fused_data = self.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
 
         # Use the fused data for balance calculations
         xRot = fused_data[0]
@@ -104,7 +114,6 @@ class Robot():
 
         # self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
         return [newTargetX, newTargetY, newTargetZ]
-
 
     def updateCoP(self): #get position of main pressure point on foot
         #foot dimensions are needed to calculate positions
@@ -234,7 +243,7 @@ class Robot():
     def moveAllToTarget(self):
         if self.is_real:
             for motor in self.motors:
-                time.sleep(0.01)
+                # time.sleep(0.01)
                 if not isinstance(motor.target, tuple) or len(motor.target) != 2:
                     # Set a default target if the motor target is not set correctly
                     motor.target = (motor.theta, 'P')  # Use the current position as a default target
