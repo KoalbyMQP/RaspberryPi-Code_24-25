@@ -9,52 +9,69 @@ import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
 
 # Edit to declare if you are testing the sim or the real robot
-setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
-tj = trajPlannerPose.TrajPlannerPose(setPoints)
-traj = tj.getCubicTraj(10, 100)
-
 is_real = False
-
 robot = Robot(is_real)
-
 print("Setup Complete")
 
-robot.motors[1].target = (math.radians(80), 'P')
-robot.motors[6].target = (math.radians(-80), 'P')
-robot.moveAllToTarget()
 
-prevTime = time.time()
+def main():
 
-simStartTime = time.time()
-
-while time.time() - simStartTime < 10:
-    loopStartTime = time.time()
-    time.sleep(0.01)
-    robot.updateRobotCoM()
-    robot.updateBalancePoint()
-    # robot.IMUBalance(0,0)
-    # print(robot.VelBalance(robot.leftFootBalancePoint))
-    print("Error: ", robot.leftFootBalancePoint - robot.CoM)
-    print("BP: ", robot.balancePoint)
+    # moves arms down from T-pose
+    robot.motors[1].target = (math.radians(80), 'P') # for RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-80), 'P') # for LeftShoulderAbductor
     robot.moveAllToTarget()
+    print("Initial Pose Done")
 
-while True:
-    startTime = time.time()
-    for point in traj:
+    # Initial IMU data
+    prevIMU = robot.imu_manager.getAllIMUData()
+
+    prevCoP = robot.updateCoP()
+    print("CoP", prevCoP)
+
+    # creates trajectory of movements (squatting knees to 80 degrees)
+    simStartTime = time.time()
+    setPoints = [[0,  0], [math.radians(80), math.radians(-80)], [math.radians(0), math.radians(0)]]
+    tj = trajPlannerPose.TrajPlannerPose(setPoints)
+    traj = tj.getCubicTraj(10, 100)
+    notFalling = True
+    count = 0  # Initialize outside of the stabilization loop for consistent counting
+
+
+    #stabilizes itself before starting test
+    while time.time() - simStartTime < 10:
         time.sleep(0.01)
-        robot.updateRobotCoM()
-        robot.updateBalancePoint()
-        # robot.IMUBalance(0,0)  
-        # robot.VelBalance(robot.leftFootBalancePoint)
-        robot.moveAllToTarget()
-        robot.motors[0].target = (point[1], 'P')
-        robot.motors[5].target = (point[2], 'P')
-        print("Error: ", robot.leftFootBalancePoint - robot.CoM)
-        while time.time() - startTime < point[0]:
-            time.sleep(0.01)
-            robot.updateRobotCoM() 
-            robot.updateBalancePoint()
-            # robot.IMUBalance(0,0)
-            # robot.VelBalance(robot.leftFootBalancePoint)
+        #robot.updateRobotCoM()
+        prevIMU = robot.imu_manager.getAllIMUData()
+        prevCoP = robot.forceManager.getAllForces()
+    print("Initialized")
+
+    while notFalling:
+        for point in traj:
+            #tells robot trajectory is specifically for arms
+            robot.motors[0].target = (point[1], 'P') # for right arm
+            robot.motors[5].target = (point[2], 'P') # for left arm
             robot.moveAllToTarget()
-            print("Error: ", robot.leftFootBalancePoint - robot.CoM)
+
+            time.sleep(0.01) 
+            # robot.IMUBalance(prevIMU) #where PID is used
+            robot.CoPBalance(prevCoP)
+            
+            IMU = robot.imu_manager.getAllIMUData()
+            pressureSensors = robot.forceManager.getAllForces()
+            robot.CoPBalance(prevCoP)
+            robot.IMUBalance(prevIMU)
+            # print("IMU Readings at step {}: {}".format(count, imu_data))
+            print("Force Readings at step {}: {}".format(count, pressureSensors))
+
+            # robot.IMUBalance(prevIMU[0], prevIMU[2])
+            
+            prevCoP = pressureSensors
+            prevIMU = IMU
+            count = count + 1 # keeps track of how many trajectory points it has reached
+            print("Count: ", count)
+    print("Dead")
+    print(count, " / ", len(traj)) # prints percentage of completion of balance test if falling was detected
+
+
+if(__name__ == "__main__"):
+    main()
