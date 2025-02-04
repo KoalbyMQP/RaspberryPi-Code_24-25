@@ -1,30 +1,27 @@
+import numpy as np
+import matplotlib.pyplot as plt
 from ikpy.chain import Chain
-from ikpy.link import OriginLink, URDFLink
-import matplotlib.pyplot
-from mpl_toolkits.mplot3d import Axes3D
-left_arm_chain = Chain(name='left_arm', links=[
-    OriginLink(),
-    URDFLink(
-      name="shoulder",
-      origin_translation=[-10, 0, 5],
-      origin_orientation=[0, 1.57, 0],
-      rotation=[0, 1, 0],
-    ),
-    URDFLink(
-      name="elbow",
-      origin_translation=[25, 0, 0],
-      origin_orientation=[0, 0, 0],
-      rotation=[0, 1, 0],
-    ),
-    URDFLink(
-      name="wrist",
-      origin_translation=[22, 0, 0],
-      origin_orientation=[0, 0, 0],
-      rotation=[0, 1, 0],
-    )
-])
-# Set the active links mask (ensure the base link is inactive)
-left_arm_chain.active_links_mask = [False, True, True, True]
-ax = matplotlib.pyplot.figure().add_subplot(111, projection='3d')
-left_arm_chain.plot(left_arm_chain.inverse_kinematics([2, 10, 10]), ax)
-matplotlib.pyplot.show()
+from ikpy.utils import plot as plot_utils
+
+left_leg_chain = Chain.from_urdf_file(
+        "backend/Testing/FullAssemFin.urdf",
+    base_elements=['left_shoulder1', 'left_shoulder_twist']
+)
+
+target_positions = np.array([0.1, -0.01, -0.45])
+
+ik_solution = left_leg_chain.inverse_kinematics(target_positions)
+ik_solution_2=np.array([0,0,0,0,0,0,0])
+print("Joint angles:", ik_solution)
+
+real_frame = left_leg_chain.forward_kinematics(ik_solution)
+
+fig, ax = plot_utils.init_3d_figure()
+
+left_leg_chain.plot(ik_solution_2, ax)
+
+ax.set_xlim([-1, 1])
+ax.set_ylim([-1, 1])
+ax.set_zlim([-1, 1])
+
+plt.show()
