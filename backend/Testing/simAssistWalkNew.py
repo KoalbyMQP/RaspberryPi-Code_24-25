@@ -84,11 +84,13 @@ def initSimWalk(robot):
 
 
 def main():
-    is_real = True
+    is_real = False
     robot = setup_robot(is_real)
-    for i in range(60):
-        initSimWalk(robot)
-        time.sleep(1)
+
+    # Uncomment below when testing on the real robot
+    # for i in range(60):
+    #     initSimWalk(robot)
+    #     time.sleep(1)
 
 
     left_leg_chain = Chain.from_urdf_file(
@@ -106,6 +108,12 @@ def main():
     y_base = -0.4
     z_base = -0.05
 
+    # ----------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------
+
+    # Leaving the below part commented as this is how we set up our code before I made the new walking trajectories
+    # The values I used to find the walking trajectories are sort of magic number-y so leaving this here is a good base
+
     # left_base = [x_base, y_base, z_base]
     # left_back_flat = [x_base, y_base, z_base - 0.1]
     # left_back_not_flat = [x_base, y_base - 0.02, z_base - 0.1]
@@ -120,6 +128,12 @@ def main():
     # right_forward_top = [x_base, y_base + 0.1, z_base + 0.1]
     # right_almost_center_top = [x_base, y_base, z_base]
 
+    # ----------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------
+
+    # My changed trajectories to help fix assisted walking. I would look at these values, as they make it so that there's less bend
+    # in the knees and Ava doesn't randomly try picking up both her legs
+    
     left_base = [x_base, y_base - 0.03, z_base]
     left_center_top = [x_base, y_base + 0.05, z_base - 0.05]
     left_intermediate_center_top = [x_base, y_base + 0.07, z_base]
@@ -144,11 +158,8 @@ def main():
     #LLF = Left Leg First
     #RLP = Right Leg Positions
     #LLP = Left Leg Positions
-    # RLF_RLP = [right_center_top, right_forward_top, right_almost_center_top, right_base, right_base]
-    # RLF_LLP = [left_base, left_base, left_base, left_back_not_flat, left_center_top]
-    # LLF_RLP = [right_base, right_base, right_base, right_back_not_flat, right_center_top]
-    # LLF_LLP = [left_center_top, left_forward_top, left_almost_center_top, left_base, left_base]
 
+    # This part was changed aswell to work with the new trajectories, refer to the earlier commits incase we want to go back to the previous version
     RLF_RLP = [right_center_top, right_intermediate_center_top, right_forward_top, right_base]
     RLF_LLP = [left_base, left_base, left_base_step, left_base]
     LLF_RLP = [right_base, right_base, right_base_step, right_base]
@@ -157,6 +168,7 @@ def main():
     total_time = []
     total_vel = []
     total_acc = []
+    # The step time was reduced to see how fast Ava could comfortably walk in sim
     step_time = 1
     for i in range(len(RLF_LLP)):
         total_time.append([i * step_time, i * step_time, i * step_time])
