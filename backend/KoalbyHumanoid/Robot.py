@@ -474,3 +474,45 @@ class Robot():
                 print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
             else:
                 print(line)
+    
+    def reset_position(self):
+        """
+        Resets the robot to a default standing pose.
+        This method sets all motor targets to a neutral position (here, 0 radians)
+        and commands the robot to move to these targets.
+        """
+        self.motors[1].target = (math.radians(70), 'P')  # RightShoulderAbductor
+        self.motors[6].target = (math.radians(-70), 'P') # LeftShoulderAbductor
+
+        # Torso
+        self.motors[10].target = (math.radians(4), 'P')
+        self.motors[11].target = (math.radians(0), 'P')
+        self.motors[12].target = (math.radians(0), 'P')
+        self.motors[13].target = (math.radians(0), 'P')
+        self.motors[14].target = (math.radians(0), 'P')
+
+        # Right Leg
+        self.motors[15].target = (0, 'P')
+        self.motors[16].target = (0, 'P')
+        self.motors[17].target = (0, 'P')
+        self.motors[18].target = (0, 'P')
+        self.motors[19].target = (0, 'P')
+
+        # Left Leg
+        self.motors[20].target = (0, 'P')
+        self.motors[21].target = (0, 'P')
+        self.motors[22].target = (0, 'P')
+        self.motors[23].target = (0, 'P')
+        self.motors[24].target = (0, 'P')
+
+        self.moveAllToTarget()       # Command all motors to move to their targets.
+        import time
+        time.sleep(1)                # Allow time for the robot to stabilize.
+
+    # In Robot.py (inside the Robot class)
+    def restart_simulation(self):
+        if not self.is_real:
+            self.sim.stopSimulation()
+            import time
+            time.sleep(0.5)
+            self.sim.startSimulation()

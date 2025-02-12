@@ -9,3 +9,5 @@ board
 pyzmq
 cbor
 cbor2 
+torch
+gym
