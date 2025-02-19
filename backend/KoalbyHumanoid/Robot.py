@@ -484,6 +484,9 @@ class Robot():
         self.motors[1].target = (math.radians(70), 'P')  # RightShoulderAbductor
         self.motors[6].target = (math.radians(-70), 'P') # LeftShoulderAbductor
 
+        self.motors[0].target = (math.radians(0), 'P')  # RightShoulderAbductor
+        self.motors[5].target = (math.radians(0), 'P') # LeftShoulderAbductor
+
         # Torso
         self.motors[10].target = (math.radians(4), 'P')
         self.motors[11].target = (math.radians(0), 'P')
@@ -494,16 +497,18 @@ class Robot():
         # Right Leg
         self.motors[15].target = (0, 'P')
         self.motors[16].target = (0, 'P')
-        self.motors[17].target = (0, 'P')
-        self.motors[18].target = (0, 'P')
-        self.motors[19].target = (0, 'P')
 
         # Left Leg
         self.motors[20].target = (0, 'P')
         self.motors[21].target = (0, 'P')
-        self.motors[22].target = (0, 'P')
-        self.motors[23].target = (0, 'P')
-        self.motors[24].target = (0, 'P')
+
+        self.motors[17].target = (0, 'P') #Kick
+        self.motors[18].target = (0, 'P') #Knee  
+        self.motors[19].target = (0, 'P') #Ankle
+
+        self.motors[22].target = (0, 'P') #Kick
+        self.motors[23].target = (0, 'P') #Knee
+        self.motors[24].target = (0, 'P') #Ankle
 
         self.moveAllToTarget()       # Command all motors to move to their targets.
         import time

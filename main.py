@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 from rl.env import BalanceEnv
-from rl.agent import RLAgent
+from rl.ppo_agent import RLAgent
 import time
 
 def train(num_episodes=500):
