@@ -60,6 +60,7 @@ def main():
     prevY = initial[1]
     prevZ = initial[2]
 
+
     # creates trajectory of movements (squatting knees to 80 degrees)
     simStartTime = time.time()
     createSetUpPoints = [[0, 0, 0], [math.radians(-45), math.radians(-80), math.radians(180)]]
@@ -76,6 +77,8 @@ def main():
     count = 0 
 
     while True:
+        force_data = robot.forceManager.getAllForces()
+        
         newTargetX = robot.IMUBalance(prevX, prevY, prevZ)[0]
         newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
         newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]

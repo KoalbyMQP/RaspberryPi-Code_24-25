@@ -154,8 +154,8 @@ class Robot():
         newTargets = [targetX, targetZ]
         return newTargets
 
-        # self.motors[13].target = (targetX, 'V') #for hips side2side
-        # self.motors[10].target = (-targetZ, 'V') #for hips front2back
+        self.motors[13].target = (targetX, 'V') #for hips side2side
+        self.motors[10].target = (-targetZ, 'V') #for hips front2back
 
     def checkCoppeliaSimResponding(self):
         client = RemoteAPIClient()

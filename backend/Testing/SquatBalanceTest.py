@@ -38,6 +38,10 @@ def main():
     prevX = initial[0]
     prevZ = initial[2]
 
+    #set initial CoP
+    force_data = robot.updateCoP()
+    print(str(force_data))
+
     while notFalling:
         for point in traj:
             # Move to trajectory points
@@ -46,8 +50,11 @@ def main():
             robot.moveAllToTarget()
             time.sleep(0.005)
 
-            robot.IMUBalance(prevX, prevZ)
-            print(robot.fused_imu)
+            #robot.IMUBalance(prevX, prevZ)
+            newTargetsForce = robot.CoPBalance(force_data)
+            print("Force error X:" + str(newTargetsForce[0]))
+            print("Force error Y:" + str(newTargetsForce[1]))
+            #print(robot.fused_imu)
             # if robot.fused_imu[0] > 15 or robot.fused_imu[1] > 15 or robot.fused_imu[2] > 15:  
             #     print("FALLING")
             #     notFalling = False

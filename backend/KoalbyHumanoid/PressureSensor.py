@@ -42,15 +42,22 @@ class PressureSensor() :
         elif self.sim:
             # Different signal names for each IMU based on imu_name
             prefix = f"Force{self.sensor_name}"
-            self.data = [
-                self.sim.getFloatSignal(f"{prefix}_forceX"),
-                self.sim.getFloatSignal(f"{prefix}_forceY"),
-                self.sim.getFloatSignal(f"{prefix}_forceZ"),
-            ]
-            # Handle cases where signals may not be available (default to 0 if no data)
-            self.data = [0 if dataPoint is None else dataPoint for dataPoint in self.data]
+            sensorHandle = self.sim.getObject(f"/{prefix}")
+            print(f"/{prefix}")
+            print(sensorHandle)
+            if self.sim.readForceSensor(sensorHandle)[0] == 1:
+                self.data = [
+                    self.sim.readForceSensor(sensorHandle)[1][0],
+                    self.sim.readForceSensor(sensorHandle)[1][1],
+                    self.sim.readForceSensor(sensorHandle)[1][2],
+                ]
+            else:
+                # Handle cases where signals may not be available (default to 0 if no data)
+                self.data = [0 if dataPoint is None else dataPoint for dataPoint in self.data]
         else:
             self.data = [0, 0, 0, 0, 0, 0]  # Fallback if sim is not set in simulation mode
+        print("ForceData")
+        print(self.data)
         return self.data
     
 
