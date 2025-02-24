@@ -21,5 +21,5 @@ is_real = True
 robot = Robot(is_real)
 print("Setup Complete")
 
-robot.moveTo(robot.motors[27], -90, 'P')
+robot.moveTo(robot.motors[27], -90)
 
