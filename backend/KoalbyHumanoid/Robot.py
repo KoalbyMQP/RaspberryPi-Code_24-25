@@ -11,7 +11,7 @@ from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
-from backend.KoalbyHumanoid.IMU import IMU
+#from backend.KoalbyHumanoid.IMU import IMU
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
 
 TIME_BETWEEN_MOTOR_CHECKS = 2
@@ -29,10 +29,10 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-            self.imuPIDX = PID(0.2,0,0.1) # 1
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
+        #    self.imuPIDX = PID(0.2,0,0.1) # 1
+       #     self.imuPIDZ = PID(0.25,0.0,0.0075)
             
-            self.electromagnet = Electromagnet()
+      #      self.electromagnet = Electromagnet()
         else:
             self.checkCoppeliaSimResponding()
 
@@ -41,28 +41,28 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./chest_respondable"))
             self.motors = self.sim_motors_init()
             
-            self.imuPIDX = PID(0.3,0.005,0.1)
-            self.imuPIDZ = PID(0.25,0.0,0.0075)
+        #    self.imuPIDX = PID(0.3,0.005,0.1)
+        #    self.imuPIDZ = PID(0.25,0.0,0.0075)
 
         self.lastMotorCheck = time.time()
 
-        self.imu = IMU(self.is_real, sim=self.sim)
-        self.CoM = np.array([0, 0, 0])
-        self.ang_vel = [0, 0, 0]
-        self.last_vel = [0, 0, 0]
-        self.ang_accel = [0, 0, 0]
-        self.balancePoint = np.array([0, 0, 0])
-        self.rightFootBalancePoint = np.array([0, 0, 0])
-        self.leftFootBalancePoint = np.array([0, 0, 0])
-        self.primitives = []
+       # self.imu = IMU(self.is_real, sim=self.sim)
+       # self.CoM = np.array([0, 0, 0])
+        # self.ang_vel = [0, 0, 0]
+        # self.last_vel = [0, 0, 0]
+        # self.ang_accel = [0, 0, 0]
+        # self.balancePoint = np.array([0, 0, 0])
+        # self.rightFootBalancePoint = np.array([0, 0, 0])
+        # self.leftFootBalancePoint = np.array([0, 0, 0])
+        # self.primitives = []
         self.chain = self.chain_init()
         self.links = self.links_init()
         self.PID = PID(0.25,0.1,0)
         # self.imuPIDX = PID(0.3,0.005,0.1)
         # self.imuPIDZ = PID(0.25,0.0,0.0075)
-        self.PIDVel = PID(0.0,0,0)
-        self.VelPIDX = PID(0.002, 0, 0)
-        self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
+        # self.PIDVel = PID(0.0,0,0)
+        # self.VelPIDX = PID(0.002, 0, 0)
+        # self.VelPIDZ = PID(0.009, 0.0005, 0.0015)
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
@@ -186,245 +186,245 @@ class Robot():
             
     # Controls/Kinematics/Dynamics methods
 
-    def updateRobotCoM(self):
-        rightArm = self.updateRightArmCoM()
-        leftArm = self.updateLeftArmCoM()
-        torso = self.updateTorsoCoM()
-        rightLeg = self.updateRightLegCoM()
-        leftLeg = self.updateLeftLegCoM()
-        chestMass = 618.15
-        chest = [0, 71.83, 54.35]
-        rightArmMass = 524.11
-        leftArmMass = 524.11
-        torsoMass = 434.67
-        rightLegMass = 883.81
-        leftLegMass = 889.11
-        massSum = rightArmMass+leftArmMass+torsoMass+chestMass
-        CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
-        CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
-        CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
-        self.CoM = [CoMx / massSum, CoMy / massSum, CoMz / massSum]
-        return self.CoM
+    # def updateRobotCoM(self):
+    #     rightArm = self.updateRightArmCoM()
+    #     leftArm = self.updateLeftArmCoM()
+    #     torso = self.updateTorsoCoM()
+    #     rightLeg = self.updateRightLegCoM()
+    #     leftLeg = self.updateLeftLegCoM()
+    #     chestMass = 618.15
+    #     chest = [0, 71.83, 54.35]
+    #     rightArmMass = 524.11
+    #     leftArmMass = 524.11
+    #     torsoMass = 434.67
+    #     rightLegMass = 883.81
+    #     leftLegMass = 889.11
+    #     massSum = rightArmMass+leftArmMass+torsoMass+chestMass
+    #     CoMx = rightArm[0] * rightArmMass + leftArm[0] * leftArmMass + torso[0]*torsoMass + chest[0]*chestMass + rightLeg[0]*rightLegMass + leftLeg[0]*leftLegMass
+    #     CoMy = rightArm[1] * rightArmMass + leftArm[1] * leftArmMass + torso[1]*torsoMass + chest[1]*chestMass + rightLeg[1]*rightLegMass + leftLeg[1]*leftLegMass
+    #     CoMz = rightArm[2] * rightArmMass + leftArm[2] * leftArmMass + torso[2]*torsoMass + chest[2]*chestMass + rightLeg[2]*rightLegMass + leftLeg[2]*leftLegMass
+    #     self.CoM = [CoMx / massSum, CoMy / massSum, CoMz / massSum]
+    #     return self.CoM
 
-    def updateRightArmCoM(self):
-        motorList = [self.motors[0], self.motors[1], self.motors[2], self.motors[3], self.motors[4]]
-        linkList = [self.links[0], self.links[1], self.links[2], self.links[3], self.links[4]]
-        return poe.calcLimbCoM(motorList, linkList)
+    # def updateRightArmCoM(self):
+    #     motorList = [self.motors[0], self.motors[1], self.motors[2], self.motors[3], self.motors[4]]
+    #     linkList = [self.links[0], self.links[1], self.links[2], self.links[3], self.links[4]]
+    #     return poe.calcLimbCoM(motorList, linkList)
     
-    def updateLeftArmCoM(self):
-        motorList = [self.motors[5], self.motors[6], self.motors[7], self.motors[8], self.motors[9]]
-        linkList = [self.links[5], self.links[6], self.links[7], self.links[8], self.links[9]]
-        return poe.calcLimbCoM(motorList, linkList)
+    # def updateLeftArmCoM(self):
+    #     motorList = [self.motors[5], self.motors[6], self.motors[7], self.motors[8], self.motors[9]]
+    #     linkList = [self.links[5], self.links[6], self.links[7], self.links[8], self.links[9]]
+    #     return poe.calcLimbCoM(motorList, linkList)
     
-    def updateTorsoCoM(self):
-        motorList = [self.motors[11], self.motors[13], self.motors[10], self.motors[12], self.motors[14]]
-        linkList = [self.links[11], self.links[13], self.links[10], self.links[12], self.links[14]]
-        return poe.calcLimbCoM(motorList, linkList)
+    # def updateTorsoCoM(self):
+    #     motorList = [self.motors[11], self.motors[13], self.motors[10], self.motors[12], self.motors[14]]
+    #     linkList = [self.links[11], self.links[13], self.links[10], self.links[12], self.links[14]]
+    #     return poe.calcLimbCoM(motorList, linkList)
     
-    def updateRightLegCoM(self):
-        motorList = [self.motors[15], self.motors[16], self.motors[17], self.motors[18], self.motors[19]]
-        linkList = [self.links[15], self.links[16], self.links[17], self.links[18], self.links[19]]
-        #print(poe.calcLegCoM(self, motorList))
-        return poe.calcLegCoM(self, motorList, linkList)
+    # def updateRightLegCoM(self):
+    #     motorList = [self.motors[15], self.motors[16], self.motors[17], self.motors[18], self.motors[19]]
+    #     linkList = [self.links[15], self.links[16], self.links[17], self.links[18], self.links[19]]
+    #     #print(poe.calcLegCoM(self, motorList))
+    #     return poe.calcLegCoM(self, motorList, linkList)
 
-    def updateLeftLegCoM(self):
-        motorList = [self.motors[20], self.motors[21], self.motors[22], self.motors[23], self.motors[24]]
-        linkList = [self.links[20], self.links[21], self.links[22], self.links[23], self.links[24]]
-        #print(poe.calcLegCoM(self, motorList))
-        return poe.calcLegCoM(self, motorList, linkList)
+    # def updateLeftLegCoM(self):
+    #     motorList = [self.motors[20], self.motors[21], self.motors[22], self.motors[23], self.motors[24]]
+    #     linkList = [self.links[20], self.links[21], self.links[22], self.links[23], self.links[24]]
+    #     #print(poe.calcLegCoM(self, motorList))
+    #     return poe.calcLegCoM(self, motorList, linkList)
       
-    def locate(self, motor):
-        slist = []
-        thetaList = []
-        M = motor.M
-        slist.append(motor.twist)
-        thetaList.append(motor.get_position())
-        next = self.chain[motor.name]
-        while next != "base":
-            slist.append(next.twist)
-            thetaList.append(next.get_position())
-            next = self.chain[next.name]            
-        slist.reverse()
-        thetaList.reverse()
-        # print(thetaList)
-        location = mr.FKinSpace(M,np.transpose(slist),thetaList)
-        return location
+    # def locate(self, motor):
+    #     slist = []
+    #     thetaList = []
+    #     M = motor.M
+    #     slist.append(motor.twist)
+    #     thetaList.append(motor.get_position())
+    #     next = self.chain[motor.name]
+    #     while next != "base":
+    #         slist.append(next.twist)
+    #         thetaList.append(next.get_position())
+    #         next = self.chain[next.name]            
+    #     slist.reverse()
+    #     thetaList.reverse()
+    #     # print(thetaList)
+    #     location = mr.FKinSpace(M,np.transpose(slist),thetaList)
+    #     return location
     
-    def locatePolygon(self):
-        slist = []
-        thetaList = []
-        locations = []
-        rightAnkleM = [[1,0,0,-43.49],[0,1,0,659.84],[0,0,1,70.68],[1,0,0,0]]
-        leftAnkleM = [[1,0,0,43.49],[0,1,0,659.84],[0,0,1,70.68],[1,0,0,0]]
-        rightAnkleMotor = self.motors[Config.Joints.Right_Ankle_Joint.value]
-        leftAnkleMotor = self.motors[Config.Joints.Left_Ankle_Joint.value]
-        Ms = [rightAnkleM, leftAnkleM]
-        ankleMotors = [rightAnkleMotor, leftAnkleMotor]
-        for i in range(len(ankleMotors)):
-            motor = ankleMotors[i]
-            M = Ms[i]
-            slist.append(motor.twist)
-            thetaList.append(motor.get_position())
-            next = self.chain[motor.name]
-            while next != "base":
-                slist.append(next.twist)
-                thetaList.append(next.get_position())
-                next = self.chain[next.name]         
-            slist.reverse()
-            thetaList.reverse()
-            # print(thetaList)
-            locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
-        return locations
+    # def locatePolygon(self):
+    #     slist = []
+    #     thetaList = []
+    #     locations = []
+    #     rightAnkleM = [[1,0,0,-43.49],[0,1,0,659.84],[0,0,1,70.68],[1,0,0,0]]
+    #     leftAnkleM = [[1,0,0,43.49],[0,1,0,659.84],[0,0,1,70.68],[1,0,0,0]]
+    #     rightAnkleMotor = self.motors[Config.Joints.Right_Ankle_Joint.value]
+    #     leftAnkleMotor = self.motors[Config.Joints.Left_Ankle_Joint.value]
+    #     Ms = [rightAnkleM, leftAnkleM]
+    #     ankleMotors = [rightAnkleMotor, leftAnkleMotor]
+    #     for i in range(len(ankleMotors)):
+    #         motor = ankleMotors[i]
+    #         M = Ms[i]
+    #         slist.append(motor.twist)
+    #         thetaList.append(motor.get_position())
+    #         next = self.chain[motor.name]
+    #         while next != "base":
+    #             slist.append(next.twist)
+    #             thetaList.append(next.get_position())
+    #             next = self.chain[next.name]         
+    #         slist.reverse()
+    #         thetaList.reverse()
+    #         # print(thetaList)
+    #         locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
+    #     return locations
     
-    def updateBalancePoint(self):
-        rightAnkle = self.locate(self.motors[Config.Joints.Right_Ankle_Joint.value])
-        leftAnkle = self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])
-        rightAnkleToSole = np.array([[1,0,0,-24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        leftAnkleToSole = np.array([[1,0,0,24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
-        rightSole = np.matmul(rightAnkle,rightAnkleToSole)
-        leftSole = np.matmul(leftAnkle,leftAnkleToSole)
-        rightPolyCoords = rightSole[0:3,3]
-        leftPolyCoords = leftSole[0:3,3]
-        self.rightFootBalancePoint = rightPolyCoords
-        self.leftFootBalancePoint = leftPolyCoords
-        centerPoint = (rightPolyCoords+leftPolyCoords)/2
-        self.balancePoint = centerPoint
-        # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
-        return centerPoint
+    # def updateBalancePoint(self):
+    #     rightAnkle = self.locate(self.motors[Config.Joints.Right_Ankle_Joint.value])
+    #     leftAnkle = self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])
+    #     rightAnkleToSole = np.array([[1,0,0,-24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
+    #     leftAnkleToSole = np.array([[1,0,0,24.18],[0,1,0,-35],[0,0,1,29.14],[0,0,0,1]])
+    #     rightSole = np.matmul(rightAnkle,rightAnkleToSole)
+    #     leftSole = np.matmul(leftAnkle,leftAnkleToSole)
+    #     rightPolyCoords = rightSole[0:3,3]
+    #     leftPolyCoords = leftSole[0:3,3]
+    #     self.rightFootBalancePoint = rightPolyCoords
+    #     self.leftFootBalancePoint = leftPolyCoords
+    #     centerPoint = (rightPolyCoords+leftPolyCoords)/2
+    #     self.balancePoint = centerPoint
+    #     # self.sim.setObjectPosition(self.trackSphere,(self.balancePoint[0]/1000,-self.balancePoint[2]/1000,self.balancePoint[1]/1000),self.sim.getObject("./Chest_respondable"))
+    #     return centerPoint
     
-    def IK(self, motor, T, thetaGuess):
-        """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
+    # def IK(self, motor, T, thetaGuess):
+    #     """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
 
-        Args:
-            eeMotor (SimMotor): Motor you want to calculate IK towards
-            T (4x4 Matrix): The desired final 4x4 matrix depicting the final position and orientation
-        """
-        Slist = []
-        Slist.append(motor.twist)
-        next = self.chain[motor.name]
-        while next != "base":
-            Slist.append(next.twist)
-            next = self.chain[next.name]
-        Slist.reverse()
-        M = motor.home
-        eomg = 0.01
-        ev = 0.01
-        return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
+    #     Args:
+    #         eeMotor (SimMotor): Motor you want to calculate IK towards
+    #         T (4x4 Matrix): The desired final 4x4 matrix depicting the final position and orientation
+    #     """
+    #     Slist = []
+    #     Slist.append(motor.twist)
+    #     next = self.chain[motor.name]
+    #     while next != "base":
+    #         Slist.append(next.twist)
+    #         next = self.chain[next.name]
+    #     Slist.reverse()
+    #     M = motor.home
+    #     eomg = 0.01
+    #     ev = 0.01
+    #     return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
 
-    # methods to balance (unassisted standing)
+    # # methods to balance (unassisted standing)
 
-    def IMUBalance(self, Xtarget, Ztarget):
-        data = self.imu.getData()
+    # def IMUBalance(self, Xtarget, Ztarget):
+    #     data = self.imu.getData()
 
-        xRot = data[0]
-        zRot = data[2]
-        Xerror = Xtarget - xRot
-        Zerror = Ztarget - zRot
-        self.imuPIDX.setError(Xerror)
-        self.imuPIDZ.setError(Zerror)
-        newTargetX = self.imuPIDX.calculate()
-        newTargetZ = self.imuPIDZ.calculate()
-        # print(math.degrees(newTargetX), math.degrees(newTargetZ))
-        self.motors[13].target = (newTargetZ, 'P')
-        self.motors[10].target = (newTargetX, 'P')
+    #     xRot = data[0]
+    #     zRot = data[2]
+    #     Xerror = Xtarget - xRot
+    #     Zerror = Ztarget - zRot
+    #     self.imuPIDX.setError(Xerror)
+    #     self.imuPIDZ.setError(Zerror)
+    #     newTargetX = self.imuPIDX.calculate()
+    #     newTargetZ = self.imuPIDZ.calculate()
+    #     # print(math.degrees(newTargetX), math.degrees(newTargetZ))
+    #     self.motors[13].target = (newTargetZ, 'P')
+    #     self.motors[10].target = (newTargetX, 'P')
 
-        self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
+    #     self.checkMotorsAtInterval(TIME_BETWEEN_MOTOR_CHECKS)
 
-    def VelBalance(self, balancePoint):
-        balanceError = balancePoint - self.CoM
-        Xerror = balanceError[0]
-        Zerror = balanceError[2]
-        self.VelPIDX.setError(Xerror)
-        self.VelPIDZ.setError(Zerror)
-        newTargetX = self.VelPIDX.calculate()
-        newTargetZ = self.VelPIDZ.calculate()
-        self.motors[13].target = (newTargetX, 'V')
-        self.motors[10].target = (-newTargetZ, 'V')
-        return balanceError
+    # def VelBalance(self, balancePoint):
+    #     balanceError = balancePoint - self.CoM
+    #     Xerror = balanceError[0]
+    #     Zerror = balanceError[2]
+    #     self.VelPIDX.setError(Xerror)
+    #     self.VelPIDZ.setError(Zerror)
+    #     newTargetX = self.VelPIDX.calculate()
+    #     newTargetZ = self.VelPIDZ.calculate()
+    #     self.motors[13].target = (newTargetX, 'V')
+    #     self.motors[10].target = (-newTargetZ, 'V')
+    #     return balanceError
 
-    def balanceAngle(self):
-        balanceError = self.balancePoint - self.CoM
+    # def balanceAngle(self):
+    #     balanceError = self.balancePoint - self.CoM
         
-        # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
-        # kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
-        # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
-        # thetaError = targetTheta - currTheta
-        # self.PID.setError(thetaError)
-        # newTarget = self.PID.calculate()
+    #     # targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
+    #     # kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
+    #     # currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
+    #     # thetaError = targetTheta - currTheta
+    #     # self.PID.setError(thetaError)
+    #     # newTarget = self.PID.calculate()
 
-        self.PIDVel.setError(balanceError[2])
-        newTarget = self.PIDVel.calculate()
+    #     self.PIDVel.setError(balanceError[2])
+    #     newTarget = self.PIDVel.calculate()
         
-        self.motors[10].target = (-0.000001*newTarget, 'V')
+    #     self.motors[10].target = (-0.000001*newTarget, 'V')
         
-        # self.motors[22].target = (0.001*newTarget, 'V')
-        # # self.motors[24].target = (-10, 'V')
-        # self.motors[17].target = (-0.001*newTarget, 'V')
-        # self.motors[19].target = (10, 'V')
-        # self.IMUBalance(0, 0)
-        return balanceError
+    #     # self.motors[22].target = (0.001*newTarget, 'V')
+    #     # # self.motors[24].target = (-10, 'V')
+    #     # self.motors[17].target = (-0.001*newTarget, 'V')
+    #     # self.motors[19].target = (10, 'V')
+    #     # self.IMUBalance(0, 0)
+    #     return balanceError
 
-    def balanceAngleOLD(self):
-        # targetZ = 88
-        # zError = targetZ - self.CoM[2]
-        # target = 0.11
-        # self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])*ankleL_to_sole
-        staticCoM = [-9.2, -487.6, 90.5]
-        staticKickLoc = [93.54, -209.39, 41.53]
-        targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
-        kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
-        currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
-        thetaError = targetTheta - currTheta
-        # print(math.degrees(targetTheta), math.degrees(currTheta), thetaError, self.CoM)
-        # print(self.CoM)
-        # print(math.degrees(self.motors[22].target), math.degrees(self.motors[22].target), math.degrees(self.motors[17].target), math.degrees(self.motors[19].target))
-        self.PID.setError(thetaError)
-        newTarget = self.PID.calculate()
+    # def balanceAngleOLD(self):
+    #     # targetZ = 88
+    #     # zError = targetZ - self.CoM[2]
+    #     # target = 0.11
+    #     # self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])*ankleL_to_sole
+    #     staticCoM = [-9.2, -487.6, 90.5]
+    #     staticKickLoc = [93.54, -209.39, 41.53]
+    #     targetTheta = math.atan2(staticCoM[1] - staticKickLoc[1], staticCoM[2] - staticKickLoc[2])
+    #     kickMotorPos = self.locate(self.motors[Config.Joints.Left_Thigh_Kick_Joint.value])
+    #     currTheta = math.atan2(self.CoM[1] - kickMotorPos[1], self.CoM[2] - kickMotorPos[2])
+    #     thetaError = targetTheta - currTheta
+    #     # print(math.degrees(targetTheta), math.degrees(currTheta), thetaError, self.CoM)
+    #     # print(self.CoM)
+    #     # print(math.degrees(self.motors[22].target), math.degrees(self.motors[22].target), math.degrees(self.motors[17].target), math.degrees(self.motors[19].target))
+    #     self.PID.setError(thetaError)
+    #     newTarget = self.PID.calculate()
         
-        self.motors[22].target = (-newTarget, 'P')
-        self.motors[24].target = (-newTarget, 'P')
-        self.motors[17].target = (newTarget, 'P')
-        self.motors[19].target = (newTarget, 'P')
-        self.IMUBalance(0, 0)
-        return thetaError
+    #     self.motors[22].target = (-newTarget, 'P')
+    #     self.motors[24].target = (-newTarget, 'P')
+    #     self.motors[17].target = (newTarget, 'P')
+    #     self.motors[19].target = (newTarget, 'P')
+    #     self.IMUBalance(0, 0)
+    #     return thetaError
     
-    def decodeError(self, errorNum : int):
-        errorNum = int(errorNum)
-        errorDict = { 1: "Exceed Input Voltage Limit",
-                      2: "Exceed Allow POT Limit",
-                      4: "Exceed Temperature Limit",
-                      8: "Invalid Packet (8)",
-                      9: "Invalid Packet (9)",
-                      16: "Overload Detected",
-                      32: "Driver Fault Detected",
-                      64: "EEP REG Distorted",
-                      255: "No Communication"}
+    # def decodeError(self, errorNum : int):
+    #     errorNum = int(errorNum)
+    #     errorDict = { 1: "Exceed Input Voltage Limit",
+    #                   2: "Exceed Allow POT Limit",
+    #                   4: "Exceed Temperature Limit",
+    #                   8: "Invalid Packet (8)",
+    #                   9: "Invalid Packet (9)",
+    #                   16: "Overload Detected",
+    #                   32: "Driver Fault Detected",
+    #                   64: "EEP REG Distorted",
+    #                   255: "No Communication"}
                       
-        if(errorNum in errorDict.keys()):
-            return errorDict[errorNum]
-        else:
-            return errorNum
+    #     if(errorNum in errorDict.keys()):
+    #         return errorDict[errorNum]
+    #     else:
+    #         return errorNum
     
-    # If continuously called, checks motor statuses at the given interval (in seconds)
-    def checkMotorsAtInterval(self, interval):
-        if(time.time() > self.lastMotorCheck + interval):
-            self.lastMotorCheck = time.time()
-            self.checkMotors()
+    # # If continuously called, checks motor statuses at the given interval (in seconds)
+    # def checkMotorsAtInterval(self, interval):
+    #     if(time.time() > self.lastMotorCheck + interval):
+    #         self.lastMotorCheck = time.time()
+    #         self.checkMotors()
 
-    # Checks the status of all motors
-    def checkMotors(self):
-        if(not self.is_real):
-            return
+    # # Checks the status of all motors
+    # def checkMotors(self):
+    #     if(not self.is_real):
+    #         return
         
-        self.arduino_serial.send_command("50") # Check motors command
+    #     self.arduino_serial.send_command("50") # Check motors command
 
-        while True:
-            line = self.arduino_serial.read_line()
-            if(line == "END" or line == None):
-                return
+    #     while True:
+    #         line = self.arduino_serial.read_line()
+    #         if(line == "END" or line == None):
+    #             return
             
-            msg = line.split(" ")
-            if(len(msg) >= 3):
-                print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
-            else:
-                print(line)
+    #         msg = line.split(" ")
+    #         if(len(msg) >= 3):
+    #             print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
+    #         else:
+    #             print(line)
