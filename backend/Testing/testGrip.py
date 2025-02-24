@@ -19,7 +19,7 @@ from backend.KoalbyHumanoid.Robot import Robot
 # Edit to declare if you are testing the sim or the real robot
 is_real = True
 robot = Robot(is_real)
-print("Setup Complete")
+print("done")
 robot.motors[27].target = (math.radians(0), 'P')
 robot.moveToTarget(robot.motors[27])
 
