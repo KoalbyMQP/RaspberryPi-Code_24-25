@@ -21,5 +21,6 @@ is_real = True
 robot = Robot(is_real)
 print("done")
 robot.motors[27].target = (math.radians(0), 'P')
+print("targeted")
 robot.moveToTarget(robot.motors[27])
-
+print("closed")
