@@ -20,6 +20,6 @@ from backend.KoalbyHumanoid.Robot import Robot
 is_real = True
 robot = Robot(is_real)
 print("Setup Complete")
-robot.motors[27].target = (math.radians(90), 'P')
+robot.motors[27].target = (math.radians(0), 'P')
 robot.moveToTarget(robot.motors[27])
 
