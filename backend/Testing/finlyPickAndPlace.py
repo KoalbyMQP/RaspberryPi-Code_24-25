@@ -34,8 +34,8 @@ from backend.Testing import finlyViaPoints as via
 # )
 
 #forward kinematics for camera chain
-camera_angles=np.array([0,0,0,0])
-camera_frame_transformation=camera.forward_kinematics(camera_angles)
+# camera_angles=np.array([0,0,0,0])
+# camera_frame_transformation=camera.forward_kinematics(camera_angles)
 
 
 # Edit to declare if you are testing the sim or the real robot
@@ -80,11 +80,11 @@ while time.time() - simStartTime < 2:
 
 
 # conversion of final points from camera coordinate systm to rorbot coordinate system 
-final_points=np.array([0, .3, 0])
-B=np.array([[final_points[0]],[final_points[1]],[final_points[2]],[1]])
-A= camera_frame_transformation
-final_points=np.array([0,0, 0])
-C = np.dot(A, B)
+# final_points=np.array([0, .3, 0])
+# B=np.array([[final_points[0]],[final_points[1]],[final_points[2]],[1]])
+# A= camera_frame_transformation
+# final_points=np.array([0,0, 0])
+# C = np.dot(A, B)
 
 
 
