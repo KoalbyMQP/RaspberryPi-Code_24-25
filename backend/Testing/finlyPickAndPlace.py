@@ -75,7 +75,7 @@ prevTime = time.time()
 simStartTime = time.time()
 while time.time() - simStartTime < 2:
     time.sleep(0.01)
-    robot.IMUBalance(0,0)
+    #robot.IMUBalance(0,0)
     robot.moveAllToTarget()
 
 
