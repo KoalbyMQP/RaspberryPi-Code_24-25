@@ -57,7 +57,7 @@ final_position=np.array([0.07089,  -0.26614,  .68187])
 # robot.motors[26].target = (math.radians(10), 'P')
 
 
-robot.motors[27].target = (math.radians(-60), 'P')
+robot.motors[27].target = (math.radians(0), 'P')
 robot.motors[5].target = (math.radians(0), 'P')
 robot.motors[6].target = (math.radians(0), 'P')
 robot.motors[7].target = (math.radians(0), 'P')
