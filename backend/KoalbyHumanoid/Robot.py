@@ -108,6 +108,7 @@ class Robot():
             self.motors[1].name:self.motors[0],
             self.motors[0].name:"base",
 
+            self.motors[27].name:self.motors[9],
             self.motors[9].name:self.motors[8],
             self.motors[8].name:self.motors[7],
             self.motors[7].name:self.motors[6],

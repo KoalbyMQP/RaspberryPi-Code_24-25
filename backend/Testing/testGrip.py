@@ -26,6 +26,5 @@ prevTime = time.time()
 simStartTime = time.time()
 while time.time() - simStartTime < 2:
     time.sleep(0.01)
-
     robot.moveAllToTarget()
 print("closed")
