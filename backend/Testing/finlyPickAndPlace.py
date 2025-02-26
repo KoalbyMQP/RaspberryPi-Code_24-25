@@ -21,17 +21,17 @@ from backend.Testing import finlyViaPoints as via
 
 
 # Creating URDF chain for left arm 
-left_arm_chain = Chain.from_urdf_file(
-    "backend/Testing/FinleyJNEWARMS_2024_straight_4.urdf",
-    base_elements=['shoulder1_left', 'shoulder1_left'],
-    active_links_mask=[False, True, True, True, True, True, True]  
-)
+# left_arm_chain = Chain.from_urdf_file(
+#     "backend/Testing/FinleyJNEWARMS_2024_straight_4.urdf",
+#     base_elements=['shoulder1_left', 'shoulder1_left'],
+#     active_links_mask=[False, True, True, True, True, True, True]  
+# )
 
-# creating URDF chain for camera
-camera = Chain.from_urdf_file(
-    "backend/Testing/\FinleyJNEWARMS_2024_straight_4.urdf",
-    base_elements=['neck', 'neck']   
-)
+# # creating URDF chain for camera
+# camera = Chain.from_urdf_file(
+#     "backend/Testing/\FinleyJNEWARMS_2024_straight_4.urdf",
+#     base_elements=['neck', 'neck']   
+# )
 
 #forward kinematics for camera chain
 camera_angles=np.array([0,0,0,0])
@@ -39,7 +39,7 @@ camera_frame_transformation=camera.forward_kinematics(camera_angles)
 
 
 # Edit to declare if you are testing the sim or the real robot
-is_real = False
+is_real = True
 robot = Robot(is_real)
 print("Setup Complete")
 
@@ -51,14 +51,15 @@ final_position=np.array([0.07089,  -0.26614,  .68187])
 
 
 
-#Starting Agnles
+#Starting Angles
 
 # robot.motors[25].target = (math.radians(30), 'P')
 # robot.motors[26].target = (math.radians(10), 'P')
 
 
+robot.motors[27].target = (math.radians(-60), 'P')
 robot.motors[5].target = (math.radians(0), 'P')
-robot.motors[6].target = (math.radians(90), 'P')
+robot.motors[6].target = (math.radians(0), 'P')
 robot.motors[7].target = (math.radians(0), 'P')
 robot.motors[8].target = (math.radians(0), 'P')
 robot.motors[9].target = (math.radians(0), 'P')
@@ -96,9 +97,9 @@ leftArmTraj = [
     [[0,0,0], [0,0,0]]
 ]
 
-final_position=left_arm_chain.forward_kinematics(ik_solution_2)
+# final_position=left_arm_chain.forward_kinematics(ik_solution_2)
 
-lArm_tj_joint = TrajPlannerTime(leftArmTraj[0], leftArmTraj[1], leftArmTraj[2], leftArmTraj[3])
+# lArm_tj_joint = TrajPlannerTime(leftArmTraj[0], leftArmTraj[1], leftArmTraj[2], leftArmTraj[3])
 
 
 
