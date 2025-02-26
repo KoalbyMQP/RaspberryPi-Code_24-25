@@ -14,5 +14,11 @@ robot = Robot(is_real)
 print("Setup Complete")
 robot.motors[27].target = (math.radians(60), 'P')
 print("targeted")
-robot.moveAllToTarget()
+prevTime = time.time()
+simStartTime = time.time()
+while time.time() - simStartTime < 2:
+    time.sleep(0.01)
+    #robot.IMUBalance(0,0)
+    robot.moveAllToTarget()
+
 print("closed")
