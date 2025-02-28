@@ -43,16 +43,25 @@ def main():
     force_data = [0,0]
     print(str(force_data))
 
+   
+
     while notFalling:
         for point in traj:
             # Move to trajectory points
             robot.motors[18].target = (point[1], 'P')  # right knee
             robot.motors[23].target = (point[2], 'P')  # left knee
+            robot.motors[19].target = (point[1]/2, 'P')  # right ankle
+            robot.motors[24].target = (point[2]/2, 'P')  # left ankle
+            newTargetsForce = robot.CoPBalance(force_data)
+            robot.motors[13].target = (newTargetsForce[0], 'P') #for hips side2side
+            robot.motors[17].target = (-newTargetsForce[1], 'P') #for hips front2back
+            robot.motors[22].target = (-newTargetsForce[1], 'P') #for hips front2back
+            robot.moveAllToTarget()
             robot.moveAllToTarget()
             time.sleep(0.005)
 
             #robot.IMUBalance(prevX, prevZ)
-            newTargetsForce = robot.CoPBalance(force_data)
+            
             # print("Force error X:" + str(newTargetsForce[0]))
             # print("Force error Y:" + str(newTargetsForce[1]))
             #print(robot.fused_imu)

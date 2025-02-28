@@ -155,7 +155,7 @@ class Robot():
 
         #temporary measure: for now to print error values, later for fusing imu and pressure sensor data
         newTargets = [targetX, targetZ]
-        # return newTargets
+        return newTargets
 
         self.motors[13].target = (targetX, 'V') #for hips side2side
         self.motors[10].target = (-targetZ, 'V') #for hips front2back

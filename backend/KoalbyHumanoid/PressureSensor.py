@@ -43,8 +43,8 @@ class PressureSensor() :
             # Different signal names for each IMU based on imu_name
             prefix = f"Force{self.sensor_name}"
             sensorHandle = self.sim.getObject(f"/{prefix}")
-            print(f"/{prefix}")
-            print(sensorHandle)
+            # print(f"/{prefix}")
+            # print(sensorHandle)
             if self.sim.readForceSensor(sensorHandle)[0] == 1:
                 self.data = [
                     self.sim.readForceSensor(sensorHandle)[1][0],
@@ -59,6 +59,10 @@ class PressureSensor() :
         print("ForceData")
         print(self.data)
         return self.data
+    
+    def getForceSensorHandle(self):
+        prefix = f"Force{self.sensor_name}"
+        return self.sim.getObject(f"/{prefix}")
     
 
 class ForceManager():
