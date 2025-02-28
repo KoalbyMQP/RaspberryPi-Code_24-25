@@ -96,4 +96,5 @@ class ForceManager():
         pressures[5] = math.sqrt( (data["LTL"][0] ** 2) + (data["LTL"][1] ** 2) + (data["LTL"][2] ** 2) )
         pressures[6] = math.sqrt( (data["LBR"][0] ** 2) + (data["LBR"][1] ** 2) + (data["LBR"][2] ** 2) )
         pressures[7] = math.sqrt( (data["LBL"][0] ** 2) + (data["LBL"][1] ** 2) + (data["LBL"][2] ** 2) )
+        print("pressures:" + str(pressures))
         return pressures

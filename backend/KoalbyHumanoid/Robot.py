@@ -142,17 +142,20 @@ class Robot():
 
     def CoPBalance(self, CoPs):
         self.updateCoP()
-        print(str(self.feetCoP))
+        print("Feet CoP: " + str(self.feetCoP))
+        print("CoPs: " + str(CoPs))
         ErrorX = CoPs[0] - self.feetCoP[0]
         ErrorY = CoPs[1] - self.feetCoP[1]
         self.CoPPIDX.setError(ErrorX)
         self.CoPPIDZ.setError(ErrorY)
         targetX = self.CoPPIDX.calculate()
+        print("Target X: " + str(targetX))
         targetZ = self.CoPPIDZ.calculate()
+        print("Target Z: " + str(targetZ))
 
         #temporary measure: for now to print error values, later for fusing imu and pressure sensor data
         newTargets = [targetX, targetZ]
-        return newTargets
+        # return newTargets
 
         self.motors[13].target = (targetX, 'V') #for hips side2side
         self.motors[10].target = (-targetZ, 'V') #for hips front2back

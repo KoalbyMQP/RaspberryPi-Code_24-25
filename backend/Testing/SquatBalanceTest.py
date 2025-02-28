@@ -39,7 +39,8 @@ def main():
     prevZ = initial[2]
 
     #set initial CoP
-    force_data = robot.updateCoP()
+    #force_data = robot.updateCoP()
+    force_data = [0,0]
     print(str(force_data))
 
     while notFalling:
@@ -52,13 +53,13 @@ def main():
 
             #robot.IMUBalance(prevX, prevZ)
             newTargetsForce = robot.CoPBalance(force_data)
-            print("Force error X:" + str(newTargetsForce[0]))
-            print("Force error Y:" + str(newTargetsForce[1]))
+            # print("Force error X:" + str(newTargetsForce[0]))
+            # print("Force error Y:" + str(newTargetsForce[1]))
             #print(robot.fused_imu)
-            # if robot.fused_imu[0] > 15 or robot.fused_imu[1] > 15 or robot.fused_imu[2] > 15:  
-            #     print("FALLING")
-            #     notFalling = False
-            #     break
+            if robot.fused_imu[0] > 15 or robot.fused_imu[1] > 15 or robot.fused_imu[2] > 15:  
+                print("FALLING")
+                notFalling = False
+                break
             count += 1
             print(count, "/", len(traj))
             
