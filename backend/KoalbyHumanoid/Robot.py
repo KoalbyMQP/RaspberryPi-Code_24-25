@@ -63,8 +63,8 @@ class Robot():
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
         self.feetCoP = [0, 0]
-        self.CoPPIDX = PID(0.01, 0, 0)
-        self.CoPPIDZ = PID(0.5, 0, 0)
+        self.CoPPIDX = PID(2, 2, 2)
+        self.CoPPIDZ = PID(2, 1, 0.5)
 
         if not is_real:
             self.sim.startSimulation()
@@ -141,17 +141,15 @@ class Robot():
         return self.feetCoP #values should be around half of footWidth and footLength
 
     def CoPBalance(self, CoPs):
-        self.updateCoP()
-        print("Feet CoP: " + str(self.feetCoP))
-        print("CoPs: " + str(CoPs))
-        ErrorX = CoPs[0] - self.feetCoP[0]
-        ErrorY = CoPs[1] - self.feetCoP[1]
+        newFeetCoP = self.updateCoP()
+
+        ErrorX = CoPs[0] - newFeetCoP[0]
+        ErrorY = CoPs[1] - newFeetCoP[1]
+
         self.CoPPIDX.setError(ErrorX)
         self.CoPPIDZ.setError(ErrorY)
         targetX = self.CoPPIDX.calculate()
-        print("Target X: " + str(targetX))
         targetZ = self.CoPPIDZ.calculate()
-        print("Target Z: " + str(targetZ))
 
         #temporary measure: for now to print error values, later for fusing imu and pressure sensor data
         newTargets = [targetX, targetZ]

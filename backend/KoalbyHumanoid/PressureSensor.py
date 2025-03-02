@@ -56,8 +56,8 @@ class PressureSensor() :
                 self.data = [0 if dataPoint is None else dataPoint for dataPoint in self.data]
         else:
             self.data = [0, 0, 0, 0, 0, 0]  # Fallback if sim is not set in simulation mode
-        print("ForceData")
-        print(self.data)
+        # print("ForceData")
+        # print(self.data)
         return self.data
     
     def getForceSensorHandle(self):
@@ -100,5 +100,5 @@ class ForceManager():
         pressures[5] = math.sqrt( (data["LTL"][0] ** 2) + (data["LTL"][1] ** 2) + (data["LTL"][2] ** 2) )
         pressures[6] = math.sqrt( (data["LBR"][0] ** 2) + (data["LBR"][1] ** 2) + (data["LBR"][2] ** 2) )
         pressures[7] = math.sqrt( (data["LBL"][0] ** 2) + (data["LBL"][1] ** 2) + (data["LBL"][2] ** 2) )
-        print("pressures:" + str(pressures))
+        # print("pressures:" + str(pressures))
         return pressures

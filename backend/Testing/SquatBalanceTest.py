@@ -35,15 +35,15 @@ def main():
     left_chest_imu = imu_data["LeftChest"]
     torso_imu = imu_data["Torso"]
     initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
-    prevX = initial[0]
-    prevZ = initial[2]
 
     #set initial CoP
-    #force_data = robot.updateCoP()
-    force_data = [0,0]
-    print(str(force_data))
-
+    inital_data = []
+    inital_data.append(robot.updateCoP()[0])
+    inital_data.append(robot.updateCoP()[1])
+    print("Initial CoP: ", inital_data)
    
+    motor_data = []
+    count = 0
 
     while notFalling:
         for point in traj:
@@ -52,29 +52,29 @@ def main():
             robot.motors[23].target = (point[2], 'P')  # left knee
             robot.motors[19].target = (point[1]/2, 'P')  # right ankle
             robot.motors[24].target = (point[2]/2, 'P')  # left ankle
-            newTargetsForce = robot.CoPBalance(force_data)
-            robot.motors[13].target = (newTargetsForce[0], 'P') #for hips side2side
-            robot.motors[17].target = (-newTargetsForce[1], 'P') #for hips front2back
-            robot.motors[22].target = (-newTargetsForce[1], 'P') #for hips front2back
-            robot.moveAllToTarget()
-            robot.moveAllToTarget()
-            time.sleep(0.005)
 
-            #robot.IMUBalance(prevX, prevZ)
+            newTargetsForce = robot.CoPBalance(inital_data)
+            motor_data.append(newTargetsForce)
+
+            print("Motor Targets: ", newTargetsForce)
             
-            # print("Force error X:" + str(newTargetsForce[0]))
-            # print("Force error Y:" + str(newTargetsForce[1]))
-            #print(robot.fused_imu)
-            if robot.fused_imu[0] > 15 or robot.fused_imu[1] > 15 or robot.fused_imu[2] > 15:  
-                print("FALLING")
-                notFalling = False
-                break
+            robot.motors[17].target = (newTargetsForce[1], 'P') #for right kick
+            robot.motors[22].target = (-newTargetsForce[1], 'P') #for left kick
+
+            robot.moveAllToTarget()
+            time.sleep(0.05)
+
+            if(count == 60):
+                motorRotate, motorFront2Back = zip(*motor_data)  # Unpacking x and y forces
+                plt.plot(range(len(motor_data)), motorFront2Back, label="Motor Targets")
+                plt.xlabel("Time step")
+                plt.ylabel("Radians")
+                plt.legend()
+                plt.title("Motor Targets over Time")
+                plt.grid()
+                plt.show()
+            
             count += 1
-            print(count, "/", len(traj))
-            
-    
-    print("Dead")
-    print(count, "/", len(traj))
 
 if __name__ == "__main__":
     main()
