@@ -6,16 +6,18 @@ sys.path.append("./")
 from backend.KoalbyHumanoid.Robot import Robot
 from backend.KoalbyHumanoid import trajPlannerPose
 import matplotlib.pyplot as plt
+from ikpy.chain import Chain
 
 is_real = False
 robot = Robot(is_real)
 print("Setup Complete")
 
-def main():
-    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
+def initialize(): 
+    robot.motors[1].target = (math.radians(90), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-90), 'P') # LeftShoulderAbductor
     robot.moveAllToTarget()
     print("Initial Pose Done")
+
 
     simStartTime = time.time()
     setPoints = [[0, 0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
@@ -29,50 +31,76 @@ def main():
         time.sleep(0.01)
     print("Initialized")
 
-    # Set initial balance targets
-    imu_data = robot.imu_manager.getAllIMUData()
-    right_chest_imu = imu_data["RightChest"]
-    left_chest_imu = imu_data["LeftChest"]
-    torso_imu = imu_data["Torso"]
-    initial = robot.fuse_imu_data(right_chest_imu, left_chest_imu, torso_imu)
+    return notFalling,traj
+
+def calculate_kick_angles(leg_chain, kick_angle, knee_angle, ankle_angle):
+        leg_joint_angles = [0.0, kick_angle, knee_angle, ankle_angle]
+        leg_fk = leg_chain.forward_kinematics(leg_joint_angles)
+        foot_to_kick = np.linalg.inv(leg_fk)
+        R32 = foot_to_kick[2][1]
+        R33 = foot_to_kick[2][2]
+        kick_angle = np.arctan2(R32, R33)
+        return kick_angle
+
+def main():
+
+    notFalling,traj = initialize()
+
+    left_leg_chain = Chain.from_urdf_file(
+            "backend/Testing/robotChain.urdf",
+            base_elements=['LeftHip2', 'LeftKick']
+        )
+    right_leg_chain = Chain.from_urdf_file(
+            "backend/Testing/robotChain.urdf",
+            base_elements=['RightHip2', 'RightKick']
+        )
 
     #set initial CoP
     inital_data = []
     inital_data.append(robot.updateCoP()[0])
     inital_data.append(robot.updateCoP()[1])
     print("Initial CoP: ", inital_data)
-   
     motor_data = []
     count = 0
-
     while notFalling:
         for point in traj:
-            # Move to trajectory points
-            robot.motors[18].target = (point[1], 'P')  # right knee
-            robot.motors[23].target = (point[2], 'P')  # left knee
-            robot.motors[19].target = (point[1]/2, 'P')  # right ankle
-            robot.motors[24].target = (point[2]/2, 'P')  # left ankle
+
+            right_kick_angle = 0
+            right_knee_angle = point[1]
+            right_ankle_angle = point[1]/2
+
+            left_kick_angle = 0
+            left_knee_angle = point[2]
+            left_ankle_angle = point[2]/2
+
+            robot.motors[18].target = (right_knee_angle, 'P')  # right knee
+            robot.motors[23].target = (left_knee_angle, 'P')  # left knee
+            robot.motors[19].target = (right_ankle_angle, 'P')  # right ankle
+            robot.motors[24].target = (left_ankle_angle, 'P')  # left ankle
+
+            right_kick_angle = calculate_kick_angles(right_leg_chain, right_kick_angle, right_knee_angle, right_ankle_angle)
+            left_kick_angle = calculate_kick_angles(left_leg_chain, left_kick_angle, left_knee_angle, left_ankle_angle)
+
+            print("right kick angle: ", right_kick_angle,  "\n")
+            print("left kick angle: ", left_kick_angle,  "\n")
 
             newTargetsForce = robot.CoPBalance(inital_data)
             motor_data.append(newTargetsForce)
-
-            print("Motor Targets: ", newTargetsForce)
-            
-            robot.motors[17].target = (newTargetsForce[1], 'P') #for right kick
-            robot.motors[22].target = (-newTargetsForce[1], 'P') #for left kick
-
+            # print("Motor Targets: ", newTargetsForce)
+            robot.motors[17].target = (newTargetsForce[1] - right_kick_angle, 'P') #for right kick
+            robot.motors[22].target = (-(newTargetsForce[1] - left_kick_angle), 'P') #for left kick
             robot.moveAllToTarget()
             time.sleep(0.005)
 
-            if(count == 60):
-                motorRotate, motorFront2Back = zip(*motor_data)  # Unpacking x and y forces
-                plt.plot(range(len(motor_data)), motorFront2Back, label="Motor Targets")
-                plt.xlabel("Time step")
-                plt.ylabel("Radians")
-                plt.legend()
-                plt.title("Motor Targets over Time")
-                plt.grid()
-                plt.show()
+            # if(count == 60):
+            #     motorRotate, motorFront2Back = zip(*motor_data)  # Unpacking x and y forces
+            #     plt.plot(range(len(motor_data)), motorFront2Back, label="Motor Targets")
+            #     plt.xlabel("Time step")
+            #     plt.ylabel("Radians")
+            #     plt.legend()
+            #     plt.title("Motor Targets over Time")
+            #     plt.grid()
+            #     plt.show()
             
             count += 1
 
