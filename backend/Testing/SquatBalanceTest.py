@@ -62,7 +62,7 @@ def main():
             robot.motors[22].target = (-newTargetsForce[1], 'P') #for left kick
 
             robot.moveAllToTarget()
-            time.sleep(0.05)
+            time.sleep(0.005)
 
             if(count == 60):
                 motorRotate, motorFront2Back = zip(*motor_data)  # Unpacking x and y forces

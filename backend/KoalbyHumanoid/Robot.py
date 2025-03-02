@@ -64,7 +64,7 @@ class Robot():
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
         self.feetCoP = [0, 0]
         self.CoPPIDX = PID(2, 2, 2)
-        self.CoPPIDZ = PID(2, 1, 0.5)
+        self.CoPPIDZ = PID(3.25, 0, 0)
 
         if not is_real:
             self.sim.startSimulation()
