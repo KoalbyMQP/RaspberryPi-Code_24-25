@@ -390,6 +390,29 @@ class Robot():
         ev = 0.01
         return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
 
+    def FKBalance(chain, joint_angles, isInvertedChain):
+        #leg_chain: chain of base motor to motor you want to balance
+        #joint_angles: angles of all the joints in the chain in order. cannot be longer than length of chain
+        #isInvertedChain: true when you want to calculate from end to start of chain instead of start to end
+
+        try:
+            if (chain.length != joint_angles.length):
+                raise ValueError("Length of chain and joint angles must be equal!")
+        except ValueError as ve:
+            print(ve)
+        chain_fk = chain.forward_kinematics(joint_angles)
+        if isInvertedChain:
+            chain_fk = np.linalg.inv(chain_fk)
+        R11 = chain_fk[0][0]; R12 = chain_fk[0][1], R13 = chain_fk[1][2]
+        R21 = chain_fk[1][0]; R22 = chain_fk[1][1]; R23 = chain_fk[1][2]
+        R31 = chain_fk[2][0]; R32 = chain_fk[2][1]; R33 = chain_fk[2][2]
+        
+        roll = np.arctan2(R32, R33)
+        pitch = np.arctan2(-R31, math.sqrt(R32**2 + R33**2))
+        yaw = np.arctan2(R21, R11)
+
+        return [pitch, roll, yaw]
+    
     # New method to get data from all IMUs
     def getAllIMUData(self):
         imu_data = {name: imu.getData() for name, imu in self.imus.items()}
