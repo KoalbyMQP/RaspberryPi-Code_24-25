@@ -4,3 +4,4 @@
 **/__pycache__
 /test/io/inputs/camera/oak-d-lite/vdepthai
 
+.venv/
