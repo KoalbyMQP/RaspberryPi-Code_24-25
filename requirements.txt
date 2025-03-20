@@ -11,3 +11,4 @@ cbor
 cbor2 
 torch
 gym
+ikpy

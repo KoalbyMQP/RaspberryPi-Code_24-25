@@ -3,6 +3,9 @@
 sim=require'sim'
 simUI=require'simUI'
 
+
+
+
 function handleUI(p)
     local s=sim.getObjectSel()
     if s and #s>0 and s[#s]==model then
@@ -53,6 +56,7 @@ function sysCall_init()
     sensor=sim.getObject('./forceSensor')
     mass=sim.getObjectFloatParam(massObject,sim.shapefloatparam_mass)
     ref=sim.getObject('./reference')
+    print(ref)
 end
 
 function sysCall_sensing() 
