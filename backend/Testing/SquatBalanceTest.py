@@ -13,14 +13,14 @@ robot = Robot(is_real)
 print("Setup Complete")
 
 def initialize(): 
-    robot.motors[1].target = (math.radians(90), 'P')  # RightShoulderAbductor
-    robot.motors[6].target = (math.radians(-90), 'P') # LeftShoulderAbductor
+    robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
+    robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
     robot.moveAllToTarget()
     print("Initial Pose Done")
 
 
     simStartTime = time.time()
-    setPoints = [[0, 0], [math.radians(-80), math.radians(80)], [math.radians(0), math.radians(0)]]
+    setPoints = [[0, 0], [math.radians(0), math.radians(90)], [math.radians(0), math.radians(0)]]
     tj = trajPlannerPose.TrajPlannerPose(setPoints)
     traj = tj.getCubicTraj(10, 100)
     notFalling = True
@@ -73,32 +73,64 @@ def main():
             left_knee_angle = point[2]
             left_ankle_angle = point[2]/2
 
-            robot.motors[18].target = (right_knee_angle, 'P')  # right knee
-            robot.motors[23].target = (left_knee_angle, 'P')  # left knee
-            robot.motors[19].target = (right_ankle_angle, 'P')  # right ankle
-            robot.motors[24].target = (left_ankle_angle, 'P')  # left ankle
+            # robot.motors[18].target = (right_knee_angle, 'P')  # right knee
+            # robot.motors[23].target = (left_knee_angle, 'P')  # left knee
+            # robot.motors[19].target = (right_ankle_angle, 'P')  # right ankle
+            # robot.motors[24].target = (left_ankle_angle, 'P')  # left ankle
 
             right_kick_angle = calculate_kick_angles(right_leg_chain, right_kick_angle, right_knee_angle, right_ankle_angle)
             left_kick_angle = calculate_kick_angles(left_leg_chain, left_kick_angle, left_knee_angle, left_ankle_angle)
 
-            print("right kick angle: ", right_kick_angle,  "\n")
-            print("left kick angle: ", left_kick_angle,  "\n")
+            # print("right kick angle: ", right_kick_angle,  "\n")
+            # print("left kick angle: ", left_kick_angle,  "\n")
 
             newTargetsForce = robot.CoPBalance(inital_data)
-            motor_data.append(newTargetsForce)
             # print("Motor Targets: ", newTargetsForce)
-            robot.motors[17].target = (newTargetsForce[1] - right_kick_angle, 'P') #for right kick
-            robot.motors[22].target = (-(newTargetsForce[1] - left_kick_angle), 'P') #for left kick
+            # print("Pressure sensor values: ",newTargetsForce)
+            motor_data.append(newTargetsForce)
+
+            # robot.motors[17].target = (newTargetsForce[1] - right_kick_angle, 'P') #for right kick
+            # robot.motors[22].target = (-(newTargetsForce[1] - left_kick_angle), 'P') #for left kick
+
+            robot.motors[1].target = (math.radians(80), 'P')  # RightShoulderAbductor
+            robot.motors[6].target = (math.radians(-80), 'P') # LeftShoulderAbductor
+
+            robot.motors[10].target = (point[1]/2, 'P') #for hips front to back 
+            robot.motors[13].target = (point[1]/2, 'P') #for hips side to side 
+
             robot.moveAllToTarget()
             time.sleep(0.005)
 
-            # if(count == 60):
+            # if(count == 65):
             #     motorRotate, motorFront2Back = zip(*motor_data)  # Unpacking x and y forces
-            #     plt.plot(range(len(motor_data)), motorFront2Back, label="Motor Targets")
+            #     plt.plot(range(len(motor_data)), motorFront2Back, label=" Kick Motor Targets")
+            #     plt.plot(range(len(motor_data)), motorRotate, label="Side to Side Motor Targets")
             #     plt.xlabel("Time step")
             #     plt.ylabel("Radians")
             #     plt.legend()
             #     plt.title("Motor Targets over Time")
+            #     plt.grid()
+            #     plt.show()
+
+            # if count == 65:
+            #     plt.figure(figsize=(10, 5))
+            #     motor_data = np.array(motor_data)  # Shape: (timesteps, 8 sensors)
+            #     for sensor_id in range(4):
+            #         plt.plot(range(len(motor_data)), motor_data[:, sensor_id], label=f"Right Sensor {sensor_id+1}")
+            #     plt.xlabel("Time Step")
+            #     plt.ylabel("Pressure / Force")
+            #     plt.legend()
+            #     plt.title("Pressure Sensor Readings Over Time")
+            #     plt.grid()
+            #     # plt.show()
+
+            #     plt.figure(figsize=(10, 5))
+            #     for sensor_id in range(4):
+            #         plt.plot(range(len(motor_data)), motor_data[:, sensor_id+4], label=f"Left Sensor {sensor_id+1}")
+            #     plt.xlabel("Time Step")
+            #     plt.ylabel("Pressure / Force")
+            #     plt.legend()
+            #     plt.title("Pressure Sensor Readings Over Time")
             #     plt.grid()
             #     plt.show()
             

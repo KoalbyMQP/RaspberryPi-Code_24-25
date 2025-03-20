@@ -63,7 +63,7 @@ class Robot():
         self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.forceManager = ForceManager(self.is_real, sim=self.sim)
         self.feetCoP = [0, 0]
-        self.CoPPIDX = PID(2, 2, 2)
+        self.CoPPIDX = PID(5, 0.5, 0.5)
         self.CoPPIDZ = PID(1.25, 0.25, 0.75)
 
         if not is_real:
@@ -123,25 +123,29 @@ class Robot():
         #get pressure value from each pressure sensor
         data = self.forceManager.pressurePerSensor()
 
+        return data
+
         rightTop= (data[0] + data[1]) / 2 #right foot
         rightBottom = (data[2] + data[3]) / 2 #right foot
         rightLeft = (data[1] + data[3]) / 2 #right foot
         rightRight = (data[0] + data[2]) / 2 #right foot
-        rightCoPX = (rightRight*footWidth) / (rightRight + rightLeft)  #right foot CoP x location WRT right edge of foot
-        rightCoPY = (rightTop*footLength) / (rightTop + rightBottom) #right foot CoP y location WRT top edge of foot
+        rightCoPX = (rightRight - rightLeft) * (footWidth / 2) / (rightRight + rightLeft)
+        rightCoPY = (rightTop - rightBottom) * (footLength / 2) / (rightTop + rightBottom) #right foot CoP y location WRT top edge of foot
 
         leftTop= (data[4] + data[5]) / 2 #left foot
         leftBottom = (data[6] + data[7]) / 2 #left foot
         leftLeft = (data[5] + data[7]) / 2 #leftt foot
         leftRight = (data[4] + data[6]) / 2 #left foot
-        leftCoPX = (leftRight*footWidth) / (leftLeft + leftRight) #left foot CoP x location WRT right edge of foot
-        leftCoPY = (leftTop*footLength) / (leftTop + leftBottom) #left foot
+        leftCoPX = (leftRight - leftLeft) * (footWidth / 2) / (leftLeft + leftRight) #left foot CoP x location WRT right edge of foot
+        leftCoPY = (leftTop - leftBottom) * (footLength / 2) / (leftTop + leftBottom) #left foot
         self.feetCoP[0] = (rightCoPX + leftCoPX) / 2 #average x for each foot
         self.feetCoP[1] = (rightCoPY + leftCoPY) / 2 #average y for each foot
         return self.feetCoP #values should be around half of footWidth and footLength
 
     def CoPBalance(self, CoPs):
         newFeetCoP = self.updateCoP()
+
+        return newFeetCoP
 
         ErrorX = CoPs[0] - newFeetCoP[0]
         ErrorY = CoPs[1] - newFeetCoP[1]
@@ -152,7 +156,8 @@ class Robot():
         targetZ = self.CoPPIDZ.calculate()
 
         #temporary measure: for now to print error values, later for fusing imu and pressure sensor data
-        newTargets = [targetX, targetZ]
+        # newTargets = [targetX, targetZ]
+        newTargets = [newFeetCoP[0], newFeetCoP[1]]
         return newTargets
 
         self.motors[13].target = (targetX, 'V') #for hips side2side
