@@ -49,3 +49,8 @@
 ## Branches (Update as new branches are made)
 ### main
 Ready to deploy for good production codebase on Ava's Raspberry Pi
+
+## Past Branches: All previous branches a team member worked on has been combined into main. For clarification on any specific code: 
+1. On the right hand side of the repository click Activity
+2. Click All Activity and change to Branch Deletions
+3. All outdated, previous branches will appear and are named according to what concept/test was focused on in the code. To properly view, click the three dots on the right side of the branch name to restore branch.
