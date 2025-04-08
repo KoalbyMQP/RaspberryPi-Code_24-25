@@ -1,4 +1,3 @@
-#import adafruit_bno055
 import numpy as np
 import math
 import adafruit_bno055
@@ -92,8 +91,9 @@ class IMUManager():
         self.imu_names = ["RightFoot", "LeftFoot", "CenterOfMass", "Torso", "RightChest", "LeftChest"]
         self.imus = {name: IMU(isReal, sim, name) for name in self.imu_names}
 
+        
         self.imu1 = adafruit_bno055.BNO055_I2C(IMU.tca[6])
-        self.imu2 = adafruit_bno055.BNO055_I2C(IMU.tca[5])
+        self.imu2 = adafruit_bno055.BNO055_I2C(IMU.tca[5]) 
 
     def getAllIMUData(self):
         """

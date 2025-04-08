@@ -48,7 +48,6 @@ class Robot():
             self.imuPIDZ = PID(15, 2, 5)
 
         self.lastMotorCheck = time.time()
-        self.imu_manager = IMUManager(self.is_real, sim=self.sim)
         self.ang_vel = [0, 0, 0]
         self.last_vel = [0, 0, 0]
         self.ang_accel = [0, 0, 0]
@@ -71,7 +70,7 @@ class Robot():
         print("Robot Created and Initialized")
 
     # Fuse IMU data from right_chest_imu, left_chest_imu and torso_imu
-    def fuse_imu_data(self, right_chest_imu, left_chest_imu, torso_imu):
+    def fuse_imu_data(self, right_chest_imu, left_chest_imu):
         """
         Fuses the IMU data from right chest, left chest, and torso.
 
@@ -83,7 +82,7 @@ class Robot():
         Returns:
             np.array: Fused [pitch, roll, yaw] data for PID controller input.
         """
-        self.fused_imu = np.mean([right_chest_imu, left_chest_imu, torso_imu], axis=0)
+        self.fused_imu = np.mean([right_chest_imu, left_chest_imu], axis=0)
         return self.fused_imu
     
     def IMUBalance(self, Xtarget, Ytarget, Ztarget):
