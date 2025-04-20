@@ -79,9 +79,9 @@ def main():
         newTargetY = robot.IMUBalance(prevX, prevY, prevZ)[1]
         newTargetZ = robot.IMUBalance(prevX, prevY, prevZ)[2]
 
-        robot.motors[12].target = (math.radians(newTargetZ), 'P')  # Adjust yaw
-        robot.motors[13].target = (math.radians(newTargetY), 'P')  # Adjust pitch
-        robot.motors[10].target = (math.radians(-newTargetX), 'P')  # Adjust pitch
+        robot.motors[12].target = robot.motor.set_position(math.radians(newTargetZ))  # Adjust yaw
+        robot.motors[13].target = robot.motor.set_position(math.radians(newTargetY))  # Adjust pitch
+        robot.motors[10].target = robot.motor.set_position(math.radians(-newTargetX))  # Adjust pitch
 
         # Right Leg
         robot.motors[15].target = (0, 'P')
@@ -97,8 +97,9 @@ def main():
         robot.motors[23].target = (0, 'P') 
         robot.motors[24].target = (0, 'P')
 
-
+        robot.motor.get_position()
         robot.moveAllToTarget()
+        
 
 
         count = count + 1 # keeps track of how many trajectory points it has reached

@@ -9,18 +9,19 @@ import matplotlib.pyplot as plt
 from backend.KoalbyHumanoid.Plotter import Plotter
 
 # Edit to declare if you are testing the sim or the real robot
-is_real = False
+is_real = True
 robot = Robot(is_real)
 print("Setup Complete")
 
 
 
 def initialize():
+    
     robot.motors[1].target = (math.radians(0), 'P')  # RightShoulderAbductor
     robot.motors[6].target = (math.radians(0), 'P') # LeftShoulderAbductor
 
     # Torso
-    robot.motors[10].target = (math.radians(4), 'P')
+    robot.motors[10].target = (math.radians(0), 'P')
     robot.motors[11].target = (math.radians(0), 'P')
     robot.motors[12].target = (math.radians(0), 'P')
     robot.motors[13].target = (math.radians(0), 'P')
@@ -47,6 +48,7 @@ def initialize():
 
 
 def main():
+    robot.arduino_serial_init()
     initialize()
 
     # Set initial balance targets
@@ -80,7 +82,7 @@ def main():
         robot.motors[1].target = (point[1], 'P') # for right arm
         robot.motors[6].target = (point[2], 'P') # for left arm
         robot.motors[2].target = (point[3], 'P')
-        robot.motors[10].target = (math.radians(4), 'P')
+        robot.motors[10].target = (math.radians(0), 'P')
         robot.motors[11].target = (math.radians(0), 'P')
         robot.motors[12].target = (math.radians(0), 'P')
         robot.motors[13].target = (math.radians(0), 'P')

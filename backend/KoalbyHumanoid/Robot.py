@@ -247,6 +247,7 @@ class Robot():
                     # Set a default target if the motor target is not set correctly
                     motor.target = (motor.theta, 'P')  # Use the current position as a default target
                 motor.move(motor.target)
+                
         else:
             # Check for invalid targets and set a safe default
             for motor in self.motors:
