@@ -2,12 +2,21 @@
 ## Raspberry Pi Side of Koalby/Ava
 
 ### Install and Use
+On the Raspberry Pi:
+1. Install the latest 64 bit version of Raspberry Pi and connect it to the internet
+2. Clone this GitHub repository
+    1. https://github.com/KoalbyMQP/RaspberryPi-Code_24-25
+3. Install all Python packages in requirements.txt found in the root folder of this repository. Newer versions of pip discourage installing packages outside of a virtual environment, so --break-system-packages is appended to ensure that the packages have full access to the system.
+    1. pip install -r requirements.txt --break-system-packages
+4. Clone and install the daqhats library. Be sure to use sudo pip install daqhats --break-system-packages when you get to that step
+    1. https://github.com/mccdaq/daqhats
+On your own computer:
 1. Download and install the latest versions of CoppeliaSim, Git, and Python for your OS
     1. CoppeliaSim: https://coppeliarobotics.com/
     2. Git: https://git-scm.com/downloads/
     3. Python: https://www.python.org/downloads/
 2. Clone this GitHub repository
-    1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
+    1. https://github.com/KoalbyMQP/RaspberryPi-Code_24-25
 3. Install all Python packages in requirements.txt found in the root folder of this repository. Newer versions of pip discourage installing packages outside of a virtual environment, so --break-system-packages is appended to ensure that the packages have full access to the system.
     1. pip install -r requirements.txt --break-system-packages
 4. Open CoppeliaSim
@@ -45,6 +54,7 @@
   - initSim: initalizes the simulation (connects python to CoppeliaSim)
   - simMotionTest: testing balancing while standing and bending over
   - trajplannertest: tests the trajPlanner class in the KoalbyHumanoid package
+  - MCC_testing.py: test communication with the MCC HAT
 
 ## Branches (Update as new branches are made)
 ### main
