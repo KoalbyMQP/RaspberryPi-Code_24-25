@@ -8,8 +8,8 @@
     3. Python: https://www.python.org/downloads/
 2. Clone this GitHub repository
     1. https://github.com/KoalbyMQP/RaspberryPi-Code_23-24
-3. Install all Python packages in requirements.txt found in the root folder of this repository
-    1. pip install -r requirements.txt
+3. Install all Python packages in requirements.txt found in the root folder of this repository. Newer versions of pip discourage installing packages outside of a virtual environment, so --break-system-packages is appended to ensure that the packages have full access to the system.
+    1. pip install -r requirements.txt --break-system-packages
 4. Open CoppeliaSim
     1. For Ubuntu and macOS, you may have to open CoppeliaSim through terminal if not working
 5. Open wanted scene in CoppeliaSim
