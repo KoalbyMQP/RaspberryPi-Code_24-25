@@ -3,8 +3,8 @@ import time
 import math
 import numpy as np
 
-sys.path.append("D:/Documents/College/Humanoid MQP Project/RaspberryPi-Code_23-24")
-sys.path.append("C:/Users/Gabriel/AppData/Local/Programs/Python/Python312/Lib/site-packages")
+sys.path.append("C:/Users/ccoto/RaspberryPi-Code_24-25")
+sys.path.append("C:/Users/ccoto/AppData/Local/Programs/Python/Python310/Lib/site-packages")
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
 from backend.KoalbyHumanoid.Link import Link
@@ -13,10 +13,7 @@ from backend.KoalbyHumanoid.ArduinoSerial import ArduinoSerial
 from backend.KoalbyHumanoid.Motor import Motor
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from backend.KoalbyHumanoid import poe as poe
-<<<<<<< HEAD
-=======
 #from backend.KoalbyHumanoid.IMU import IMU
->>>>>>> gripperTest_da
 from backend.KoalbyHumanoid.Electromagnet import Electromagnet
 from backend.KoalbyHumanoid.IMU import IMU, IMUManager
 from backend.KoalbyHumanoid.PressureSensor import PressureSensor, ForceManager
@@ -35,17 +32,14 @@ class Robot():
             self.arduino_serial_init()
             self.motors = self.real_motors_init()
             
-<<<<<<< HEAD
             self.imuPIDX = PID(0.5, 0.0, 0.2)
             self.imuPIDY = PID(0.5, 0.0, 0.2)
             self.imuPIDZ = PID(0.5, 0.0, 0.2)
             self.electromagnet = Electromagnet()
-=======
         #    self.imuPIDX = PID(0.2,0,0.1) # 1
        #     self.imuPIDZ = PID(0.25,0.0,0.0075)
             
       #      self.electromagnet = Electromagnet()
->>>>>>> gripperTest_da
         else:
             self.checkCoppeliaSimResponding()
 
@@ -54,7 +48,6 @@ class Robot():
             self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./chest_respondable"))
             self.motors = self.sim_motors_init()
             
-<<<<<<< HEAD
             self.imuPIDX = PID(5, 2, 5)
             self.imuPIDY = PID(15, 2, 5)
             self.imuPIDZ = PID(15, 2, 5)
@@ -79,11 +72,10 @@ class Robot():
         self.CoPPIDZ = PID(0.5, 0, 0)
 
         if not is_real:
-=======
         #    self.imuPIDX = PID(0.3,0.005,0.1)
         #    self.imuPIDZ = PID(0.25,0.0,0.0075)
 
-        self.lastMotorCheck = time.time()
+            self.lastMotorCheck = time.time()
 
        # self.imu = IMU(self.is_real, sim=self.sim)
        # self.CoM = np.array([0, 0, 0])
@@ -105,7 +97,6 @@ class Robot():
         # self.trackSphere = self.sim.getObject("./trackSphere")
         # self.sim.setObjectColor(self.trackSphere, 0, self.sim.colorcomponent_ambient_diffuse, (0,0,1))
         if(not is_real):
->>>>>>> gripperTest_da
             self.sim.startSimulation()
         print("Robot Created and Initialized")
 
@@ -404,10 +395,8 @@ class Robot():
     #         locations.append(mr.FKinSpace(M,np.transpose(slist),thetaList)[0:3,3])
     #     return locations
     
-<<<<<<< HEAD
     def IK(self, motor, T, thetaGuess):
         """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
-=======
     # def updateBalancePoint(self):
     #     rightAnkle = self.locate(self.motors[Config.Joints.Right_Ankle_Joint.value])
     #     leftAnkle = self.locate(self.motors[Config.Joints.Left_Ankle_Joint.value])
@@ -425,8 +414,7 @@ class Robot():
     #     return centerPoint
     
     # def IK(self, motor, T, thetaGuess):
-    #     """Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
->>>>>>> gripperTest_da
+    #     ""Computes the Inverse Kinematics from the Body Frame to the desired end effector motor
 
     #     Args:
     #         eeMotor (SimMotor): Motor you want to calculate IK towards
@@ -444,12 +432,10 @@ class Robot():
     #     ev = 0.01
     #     return (mr.IKinSpace(Slist, M, T, thetaGuess, eomg, ev))
 
-<<<<<<< HEAD
     # New method to get data from all IMUs
     def getAllIMUData(self):
         imu_data = {name: imu.getData() for name, imu in self.imus.items()}
         return imu_data
-=======
     # # methods to balance (unassisted standing)
 
     # def IMUBalance(self, Xtarget, Ztarget):
@@ -480,7 +466,6 @@ class Robot():
     #     self.motors[13].target = (newTargetX, 'V')
     #     self.motors[10].target = (-newTargetZ, 'V')
     #     return balanceError
->>>>>>> gripperTest_da
 
     # def balanceAngle(self):
     #     balanceError = self.balancePoint - self.CoM
@@ -563,11 +548,10 @@ class Robot():
     #         if(line == "END" or line == None):
     #             return
             
-<<<<<<< HEAD
-            msg = line.split(" ")
-            if(len(msg) >= 3):
+        msg = line.split(" ")
+        if(len(msg) >= 3):
                 print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
-            else:
+        else:
                 print(line)
     
     def reset_position(self):
@@ -611,10 +595,8 @@ class Robot():
             import time
             time.sleep(0.5)
             self.sim.startSimulation()
-=======
     #         msg = line.split(" ")
     #         if(len(msg) >= 3):
     #             print(f"Error: {self.decodeError(msg[1])}, Motor: {msg[0]}, Angle: {msg[2]}")
     #         else:
     #             print(line)
->>>>>>> gripperTest_da

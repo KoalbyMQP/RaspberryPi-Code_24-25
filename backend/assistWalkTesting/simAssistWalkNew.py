@@ -94,14 +94,15 @@ def main():
 
 
     left_leg_chain = Chain.from_urdf_file(
-        "backend/Testing/robotChain.urdf",
-        base_elements=['LeftHip', 'LeftLegRotator']
+        "backend/assistWalkTesting/WalkingAssistedURDF/Finly_Walking_Assisted_URDF.urdf",
+        base_elements=['LeftHip', 'hip_in_left']
     )
+    print(left_leg_chain)
 
 
     right_leg_chain = Chain.from_urdf_file(
-        "backend/Testing/robotChain.urdf",
-        base_elements=['RightHip', 'RightLegRotator']
+        "backend/assistWalkTesting/WalkingAssistedURDF/Finly_Walking_Assisted_URDF.urdf",
+        base_elements=['RightHip', 'hip_in_right']
     )
     
     x_base = 0.004
