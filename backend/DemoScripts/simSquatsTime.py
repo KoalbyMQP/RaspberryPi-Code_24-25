@@ -22,12 +22,12 @@ robot.motors[6].target = (math.radians(-80), 'P')
 
 simStartTime = time.time()
 while time.time() - simStartTime < 5:
-    robot.IMUBalance(0,0)
+    robot.IMUBalance(0,0,0)
     robot.moveAllToTarget()
 while True:
     startTime = time.time()
     while time.time() - startTime < squatTime*2:
-        robot.IMUBalance(0,0)
+        robot.IMUBalance(0,0,0)
         point = tjTime.getQuinticPositions(time.time() - startTime)
         robot.motors[17].target = (point[0], 'P')
         robot.motors[18].target = (point[1], 'P')

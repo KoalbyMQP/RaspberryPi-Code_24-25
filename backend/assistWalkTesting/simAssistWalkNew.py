@@ -94,14 +94,14 @@ def main():
 
 
     left_leg_chain = Chain.from_urdf_file(
-        "backend/assistWalkTesting/WalkingAssistedURDF/Finly_Walking_Assisted_URDF.urdf",
-        base_elements=['LeftHip', 'hip_in_left']
+        "C:/Users/ccoto/RaspberryPi-Code_24-25/backend/assistWalkTesting/Testing/robotChain.urdf",
+        base_elements=['LeftHip', 'hip_in_left'],
     )
     print(left_leg_chain)
 
 
     right_leg_chain = Chain.from_urdf_file(
-        "backend/assistWalkTesting/WalkingAssistedURDF/Finly_Walking_Assisted_URDF.urdf",
+        "C:/Users/ccoto/RaspberryPi-Code_24-25/backend/assistWalkTesting/Testing/robotChain.urdf",
         base_elements=['RightHip', 'hip_in_right']
     )
     
@@ -198,6 +198,7 @@ def main():
                     target_orientation=target_orientation_left,
                     orientation_mode='Z' 
                 )
+                print(ik_solution_left)
                 initial_position_left = ik_solution_left
                    
                 target_position_right = right_quintic

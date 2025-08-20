@@ -45,7 +45,7 @@ class Robot():
 
             self.client = RemoteAPIClient()
             self.sim = self.client.require('sim')
-            self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("./chest_respondable"))
+            self.motorMovePositionScriptHandle = self.sim.getScript(self.sim.scripttype_childscript, self.sim.getObject("/chest_respondable"))
             self.motors = self.sim_motors_init()
             
             self.imuPIDX = PID(5, 2, 5)
