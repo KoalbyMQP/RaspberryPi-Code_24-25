@@ -3,8 +3,8 @@ import time
 import math
 import numpy as np
 
-sys.path.append("C:/Users/ccoto/RaspberryPi-Code_24-25")
-sys.path.append("C:/Users/ccoto/AppData/Local/Programs/Python/Python310/Lib/site-packages")
+sys.path.append("/RaspberryPi-Code_24-25")
+sys.path.append("AppData/Local/Programs/Python/Python310/Lib/site-packages")
 import backend.KoalbyHumanoid.Config as Config
 import modern_robotics as mr
 from backend.KoalbyHumanoid.Link import Link
