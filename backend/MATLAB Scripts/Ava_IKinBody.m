@@ -64,7 +64,12 @@ thetalist0 =[deg2rad(0); deg2rad(0); deg2rad(20); deg2rad(40); deg2rad(-20)];
 eomg = 0.01;
 ev = 0.01;
 [thetalist, success] = IKinBody(Slist, M, T, thetalist0, eomg, ev);
-success
+if success
+    fprintf("IKinBody successful. Thetalist calculated:\n");
+else
+    fprintf("IKinBody failed to converge.\n");
+end
+
 thetalist = transpose(thetalist);
 
 % Print the row vector separated by commas
